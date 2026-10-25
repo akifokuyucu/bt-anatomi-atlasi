@@ -5,4 +5,5 @@ data/segments/run.log
 
 # Yalnızca bu bilgisayarda kalır, GitHub'a gönderilmez
 TODO.md
+CLAUDE.local.md
 .claude/
