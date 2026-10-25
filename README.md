@@ -2,7 +2,11 @@
 
 Gerçek bir kontrastlı abdomen-pelvis BT'si üzerinde renkli organ maskeleri ve çizgili Türkçe etiketler gösteren, tarayıcıda çalışan etkileşimli atlas.
 
-## Çalıştırma
+**Canlı site:** https://akifokuyucu.github.io/bt-anatomi-atlasi/
+
+Site GitHub Pages ile `main` dalının `docs/` klasöründen yayınlanır; `main`'e her push siteyi bir iki dakika içinde günceller.
+
+## Yerelde çalıştırma
 
 ```bash
 python -m http.server 8765 --directory docs
