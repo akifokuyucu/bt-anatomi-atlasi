@@ -56,8 +56,3 @@ Türkçe adlar, renkler ve sistemler `scripts/build_atlas.py` içindeki `BASE` s
 Görüntü ve segmentasyonlar: TotalSegmentator dataset v2.0.1, Wasserthal J. ve ark., *Radiology: Artificial Intelligence* 2023, [CC BY 4.0](https://zenodo.org/records/10047292). Bu atıf arayüzde de gösterilir ve korunmalıdır. Karaciğer segmentleri TotalSegmentator'ın açık lisanslı (Apache-2.0) `liver_segments` modeliyle üretilmiştir.
 
 Segmentasyonlar otomatik veya yarı otomatik üretilmiştir; kenarlarda küçük hatalar olabilir. Uygulama eğitim amaçlıdır, tanı için kullanılamaz.
-
-## Sonraki adımlar
-
-- SMA, çölyak trunkus, renal damarlar, lenf nodları ve periton: 3D Slicer'da elle çizim
-- Birden çok vaka ve faz (arteryel, geç faz), yapılara kısa klinik notlar
