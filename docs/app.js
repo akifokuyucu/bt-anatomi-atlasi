@@ -17,6 +17,8 @@ const state = {
   slices: {},
   systemsOn: new Set(),
   hidden: new Set(),
+  lesOn: true,
+  lesion: 0,
   labels: true,
   outline: true,
   opacity: 0.45,
@@ -30,7 +32,7 @@ const state = {
   quiz: null,
 };
 
-let atlas, ct, lab, ov, nx, ny, nz;
+let atlas, ct, lab, ov, les, nx, ny, nz;
 let hiddenByOverlay = new Set();
 let structById = [];
 let rgbById = [];
@@ -42,6 +44,8 @@ const off = document.createElement('canvas');
 const offCtx = off.getContext('2d');
 let sliceLabels = new Uint8Array(0);
 let sliceArea = new Uint32Array(0);
+let sliceLes = new Uint8Array(0);
+let sliceLesArea = new Uint32Array(0);
 let labelHits = [];
 
 // ---------- Yükleme ----------
@@ -80,7 +84,7 @@ async function load() {
   [nx, ny, nz] = atlas.dims;
   const v = atlas.v ? `?v=${atlas.v}` : '';
   text.textContent = 'BT yükleniyor…';
-  const [ctBuf, labBuf, ovBuf] = await Promise.all([
+  const [ctBuf, labBuf, ovBuf, lesBuf] = await Promise.all([
     fetchBin(`${dir}/ct.bin.gz${v}`, (got, total) => {
       text.textContent = total
         ? `BT yükleniyor… %${Math.min(100, Math.round((got / total) * 100))}`
@@ -88,10 +92,15 @@ async function load() {
     }),
     fetchBin(`${dir}/labels.bin.gz${v}`),
     atlas.overlay ? fetchBin(`${dir}/${atlas.overlay.file}${v}`) : null,
+    atlas.lesions ? fetchBin(`${dir}/${atlas.lesions.file}${v}`) : null,
   ]);
   ct = new Int16Array(ctBuf);
   lab = new Uint8Array(labBuf);
   if (ct.length !== nx * ny * nz || lab.length !== ct.length) throw new Error('Hacim boyutu atlas.json ile uyuşmuyor');
+  if (lesBuf) {
+    les = new Uint8Array(lesBuf);
+    if (les.length !== ct.length) throw new Error('Lezyon hacmi boyutu uyuşmuyor');
+  }
   if (ovBuf) {
     ov = new Uint8Array(ovBuf);
     if (ov.length !== ct.length) throw new Error('Katman hacmi boyutu uyuşmuyor');
@@ -114,18 +123,24 @@ async function load() {
     $('windowSel').value = atlas.win;
   }
   $('eyebrow').textContent = atlas.eyebrow;
+  if (atlas.lesions) {
+    // Patoloji vakası: ilk açılışta en büyük lezyonun kesitleri
+    Object.assign(state.slices, atlas.lesions.items[0].focus);
+    $('lesToggle').hidden = false;
+  }
   state.slices.axial = anchor.focus.axial;
   state.slices.coronal = anchor.focus.coronal;
   state.slices.sagittal = (byKey('aorta') || anchor).focus.sagittal;
 
   $('title').textContent = atlas.title;
   $('credit').innerHTML =
-    `Veri: <a href="https://zenodo.org/records/10047292" target="_blank" rel="noopener">${atlas.source}</a>. ` +
+    `Veri: <a href="${atlas.sourceUrl || 'https://zenodo.org/records/10047292'}" target="_blank" rel="noopener">${atlas.source}</a>. ` +
     'Segmentasyonlar otomatik/yarı otomatiktir. Eğitim amaçlıdır, tanı için kullanılamaz.';
 
   readHash();
   buildSystems();
   buildList();
+  buildDx();
   bindEvents();
   setPlane(state.plane, true);
   $('loading').hidden = true;
@@ -144,6 +159,7 @@ function setLang(lang) {
   try { localStorage.setItem('btatlas.lang', lang); } catch { /* yoksay */ }
   document.querySelectorAll('#lang button').forEach((b) => b.classList.toggle('on', b.dataset.lang === lang));
   buildList();
+  buildDx();
   if (state.quiz) quizNew(); else render();
 }
 
@@ -193,6 +209,8 @@ function readHash() {
     const ids = new Set(atlas.systems.map((x) => x.id));
     state.systemsOn = new Set(q.get('sys').split('.').filter((x) => ids.has(x)));
   }
+  const l = parseInt(q.get('l'), 10);
+  if (atlas.lesions && l >= 1 && l <= atlas.lesions.items.length) state.lesion = l;
   const z = parseFloat(q.get('z'));
   if (z >= 1 && z <= 8) state.zoom = z;
   const w = q.get('w');
@@ -207,6 +225,7 @@ function writeHash() {
     if (state.quiz) return;
     const q = new URLSearchParams({ c: caseId, p: state.plane, s: state.slices[state.plane] });
     if (state.selected) q.set('y', structById[state.selected].key);
+    if (state.lesion) q.set('l', state.lesion);
     q.set('sys', [...state.systemsOn].join('.'));
     if (state.zoom !== 1) q.set('z', state.zoom.toFixed(2));
     q.set('w', state.win.join(','));
@@ -319,6 +338,9 @@ function renderSlice() {
   sliceLabels = new Uint8Array(n);
   sliceArea = new Uint32Array(atlas.structures.length + 1);
   const useOv = overlayOn();
+  const showLes = Boolean(les) && state.lesOn && !state.quiz;
+  sliceLes = new Uint8Array(showLes ? n : 0);
+  sliceLesArea = new Uint32Array(showLes ? atlas.lesions.items.length + 1 : 0);
   for (let v = 0, p = 0; v < h; v++) {
     let idx = base + v * dv;
     for (let u = 0; u < w; u++, p++, idx += du) {
@@ -326,6 +348,11 @@ function renderSlice() {
       const l = (useOv && ov[idx]) || lab[idx];
       sliceLabels[p] = l;
       sliceArea[l]++;
+      if (showLes) {
+        const q = les[idx];
+        sliceLes[p] = q;
+        sliceLesArea[q]++;
+      }
     }
   }
 
@@ -351,6 +378,20 @@ function renderSlice() {
         r = g + (c[0] - g) * a;
         gg = g + (c[1] - g) * a;
         b = g + (c[2] - g) * a;
+      }
+      if (showLes && sliceLes[p]) {
+        // Lezyon: yapıların üstünde kırmızı dolgu; seçili lezyonun konturu beyaz
+        const q = sliceLes[p];
+        const edge = (u > 0 && sliceLes[p - 1] !== q) || (u < w - 1 && sliceLes[p + 1] !== q) ||
+          (v > 0 && sliceLes[p - w] !== q) || (v < h - 1 && sliceLes[p + w] !== q);
+        if (edge && q === state.lesion) {
+          r = 255; gg = 255; b = 255;
+        } else {
+          const a = edge ? 1 : (state.lesion && q !== state.lesion ? 0.5 : 0.8);
+          r += (235 - r) * a;
+          gg += (30 - gg) * a;
+          b += (50 - b) * a;
+        }
       }
       const o = p * 4;
       px[o] = r;
@@ -481,6 +522,7 @@ function render() {
   updateSliceInfo();
   updateListPresence();
   updateInfo();
+  updateDx();
   writeHash();
 }
 
@@ -711,6 +753,53 @@ function updateInfo() {
   }));
 }
 
+// ---------- Tanı kartı (patoloji vakaları) ----------
+
+function selectLesion(id) {
+  state.lesion = id;
+  render();
+  if (id) document.querySelector(`.les-item[data-id="${id}"]`)?.scrollIntoView({ block: 'nearest' });
+}
+
+function goLesion(id) {
+  const it = atlas.lesions.items[id - 1];
+  for (const p of ['axial', 'coronal', 'sagittal']) state.slices[p] = it.focus[p];
+  selectLesion(id);
+}
+
+function buildDx() {
+  const card = $('dxCard');
+  const dx = atlas.diagnosis;
+  card.hidden = !dx;
+  if (!dx) return;
+  const list = (arr) => `<ul>${arr.map((t) => `<li>${t}</li>`).join('')}</ul>`;
+  const main = state.lang === 'en' ? dx.en : state.lang === 'la' ? dx.la : dx.tr;
+  const others = [dx.tr, dx.en, dx.la].filter((x) => x !== main);
+  card.innerHTML = `
+    <div class="caption dx-cap">PATOLOJİ · TANI</div>
+    <div class="dx-name">${main}</div>
+    ${others.map((x) => `<div class="en${x === dx.la ? ' la' : ''}">${x}</div>`).join('')}
+    ${dx.draft ? '<span class="tag draft">Taslak · uzman onayı bekliyor</span>' : ''}
+    <div class="caption">LEZYONLAR · ${atlas.lesions.items.length}</div>
+    <div class="dx-les">${atlas.lesions.items.map((it) => `
+      <button class="les-item" data-id="${it.id}"><span class="lname">● ${nm(it)}</span><span class="here"></span>
+      <small>${it.volumeMl} mL · ${it.hu} HU · ${it.loc}</small></button>`).join('')}</div>
+    <details open><summary>BT bulguları</summary>${list(dx.findings)}</details>
+    <details><summary>Ayırıcı tanı</summary>${list(dx.ddx)}</details>
+    <details><summary>Öğretici noktalar</summary>${list(dx.pearls)}</details>
+    <p class="dx-note">${dx.note}</p>`;
+  card.querySelectorAll('.les-item').forEach((b) => b.addEventListener('click', () => goLesion(+b.dataset.id)));
+}
+
+function updateDx() {
+  if (!atlas.diagnosis) return;
+  document.querySelectorAll('.les-item').forEach((b) => {
+    const id = +b.dataset.id;
+    b.classList.toggle('sel', id === state.lesion);
+    b.querySelector('.here').textContent = sliceLesArea[id] > 0 ? 'bu kesitte' : '';
+  });
+}
+
 // ---------- Etkileşim ----------
 
 function showTooltip(x, y) {
@@ -724,7 +813,9 @@ function showTooltip(x, y) {
   const l = sliceLabels[v * w + u];
   const vis = visibleTable();
   const name = l && vis[l] && !state.quiz ? nm(structById[l]) : '';
-  tip.innerHTML = `${name}<span class="hu">${hu} HU</span>`;
+  const q = sliceLes.length ? sliceLes[v * w + u] : 0;
+  const lname = q ? `<b class="lesname">● ${nm(atlas.lesions.items[q - 1])}</b> ` : '';
+  tip.innerHTML = `${lname}${name}<span class="hu">${hu} HU</span>`;
   tip.hidden = false;
   const vw = canvas.clientWidth;
   tip.style.left = `${Math.min(x + 14, vw - tip.offsetWidth - 6)}px`;
@@ -738,6 +829,8 @@ function clickAt(x, y) {
   const px = screenToPixel(x, y);
   if (!px) return select(0);
   const [w] = dimsOf(state.plane);
+  const q = sliceLes.length ? sliceLes[px[1] * w + px[0]] : 0;
+  if (q) return selectLesion(q === state.lesion ? 0 : q);
   const l = sliceLabels[px[1] * w + px[0]];
   const vis = visibleTable();
   select(l && vis[l] && l !== state.selected ? l : 0);
@@ -887,6 +980,7 @@ function bindEvents() {
   $('quizNext').addEventListener('click', quizNext);
   $('quizExam').addEventListener('click', () => quizStart(true));
   $('shareBtn').addEventListener('click', copyLink);
+  $('lesOn').addEventListener('change', (e) => { state.lesOn = e.target.checked; render(); });
   document.querySelectorAll('#lang button').forEach((b) => {
     b.classList.toggle('on', b.dataset.lang === state.lang);
     b.addEventListener('click', () => setLang(b.dataset.lang));

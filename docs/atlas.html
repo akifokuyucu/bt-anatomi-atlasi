@@ -67,6 +67,7 @@
       <div class="viewer-head">
         <span id="planeInfo" class="mono">AKSİYEL</span>
         <span class="spacer"></span>
+        <label class="toggle" id="lesToggle" hidden><input type="checkbox" id="lesOn" checked> Lezyon</label>
         <label class="toggle"><input type="checkbox" id="labelsOn" checked> Etiketler</label>
         <label class="toggle"><input type="checkbox" id="outlineOn" checked> Kontur</label>
         <label class="toggle opacity">Dolgu <input type="range" id="opacity" min="0" max="90" value="45"></label>
@@ -107,6 +108,7 @@
     </section>
 
     <aside class="panel">
+      <div class="card dx" id="dxCard" hidden></div>
       <div class="card" id="infoCard">
         <div class="caption">SEÇİLİ YAPI</div>
         <div id="info" class="info empty">Görüntüde bir yapıya veya etikete dokunun.</div>

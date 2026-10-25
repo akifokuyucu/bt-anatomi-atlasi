@@ -22,6 +22,17 @@
   "status": "ready"
  },
  {
+  "id": "pe01",
+  "title": "Pulmoner emboli · BT anjiyo",
+  "eyebrow": "TORAKS · ANJİYO",
+  "n": 87,
+  "mm": 1.5,
+  "img": "img/pe01.jpg",
+  "category": "patoloji",
+  "region": "toraks",
+  "status": "ready"
+ },
+ {
   "id": "kraniyal",
   "category": "saglikli",
   "region": "kraniyal",
@@ -46,15 +57,6 @@
   "title": "İntrakraniyal kanama",
   "eyebrow": "KRANİYAL",
   "text": "Parankimal, subaraknoid ve subdural kanama örnekleri; hiperdens alan kırmızıyla işaretlenir.",
-  "status": "planned"
- },
- {
-  "id": "pe",
-  "category": "patoloji",
-  "region": "toraks",
-  "title": "Pulmoner emboli (BT anjiyo)",
-  "eyebrow": "TORAKS · ANJİYO",
-  "text": "Pulmoner arter dallarında dolum defekti; emboli kırmızıyla işaretlenir.",
   "status": "planned"
  }
 ]

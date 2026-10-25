@@ -87,6 +87,7 @@ BASE = {
     "clavicula": ("klavikula", "clavicle", "kemik", "#e8dcb8"),
     "scapula": ("skapula", "scapula", "kemik", "#dccfa4"),
     "humerus": ("humerus", "humerus", "kemik", "#efe3bd"),
+    "skull": ("Kafatası", "Skull", "kemik", "#e9ddb5"),
 }
 
 # Vaka tanımları: klasör adı -> arayüz başlığı, üst etiket, varsayılan pencere, ilk açılışta odaklanacak yapı
@@ -95,7 +96,36 @@ CASES = {
               "category": "saglikli", "region": "abdomen"},
     "s0372": {"title": "Toraks · BT arteriyel faz", "eyebrow": "TORAKS", "win": "400,40", "start": "heart",
               "category": "saglikli", "region": "toraks"},
+    "pe01": {"title": "Pulmoner emboli · BT anjiyo", "eyebrow": "TORAKS · ANJİYO", "win": "600,150", "start": "heart",
+             "category": "patoloji", "region": "toraks", "lesions": "pe_mask.nii.gz",
+             "exclude": [],
+             "source": "READ PE CT (Andrade ve ark., Sci Data 2023, CC0 1.0); yapı segmentasyonu: TotalSegmentator (Wasserthal ve ark., Radiology: AI 2023)",
+             "sourceUrl": "https://doi.org/10.1038/s41597-023-02374-x",
+             "diagnosis": {
+                 "tr": "Akut pulmoner emboli", "en": "Acute pulmonary embolism", "la": "Embolia pulmonalis acuta",
+                 "draft": True,
+                 "findings": [
+                     "Pulmoner arter dalında kontrast dolum defekti: parlak lümen içinde hipodens (trombüs) alan.",
+                     "Akut emboli lümenin ortasında yer alır, damarı genişletebilir; eksenel kesitte 'polo nane' (halka), uzunlamasına kesitte 'demiryolu rayı' işareti görülür.",
+                     "Kronik emboli eksantriktir, duvara yapışıktır, damarı daraltır; kalsifikasyon içerebilir.",
+                     "Sağ kalp yüklenmesi: sağ/sol ventrikül oranı >1, septumun sola bombelenmesi, kontrastın hepatik venlere reflüsü.",
+                     "Akciğer enfarktı: periferik, plevraya dayalı kama biçimli konsolidasyon (Hampton hörgücü).",
+                 ],
+                 "ddx": [
+                     "Kronik tromboembolik hastalık",
+                     "Akım (karışım) ve solunum hareketi artefaktı",
+                     "Pulmoner arter sarkomu / tümör trombüsü (kontrast tutar, damarı genişletir)",
+                     "Septik emboli",
+                 ],
+                 "pearls": [
+                     "Pulmoner arter fazında tüm dallar parlak olmalıdır; defekt ne kadar belirgin zıtlık gösterirse tanı o kadar güvenilirdir.",
+                     "Önce ana ve lober dallara bakın (eyer emboli en tehlikelisidir), sonra segmentlere inin.",
+                     "Yanlış pozitiflerin en sık nedeni karışım ve hareket artefaktıdır; birden fazla düzlemde doğrulayın.",
+                 ],
+                 "note": "Kırmızı işaretler READ veri setinin uzman anotasyonudur. Yazılı içerik taslaktır ve bir radyolog tarafından gözden geçirilmemiştir. Eğitim amaçlıdır, tanı için kullanılamaz.",
+             }},
 }
+
 
 # Henüz verisi olmayan, ana sayfada "hazırlanıyor" kartı olarak görünen vakalar
 PLANNED = [
@@ -105,8 +135,6 @@ PLANNED = [
      "eyebrow": "ABDOMEN", "text": "Dilate barsak ansları, hava-sıvı seviyeleri ve geçiş noktası; patolojik alan kırmızıyla işaretlenir."},
     {"id": "ich", "category": "patoloji", "region": "kraniyal", "title": "İntrakraniyal kanama",
      "eyebrow": "KRANİYAL", "text": "Parankimal, subaraknoid ve subdural kanama örnekleri; hiperdens alan kırmızıyla işaretlenir."},
-    {"id": "pe", "category": "patoloji", "region": "toraks", "title": "Pulmoner emboli (BT anjiyo)",
-     "eyebrow": "TORAKS · ANJİYO", "text": "Pulmoner arter dallarında dolum defekti; emboli kırmızıyla işaretlenir."},
 ]
 # Latince ad (Terminologia Anatomica) ve kısa not, BASE anahtarıyla. Çiftli yapılarda sağ/sol varyantları aynı notu paylaşır.
 # la: (ad, cinsiyet m/f/n); çiftlilerde cinsiyete göre sinister/dexter eki eklenir.
@@ -188,7 +216,7 @@ LATIN_ONLY = {
     "superior_vena_cava": ("Vena cava superior", "f"), "brachiocephalic_vein": ("Vena brachiocephalica", "f"),
     "brachiocephalic_trunk": ("Truncus brachiocephalicus", "m"), "common_carotid_artery": ("Arteria carotis communis", "f"),
     "subclavian_artery": ("Arteria subclavia", "f"), "clavicula": ("Clavicula", "f"), "scapula": ("Scapula", "f"),
-    "humerus": ("Humerus", "m"),
+    "humerus": ("Humerus", "m"), "skull": ("Cranium", "n"),
     "iliopsoas": ("Musculus iliopsoas", "m"), "gluteus_maximus": ("Musculus gluteus maximus", "m"),
     "gluteus_medius": ("Musculus gluteus medius", "m"), "gluteus_minimus": ("Musculus gluteus minimus", "m"),
     "autochthon": ("Musculus erector spinae", "m"), "heart": ("Cor", "n"), "spinal_cord": ("Medulla spinalis", "f"),
@@ -363,11 +391,14 @@ def denoise(ct, strength=0.6, keep=0.15, chunk=32):
     return result + keep * (ct - result), sigma
 
 
-def load_masks(folder):
+def load_masks(folder, exclude=()):
     """Klasördeki boş olmayan, katalogda tanımlı maskeleri sıralı yükler."""
     structures, masks = [], []
     for f in sorted(folder.glob("*.nii.gz")):
         key = f.name[: -len(".nii.gz")]
+        if key in exclude:
+            print(f"  dışlandı: {key}")
+            continue
         m = np.asarray(nib.as_closest_canonical(nib.load(f)).dataobj) > 0
         if not m.any():
             continue
@@ -386,6 +417,44 @@ def load_masks(folder):
             entry["note"] = note
         structures.append(entry)
     return structures, masks
+
+
+def build_lesions(mask, labels, structures, ct, voxel_ml, min_voxels=15):
+    """Lezyon maskesini (kırpılmış, [x, y, z]) yakın parçaları birleştirerek numaralı bileşenlere ayırır.
+
+    Dönüş: (uint8 hacim, öğeler). Kimlikler boyuta göre azalan sırayla 1..N; küçük gürültü atılır.
+    """
+    merged = ndimage.binary_dilation(mask, structure=np.ones((3, 3, 3)), iterations=2)
+    comp, n = ndimage.label(merged, structure=np.ones((3, 3, 3)))
+    comp = np.where(mask, comp, 0)
+    sizes = ndimage.sum(mask, comp, range(1, n + 1))
+    order = [i + 1 for i in np.argsort(-np.asarray(sizes)) if sizes[i] >= min_voxels]
+    vol = np.zeros(mask.shape, np.uint8)
+    items = []
+    mid_x = mask.shape[0] / 2
+    for new_id, old in enumerate(order, 1):
+        m = comp == old
+        vol[m] = new_id
+        pts = np.argwhere(m)
+        c = pts.mean(0)
+        near = pts[np.argmin(((pts - c) ** 2).sum(1))]  # merkeze en yakın lezyon vokseli
+        # Yer: lezyonu saran 3 vokselli kabukta en çok geçen yapılar (otomatik)
+        shell = ndimage.binary_dilation(m, iterations=3) & ~m
+        ids, counts = np.unique(labels[shell], return_counts=True)
+        ranked = [int(i) for _, i in sorted(zip(-counts, ids)) if i > 0]
+        near_names = [structures[i - 1]["tr"] for i in ranked[:2]]
+        side = "Sağ" if c[0] > mid_x else "Sol"
+        items.append({
+            "id": new_id,
+            "tr": f"{side} pulmoner emboli odağı ({new_id})",
+            "en": f"{'Right' if side == 'Sağ' else 'Left'} pulmonary embolus ({new_id})",
+            "la": "Embolus arteriae pulmonalis",
+            "loc": f"{side} taraf · komşu: {', '.join(near_names)} (otomatik)" if near_names else f"{side} taraf",
+            "volumeMl": round(float(m.sum()) * voxel_ml, 2),
+            "hu": int(round(float(ct[m].mean()))),
+            "focus": {"axial": int(near[2]), "coronal": int(near[1]), "sagittal": int(near[0])},
+        })
+    return vol, items
 
 
 def partition_within(parent, parts, first_id):
@@ -436,7 +505,7 @@ def main(case_dir, out_dir, overlay_dir=None, min_area=12):
     ct = np.asarray(ct_img.dataobj).astype(np.float32)
     spacing = [float(s) for s in ct_img.header.get_zooms()[:3]]
 
-    structures, masks = load_masks(case_dir / "segmentations")
+    structures, masks = load_masks(case_dir / "segmentations", case.get("exclude", ()))
     ov_structures, ov_masks = load_masks(Path(overlay_dir)) if overlay_dir else ([], [])
     for s in ov_structures:
         s["note"] = LIVER_SEGMENTS[int(s["key"].rsplit("_", 1)[1])][3]
@@ -469,6 +538,13 @@ def main(case_dir, out_dir, overlay_dir=None, min_area=12):
 
     anchors = compute_anchors(volumes, len(structures), structures, min_area)
 
+    lesions, lesion_items = None, []
+    if case.get("lesions"):
+        lm = np.asarray(nib.as_closest_canonical(nib.load(case_dir / case["lesions"])).dataobj) > 0
+        lesions, lesion_items = build_lesions(lm[crop], labels, structures, ct, float(np.prod(spacing)) / 1000)
+        print(f"  lezyon: {len(lesion_items)} bileşen, {sum(i['volumeMl'] for i in lesion_items):.1f} mL")
+        assert lesion_items, "Lezyon bulunamadı"
+
     voxel_ml = float(np.prod(spacing)) / 1000
     for sid, s in enumerate(structures, 1):
         s["id"] = sid
@@ -480,12 +556,14 @@ def main(case_dir, out_dir, overlay_dir=None, min_area=12):
     outputs = {"ct.bin.gz": hu, "labels.bin.gz": labels}
     if overlay is not None:
         outputs["overlay.bin.gz"] = overlay
+    if lesions is not None:
+        outputs["lesions.bin.gz"] = lesions
     for name, arr in outputs.items():
         # mtime=0: içerik aynıysa dosya da bayt bayt aynı kalır, git boşuna değişiklik görmez
         with gzip.GzipFile(out_dir / name, "wb", compresslevel=9, mtime=0) as fh:
             fh.write(np.ascontiguousarray(arr.transpose(2, 1, 0)).tobytes())
 
-    write_thumb(out_dir, case_dir.name, case, structures, ct, labels)
+    write_thumb(out_dir, case_dir.name, case, structures, ct, labels, lesions, lesion_items)
     # Veri sürümü: içerik değişince değişir; tarayıcı ve servis çalışanı önbelleği buna göre yenilenir
     digest = hashlib.sha1(hu.tobytes()[::97] + labels.tobytes()[::97]).hexdigest()[:10]
 
@@ -503,8 +581,12 @@ def main(case_dir, out_dir, overlay_dir=None, min_area=12):
         "anchors": anchors,
         # Katman sistemi açıkken overlay hacmi ana etiketlerin önüne geçer ve "hides" yapıları gizlenir
         "overlay": {"file": "overlay.bin.gz", "system": "kc_segment", "hides": ["liver"]} if overlay is not None else None,
-        "source": "TotalSegmentator dataset v2.0.1 (Wasserthal et al., Radiology: AI 2023), CC BY 4.0",
+        "source": case.get("source", "TotalSegmentator dataset v2.0.1 (Wasserthal et al., Radiology: AI 2023), CC BY 4.0"),
+        "sourceUrl": case.get("sourceUrl", "https://zenodo.org/records/10047292"),
     }
+    if lesions is not None:
+        atlas["lesions"] = {"file": "lesions.bin.gz", "items": lesion_items}
+        atlas["diagnosis"] = case["diagnosis"]
     if overlay is None:
         atlas["systems"] = [s for s in atlas["systems"] if s["id"] != "kc_segment"]
     (out_dir / "atlas.json").write_text(json.dumps(atlas, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
@@ -512,12 +594,12 @@ def main(case_dir, out_dir, overlay_dir=None, min_area=12):
     write_index(out_dir.parent)
 
 
-def write_thumb(out_dir, case_id, case, structures, ct, labels):
+def write_thumb(out_dir, case_id, case, structures, ct, labels, lesions=None, lesion_items=()):
     """Ana sayfa kartı için renkli aksiyel küçük görsel: docs/img/<vaka>.jpg"""
     from PIL import Image
 
     start = next((s for s in structures if s["key"] == case["start"]), structures[0])
-    z = start["focus"]["axial"]
+    z = lesion_items[0]["focus"]["axial"] if lesion_items else start["focus"]["axial"]
     g = np.clip((ct[:, :, z] - (40 - 200)) / 400, 0, 1)
     rgb = np.stack([g] * 3, -1) * 255
     lab = labels[:, :, z]
@@ -528,6 +610,9 @@ def write_thumb(out_dir, case_id, case, structures, ct, labels):
         if m.any():
             c = np.array([int(s["color"][i:i + 2], 16) for i in (1, 3, 5)], dtype=np.float32)
             rgb[m] = rgb[m] * 0.55 + c * 0.45
+    if lesions is not None:
+        lm = lesions[:, :, z] > 0
+        rgb[lm] = rgb[lm] * 0.2 + np.array([255, 40, 40]) * 0.8
     # [x, y] -> ekran: hastanın sağı solda, ön üstte
     img = Image.fromarray(rgb.transpose(1, 0, 2)[::-1, ::-1].astype(np.uint8))
     img = img.resize((640, round(640 * img.height / img.width)), Image.LANCZOS)
@@ -556,10 +641,10 @@ def verify(out_dir):
     n = int(np.prod(atlas["dims"]))
     structures = atlas["structures"]
     problems, sizes = [], []
-    for name, dtype in (("ct.bin.gz", np.int16), ("labels.bin.gz", np.uint8), ("overlay.bin.gz", np.uint8)):
+    for name, dtype in (("ct.bin.gz", np.int16), ("labels.bin.gz", np.uint8), ("overlay.bin.gz", np.uint8), ("lesions.bin.gz", np.uint8)):
         path = out_dir / name
         if not path.exists():
-            if name != "overlay.bin.gz" or atlas["overlay"]:
+            if (name == "overlay.bin.gz" and atlas["overlay"]) or (name == "lesions.bin.gz" and atlas.get("lesions")) or name in ("ct.bin.gz", "labels.bin.gz"):
                 problems.append(f"{name} yok")
             continue
         arr = np.frombuffer(gzip.open(path).read(), dtype=dtype)

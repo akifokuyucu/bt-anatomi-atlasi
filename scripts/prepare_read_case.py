@@ -5,10 +5,11 @@ Adımlar: remotezip ile yalnızca o vakanın DICOM + maske dosyalarını indir, 
 Çıktı: data/raw/<out>/ct.nii.gz ve pe_mask.nii.gz (ardından TotalSegmentator ile segmentasyon).
 
 READ maskelerinin yönelimi vaka başına farklıdır; hangi dönüşümün doğru olduğunu görsel doğrula.
-02GE için z ekseni ters çevrilir (--flip-z). 01GE'de denenen 16 dönüşümün hiçbiri tutmadı.
+READ DICOM'ları DICOMOrient sonrası da baş z=0'da (baş aşağı) çıkıyor: BT'yi z'de çevir (--flip-ct-z); 02GE'de bundan sonra ham maske doğrudan hizalı (--flip-z gerekmez).
+Doğrulama: TotalSegmentator sonrası tiroid/trakea z merkezi kalpten BÜYÜK olmalı (baş yüksek z'de). 01GE'de denenen 16 dönüşümün hiçbiri tutmadı.
 
 Kullanım:
-    .venv/Scripts/python scripts/prepare_read_case.py 02GE pe01 --flip-z
+    .venv/Scripts/python scripts/prepare_read_case.py 02GE pe01 --flip-ct-z
 """
 
 import argparse
@@ -56,13 +57,15 @@ def resample(im, interp, default):
     return r.Execute(im)
 
 
-def main(case, out, flip_z, raw=Path("data/raw")):
+def main(case, out, flip_z, flip_ct_z, raw=Path("data/raw")):
     base, vendor = download(case, raw)
     folder = base / f"CT scans (DICOM files)/{vendor} (DICOM files)/{case}"
     reader = sitk.ImageSeriesReader()
     reader.SetFileNames(sitk.ImageSeriesReader.GetGDCMSeriesFileNames(str(folder), sitk.ImageSeriesReader.GetGDCMSeriesIDs(str(folder))[0]))
     img = sitk.DICOMOrient(reader.Execute(), "RAS")
     ct = sitk.GetArrayFromImage(img).transpose(2, 1, 0).astype(np.int16)  # [x, y, z]
+    if flip_ct_z:
+        ct = np.ascontiguousarray(ct[:, :, ::-1])
     sp = img.GetSpacing()
     mask = nib.as_closest_canonical(nib.load(base / f"Ground truth (pixel level segmentation - NiFTI files)/{vendor} (NiFTI files)/{case}.nii.gz"))
     mk = np.asarray(mask.dataobj) > 0
@@ -84,6 +87,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("case")
     ap.add_argument("out")
-    ap.add_argument("--flip-z", action="store_true")
+    ap.add_argument("--flip-z", action="store_true", help="maskeyi z'de çevir")
+    ap.add_argument("--flip-ct-z", action="store_true", help="BT'yi z'de çevir (baş yukarı olsun)")
     a = ap.parse_args()
-    main(a.case, a.out, a.flip_z)
+    main(a.case, a.out, a.flip_z, a.flip_ct_z)
