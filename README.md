@@ -26,6 +26,22 @@ Sonra tarayıcıda `http://localhost:8765` adresini açın. Kurulum veya derleme
 - Kesit değiştirme: fare tekerleği, sürükleme, ok tuşları; yakınlaştırma: Ctrl+tekerlek, iki parmak, +/−
 - Kısayollar: `1` `2` `3` düzlem, `Esc` seçimi kaldırır
 
+## Laparoskopik anatomi (prototip)
+
+`docs/lapa.html`: robotik ameliyat karelerinde organlar renkli maske, kontur ve Türkçe etiketle gösterilir. Bir yapıya dokununca laparoskopide tanıma notu çıkar; "BT'de göster" aynı yapıyı BT atlasında seçili olarak açar (`atlas.html#c=s0139&y=<yapı>`). Test modu ve paylaşılabilir bağlantı (`#c=lapa01&f=<kare>&y=<yapı>`) vardır.
+
+| Adım | Dosya |
+|---|---|
+| Kare indirme: Hugging Face `nct-tso/dsad` parquet dosyalarından yalnızca gereken parçalar | `scripts/fetch_dsad.py` → `data/raw/dsad/` |
+| Web verisi: WebP kareler, `labels.bin.gz` (uint8 bit maskesi, örtüşen yapılar için), `lapa.json`, kapak görseli | `scripts/build_lapa.py` → `docs/data/lapa01/` |
+
+```bash
+.venv/Scripts/python scripts/fetch_dsad.py --split validation --n 16
+.venv/Scripts/python scripts/build_lapa.py --case lapa01
+```
+
+Araştırma notları ve yol haritası: `arastirma/laparoskopik-robotik-cerrahi.md`.
+
 ## Veri hattı
 
 | Adım | Dosya |
@@ -53,6 +69,8 @@ Türkçe adlar, renkler ve sistemler `scripts/build_atlas.py` içindeki `BASE` s
 
 ## Lisans ve atıf
 
-Görüntü ve segmentasyonlar: TotalSegmentator dataset v2.0.1, Wasserthal J. ve ark., *Radiology: Artificial Intelligence* 2023, [CC BY 4.0](https://zenodo.org/records/10047292). Bu atıf arayüzde de gösterilir ve korunmalıdır. Karaciğer segmentleri TotalSegmentator'ın açık lisanslı (Apache-2.0) `liver_segments` modeliyle üretilmiştir.
+Görüntü ve segmentasyonlar: TotalSegmentator dataset v2.0.1, Wasserthal J. ve ark., *Radiology: Artificial Intelligence* 2023, [CC BY 4.0](https://zenodo.org/records/10047292). Bu atıf arayüzde de gösterilir ve korunmalıdır.
+
+Laparoskopik görüntü ve maskeler: Dresden Surgical Anatomy Dataset, Carstens M. ve ark., *Scientific Data* 2023, [CC BY 4.0](https://doi.org/10.6084/m9.figshare.21702600). Kareler küçültülmüş ve WebP'ye dönüştürülmüştür; maskeler tek bir bit maskesinde birleştirilmiştir. Laparoskopik tanıma notları taslaktır. Karaciğer segmentleri TotalSegmentator'ın açık lisanslı (Apache-2.0) `liver_segments` modeliyle üretilmiştir.
 
 Segmentasyonlar otomatik veya yarı otomatik üretilmiştir; kenarlarda küçük hatalar olabilir. Uygulama eğitim amaçlıdır, tanı için kullanılamaz.

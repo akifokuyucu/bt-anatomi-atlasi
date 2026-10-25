@@ -10,8 +10,10 @@ Gerçek bir abdomen-pelvis BT'si üzerinde Türkçe etiketli, tarayıcıda çal�
 | `docs/atlas.html`, `docs/style.css` | Atlas arayüzü; durum `#c=vaka&p=düzlem&…` bağlantısında |
 | `docs/sw.js` | Servis çalışanı: `?v=` sürümlü `.bin.gz` hacimlerini önbelleğe alır; veri değişince `atlas.json`'daki `v` değişir |
 | `docs/app.js` | Tüm uygulama: veri yükleme (`load`), kesit çizimi (`renderSlice`, `draw`), etiketler (`drawLabels`), olaylar (`bindEvents`), test modu (`quiz*`) |
+| `docs/lapa.html`, `docs/lapa.js`, `docs/lapa.css` | Laparoskopik atlas (prototip); durum `#c=vaka&f=kare&y=yapı`, "BT'de göster" → `atlas.html#c=s0139&y=…` |
 | `docs/data/<vaka>/`, `docs/data/cases.json` | Vaka başına üretilmiş web verisi (vakalar `CASES` sözlüğünde, `build_atlas.py`): `ct.bin.gz` (int16 HU), `labels.bin.gz` ve `overlay.bin.gz` (uint8), `atlas.json` |
 | `scripts/build_atlas.py` | Atlas üretimi; Türkçe adlar, renkler ve sistemler `BASE` sözlüğünde, segment notları `LIVER_SEGMENTS`'te |
+| `scripts/fetch_dsad.py`, `scripts/build_lapa.py` | DSAD karelerini indirir / laparoskopi web verisini üretir (`docs/data/lapa01/`, `docs/data/lapa_cases.json`, `docs/img/lapa01.jpg`); maskeler uint8 bit maskesi |
 | `scripts/fetch_case.py` | TotalSegmentator veri setinden tek vaka indirir |
 | `data/segments/` | Karaciğer segment maskeleri (NIfTI) |
 

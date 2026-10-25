@@ -1,0 +1,26 @@
+[
+ {
+  "id": "lapa01",
+  "title": "Robotik rektum cerrahisi · üst batın görüntüleri",
+  "eyebrow": "LAPAROSKOPİ · ROBOTİK",
+  "text": "Mide, karaciğer, kolon, pankreas ve ince bağırsak; splenik fleksura mobilizasyonu sırasında üst batın.",
+  "img": "img/lapa01.jpg",
+  "frames": 17,
+  "n": 7,
+  "status": "ready"
+ },
+ {
+  "id": "lapa-pelvis",
+  "title": "Pelvik diseksiyon · üreter ve veziküler bezler",
+  "eyebrow": "PELVİS · ROBOTİK",
+  "text": "Total mezorektal eksizyonda korunacak yapılar: üreter, inferior mezenterik arter, veziküler bezler (DSAD).",
+  "status": "planned"
+ },
+ {
+  "id": "lapa-chole",
+  "title": "Kolesistektomi · Calot üçgeni",
+  "eyebrow": "SAFRA KESESİ",
+  "text": "Safra kesesi, sistik kanal, sistik arter ve kritik güvenlik görüntüsü (CVS).",
+  "status": "planned"
+ }
+]

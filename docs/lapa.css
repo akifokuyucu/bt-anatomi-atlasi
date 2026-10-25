@@ -1,0 +1,22 @@
+/* Laparoskopik atlas: style.css üzerine yalnızca farklı olanlar */
+
+/* Kare oranı 5:4; dar ekranda boş siyah alan kalmasın */
+.viewer.lapa { height: auto; min-height: 0; aspect-ratio: 5 / 4; max-height: min(72vh, 760px); }
+.viewer.lapa #canvas { cursor: crosshair; }
+.top-actions .tag.draft { align-self: center; }
+
+/* Kare küçük resimleri */
+.thumbs { display: flex; gap: 6px; overflow-x: auto; padding: 0 12px 10px; scrollbar-width: thin; }
+.thumbs button {
+  flex: none; width: 76px; aspect-ratio: 5 / 4; padding: 0; border-radius: 6px; cursor: pointer;
+  border: 2px solid transparent; background: #000 center / cover no-repeat; opacity: .6;
+}
+.thumbs button:hover { opacity: .9; }
+.thumbs button.on { border-color: var(--accent); opacity: 1; }
+@media (max-width: 700px) { .thumbs button { width: 60px; } }
+
+/* Liste: göz düğmesiyle aç/kapa, ada dokununca seç */
+.item.off .iname { text-decoration: line-through; text-decoration-color: var(--muted); }
+.item .pct { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+.info .ctlink { text-decoration: none; }

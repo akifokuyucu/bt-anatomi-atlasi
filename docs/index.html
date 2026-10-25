@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b0d10">
   <title>BT Anatomi Atlası</title>
-  <meta name="description" content="Gerçek BT kesitlerinde Türkçe etiketli, etkileşimli anatomi atlası. Abdomen-pelvis ve toraks vakaları, üç düzlem, test modu, paylaşılabilir bağlantılar.">
+  <meta name="description" content="Gerçek BT kesitlerinde Türkçe etiketli, etkileşimli anatomi atlası. Abdomen-pelvis ve toraks vakaları, üç düzlem, test modu, paylaşılabilir bağlantılar; laparoskopik ve robotik ameliyat görüntülerinde anatomi.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="tr_TR">
   <meta property="og:title" content="BT Anatomi Atlası">
@@ -34,6 +34,7 @@
     <nav class="top-actions">
       <a class="navlink" href="#saglikli">Sağlıklı</a>
       <a class="navlink" href="#patoloji">Patoloji</a>
+      <a class="navlink" href="#laparoskopi">Laparoskopi</a>
       <a class="navlink" href="#ozellikler">Özellikler</a>
       <a class="navlink" href="#hakkinda">Hakkında</a>
       <a class="btn accent" href="atlas.html">Atlası aç</a>
@@ -56,6 +57,24 @@
       </a>
     </section>
 
+    <nav class="areas" aria-label="Atlas bölümleri">
+      <a class="area" href="#saglikli" style="--c: var(--ok)">
+        <span class="caption">BT</span>
+        <b>Sağlıklı anatomi</b>
+        <span class="muted">Normal toraks ve abdomen-pelvis BT'si</span>
+      </a>
+      <a class="area" href="#patoloji" style="--c: var(--bad)">
+        <span class="caption">BT</span>
+        <b>Patoloji atlası</b>
+        <span class="muted">Lezyonu işaretli vakalar, tanı kartı</span>
+      </a>
+      <a class="area" href="#laparoskopi" style="--c: var(--lap)">
+        <span class="caption">LAPAROSKOPİ · ROBOTİK <span class="badge new">YENİ</span></span>
+        <b>Ameliyat görüntüsünde anatomi</b>
+        <span class="muted">Cerrahın kamerasında organlar, BT'deki karşılığı</span>
+      </a>
+    </nav>
+
     <section id="saglikli" class="block">
       <div class="cat-head"><span class="badge ok">SAĞLIKLI ANATOMİ</span></div>
       <h2>Normal BT: sağlıklı toraks, abdomen ve kraniyal</h2>
@@ -71,6 +90,14 @@
       <p class="note-box">Patoloji vakalarında lezyon işaretlemeleri yalnızca açık lisanslı, uzman onaylı verilerden alınır. Hazır olmayan vakalar "Hazırlanıyor" olarak gösterilir.</p>
     </section>
 
+    <section id="laparoskopi" class="block">
+      <div class="cat-head"><span class="badge lap">LAPAROSKOPİ · ROBOTİK CERRAHİ</span></div>
+      <h2>Ameliyat görüntüsünde anatomi</h2>
+      <p class="sub">Aynı organlar bu kez cerrahın kamerasından. Robotik ameliyat karelerinde organlar renkli ve Türkçe etiketli; bir yapıya dokunun, laparoskopide nasıl tanındığını okuyun ve tek dokunuşla BT atlasındaki karşılığına geçin.</p>
+      <div class="cards" id="cases-laparoskopi"><p class="muted">Vakalar yükleniyor…</p></div>
+      <p class="note-box lap">Prototip: görüntüler ve organ maskeleri uzmanlarca gözden geçirilmiş açık bir veri setinden (Dresden Surgical Anatomy Dataset, CC BY 4.0) alınır; laparoskopik tanıma notları taslaktır.</p>
+    </section>
+
     <section id="ozellikler" class="block">
       <h2>Neler yapabilirsiniz?</h2>
       <div class="features">
@@ -79,6 +106,7 @@
         <div class="feat"><b>TR · EN · LA</b><span>Yapı adlarını Türkçe, İngilizce veya Latince görün; arama üç dilde de çalışır.</span></div>
         <div class="feat"><b>Kendinizi test edin</b><span>Vurgulanan yapıyı bulun. Yanlış yaptıklarınız daha sık sorulur; 20 soruluk sınav modu vardır.</span></div>
         <div class="feat"><b>Yapı ağacı</b><span>Sistem, alt grup ve yapı düzeyinde göster/gizle: omurlar, kaburgalar, damarlar tek tek açılıp kapanır.</span></div>
+        <div class="feat"><b>Ameliyat görüntüsü ↔ BT</b><span>Laparoskopik karede seçtiğiniz organı BT atlasında aynı yapı seçili olarak açın; iki görünümü birlikte öğrenin.</span></div>
         <div class="feat"><b>Bağlantıyla paylaşın</b><span>Bulunduğunuz kesit, seçili yapı ve açık sistemler tek bir bağlantıda; derse veya gruba gönderin.</span></div>
       </div>
     </section>
@@ -90,13 +118,14 @@
         <li>Adım adım rehberli turlar</li>
         <li>Tüm yapılar için kısa anatomi notları (bir uzman gözden geçirmesiyle)</li>
         <li>Üçlü kesit görünümü ve 3B model</li>
+        <li>Laparoskopi: pelvik diseksiyon (üreter, veziküler bezler) ve kolesistektomi vakaları</li>
       </ul>
     </section>
   </main>
 
   <footer id="hakkinda" class="foot">
     <p><b>Eğitim amaçlıdır, tanı için kullanılamaz.</b> Yapı notları taslak niteliğindedir ve bir radyolog ya da anatomist tarafından gözden geçirilmemiştir.</p>
-    <p>Veri: <a href="https://zenodo.org/records/10047292" target="_blank" rel="noopener">TotalSegmentator veri seti v2.0.1</a> (Wasserthal ve ark., Radiology: AI 2023), CC BY 4.0. Patoloji vakası: <a href="https://doi.org/10.1038/s41597-023-02374-x" target="_blank" rel="noopener">READ PE CT</a> (Andrade ve ark., Sci Data 2023), CC0 1.0. Anonim, açık lisanslı BT'ler kullanılır.</p>
+    <p>Veri: <a href="https://zenodo.org/records/10047292" target="_blank" rel="noopener">TotalSegmentator veri seti v2.0.1</a> (Wasserthal ve ark., Radiology: AI 2023), CC BY 4.0. Patoloji vakası: <a href="https://doi.org/10.1038/s41597-023-02374-x" target="_blank" rel="noopener">READ PE CT</a> (Andrade ve ark., Sci Data 2023), CC0 1.0. Laparoskopik görüntüler: <a href="https://doi.org/10.1038/s41597-022-01719-2" target="_blank" rel="noopener">Dresden Surgical Anatomy Dataset</a> (Carstens ve ark., Sci Data 2023), CC BY 4.0. Yalnızca anonim, açık lisanslı veriler kullanılır.</p>
     <p><a href="https://github.com/akifokuyucu/bt-anatomi-atlasi/issues" target="_blank" rel="noopener">Hata bildir / öneri gönder</a> · <a href="https://github.com/akifokuyucu/bt-anatomi-atlasi" target="_blank" rel="noopener">Kaynak kod</a></p>
   </footer>
 

@@ -52,3 +52,23 @@ main { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 .case.planned:hover { transform: none; border-color: var(--line); }
 .case .ph { aspect-ratio: 4 / 3; display: grid; place-content: center; background: repeating-linear-gradient(45deg, #0d1014, #0d1014 10px, #11151a 10px, #11151a 20px); color: #3a414c; font-family: var(--mono); letter-spacing: .12em; font-size: 13px; }
 .note-box { margin: 14px 0 0; padding: 10px 12px; border: 1px solid var(--line); border-left: 3px solid var(--bad); border-radius: 8px; color: var(--muted); font-size: 13px; background: var(--panel); }
+
+/* Bölüm menüsü: BT (sağlıklı, patoloji) ve laparoskopi */
+:root { --lap: #5bc0eb; }
+.areas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 0 0 36px; }
+.area {
+  display: grid; gap: 4px; align-content: start; text-decoration: none; color: inherit;
+  background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--c); border-radius: 12px;
+  padding: 14px 16px; transition: border-color .15s, transform .15s;
+}
+.area:hover { border-color: var(--c); transform: translateY(-2px); }
+.area b { font-size: 16px; }
+.area .muted { font-size: 13px; }
+.area .caption { display: flex; align-items: center; gap: 8px; }
+@media (max-width: 800px) { .areas { grid-template-columns: 1fr; gap: 8px; padding-bottom: 28px; } .area { padding: 12px 14px; } }
+@media (prefers-reduced-motion: reduce) { .area { transition: none; } }
+
+.badge.lap { color: var(--lap); border-color: color-mix(in srgb, var(--lap) 55%, var(--line)); }
+.badge.new { color: #1a1405; background: var(--accent); border-color: var(--accent); font-size: 10px; padding: 1px 6px; }
+#laparoskopi .case:not(.planned):hover { border-color: var(--lap); }
+.note-box.lap { border-left-color: var(--lap); }

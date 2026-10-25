@@ -1,7 +1,8 @@
-// Ana sayfa: kartlar data/cases.json'dan, kategoriye göre ayrı bölümlere üretilir.
+// Ana sayfa: BT kartları data/cases.json'dan, laparoskopi kartları data/lapa_cases.json'dan üretilir.
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
-function card(c) {
+// href: hazır vakanın açılacağı sayfa; meta: kartın alt satırı
+function card(c, href, meta) {
   if (c.status !== 'ready') {
     const d = document.createElement('div');
     d.className = 'case planned';
@@ -13,25 +14,37 @@ function card(c) {
   }
   const a = document.createElement('a');
   a.className = 'case';
-  a.href = `atlas.html#c=${encodeURIComponent(c.id)}`;
+  a.href = href(c);
   a.innerHTML =
     `<img src="${esc(c.img)}" alt="" loading="lazy" width="640" height="468">` +
     `<div class="case-body"><span class="caption">${esc(c.eyebrow)}</span><b>${esc(c.title)}</b>` +
-    `<span class="muted">${c.n} yapı · ${c.mm} mm kesit</span></div>`;
+    `<span class="muted">${esc(meta(c))}</span></div>`;
   return a;
 }
 
-try {
-  const cases = await (await fetch('data/cases.json', { cache: 'no-cache' })).json();
-  for (const cat of ['saglikli', 'patoloji']) {
-    const box = document.getElementById(`cases-${cat}`);
-    box.innerHTML = '';
-    const list = cases.filter((c) => c.category === cat);
-    if (!list.length) box.innerHTML = '<p class="muted">Bu kategoride henüz vaka yok.</p>';
-    list.forEach((c) => box.appendChild(card(c)));
+async function fill(url, groups, href, meta) {
+  try {
+    const cases = await (await fetch(url, { cache: 'no-cache' })).json();
+    for (const [id, filter] of groups) {
+      const box = document.getElementById(id);
+      box.innerHTML = '';
+      const list = cases.filter(filter);
+      if (!list.length) box.innerHTML = '<p class="muted">Bu kategoride henüz vaka yok.</p>';
+      list.forEach((c) => box.appendChild(card(c, href, meta)));
+    }
+  } catch {
+    for (const [id] of groups) {
+      document.getElementById(id).innerHTML = '<p class="muted">Vakalar yüklenemedi. Sayfayı yenileyin.</p>';
+    }
   }
-} catch {
-  document.querySelectorAll('.cards').forEach((b) => {
-    b.innerHTML = '<p class="muted">Vakalar yüklenemedi. <a href="atlas.html">Atlası doğrudan açın.</a></p>';
-  });
 }
+
+fill('data/cases.json',
+  ['saglikli', 'patoloji'].map((cat) => [`cases-${cat}`, (c) => c.category === cat]),
+  (c) => `atlas.html#c=${encodeURIComponent(c.id)}`,
+  (c) => `${c.n} yapı · ${c.mm} mm kesit`);
+
+fill('data/lapa_cases.json',
+  [['cases-laparoskopi', () => true]],
+  (c) => `lapa.html#c=${encodeURIComponent(c.id)}`,
+  (c) => `${c.frames} kare · ${c.n} yapı`);

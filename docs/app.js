@@ -204,7 +204,11 @@ function readHash() {
   const s = parseInt(q.get('s'), 10);
   if (Number.isInteger(s)) state.slices[state.plane] = Math.max(0, Math.min(dimsOf(state.plane)[2] - 1, s));
   const st = atlas.structures.find((x) => x.key === q.get('y'));
-  if (st) state.selected = st.id;
+  if (st) {
+    state.selected = st.id;
+    // Kesit verilmeden yalnızca yapı geldiyse (ör. laparoskopi sayfasından) o yapının kesitine git
+    if (!q.has('s')) state.slices[state.plane] = st.focus[state.plane];
+  }
   if (q.has('sys')) {
     const ids = new Set(atlas.systems.map((x) => x.id));
     state.systemsOn = new Set(q.get('sys').split('.').filter((x) => ids.has(x)));
