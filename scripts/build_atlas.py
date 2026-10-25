@@ -2,12 +2,14 @@
 
 Kullanım:
     .venv/Scripts/python scripts/build_atlas.py data/raw/s0139 docs/data [data/segments/s0139]
+    .venv/Scripts/python scripts/build_atlas.py --verify docs/data   # yalnızca denetim
 
 Üçüncü argüman isteğe bağlıdır: TotalSegmentator `liver_segments` çıktısının klasörü.
 Verilirse Couinaud segmentleri ayrı bir katman olarak eklenir.
+Üretim sonunda çıktılar otomatik denetlenir; son satır "Tamam: ..." ya da "N SORUN: ..." olur.
 
 Çıktılar:
-    ct.bin.gz        int16 HU hacmi, sıra [z][y][x] (x en hızlı)
+    ct.bin.gz        int16 HU hacmi (NLM ile gürültüsü azaltılmış, %15 ham karışım), sıra [z][y][x] (x en hızlı)
     labels.bin.gz    uint8 etiket hacmi, aynı sıra
     overlay.bin.gz   uint8 katman hacmi (karaciğer segmentleri), aynı sıra
     atlas.json       boyutlar, yapı kataloğu, kesit başına etiket noktaları
@@ -15,12 +17,15 @@ Verilirse Couinaud segmentleri ayrı bir katman olarak eklenir.
 
 import gzip
 import json
+import os
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import nibabel as nib
 import numpy as np
 from scipy import ndimage
+from skimage.restoration import denoise_nl_means
 
 # Sistemler: id, Türkçe ad, varsayılan açık mı
 SYSTEMS = [
@@ -143,6 +148,37 @@ def anchor_point(mask2d):
     return int(u - 1 + sl[1].start), int(v - 1 + sl[0].start)
 
 
+def noise_sigma(ct):
+    """Yumuşak dokuda komşu voksel farklarından sağlam (MAD) gürültü tahmini, HU."""
+    a, b = ct[1:], ct[:-1]
+    d = (a - b)[(a > -100) & (a < 200) & (b > -100) & (b < 200)]
+    return float(1.4826 * np.median(np.abs(d - np.median(d))) / np.sqrt(2))
+
+
+def denoise(ct, strength=0.6, keep=0.15, chunk=32):
+    """3B non-local means ile gürültüyü azaltır; kenarları ve küçük damarları korur.
+
+    Ham görüntünün `keep` oranı geri karıştırılır: saf NLM dokuyu mumsu gösterir,
+    %15 karışım normal dozlu BT'ye benzer bir tanecik bırakır (σ ≈ 9 HU).
+    Hacim z boyunca örtüşen dilimlerle paralel işlenir; örtüşme arama penceresini
+    (patch_distance + patch_size // 2) karşıladığı için sonuç tek parça işlemle aynıdır.
+    """
+    sigma = noise_sigma(ct)
+    pad = 5
+    nz = ct.shape[2]
+    starts = range(0, nz, chunk)
+
+    def run(z0):
+        a, b = max(z0 - pad, 0), min(z0 + chunk + pad, nz)
+        out = denoise_nl_means(ct[:, :, a:b], patch_size=3, patch_distance=4,
+                               h=strength * sigma, sigma=sigma, fast_mode=True)
+        return out[:, :, z0 - a: z0 - a + min(chunk, nz - z0)]
+
+    with ThreadPoolExecutor(min(8, os.cpu_count() or 1)) as ex:
+        result = np.concatenate(list(ex.map(run, starts)), axis=2).astype(np.float32)
+    return result + keep * (ct - result), sigma
+
+
 def load_masks(folder):
     """Klasördeki boş olmayan, katalogda tanımlı maskeleri sıralı yükler."""
     structures, masks = [], []
@@ -219,6 +255,8 @@ def main(case_dir, out_dir, overlay_dir=None, min_area=12):
     hi = np.minimum(nz.max(0) + 7, ct.shape)
     crop = tuple(slice(a, b) for a, b in zip(lo, hi))
     ct = ct[crop]
+    ct, sigma = denoise(ct)
+    print(f"  gürültü azaltma: σ {sigma:.1f} HU -> {noise_sigma(ct):.1f} HU")
     labels = np.zeros(ct.shape, np.uint8)
     for i, m in enumerate(masks, start=1):
         labels[m[crop]] = i  # Çakışmada sonraki yapı kazanır; TotalSegmentator maskeleri zaten ayrık
@@ -250,7 +288,8 @@ def main(case_dir, out_dir, overlay_dir=None, min_area=12):
     if overlay is not None:
         outputs["overlay.bin.gz"] = overlay
     for name, arr in outputs.items():
-        with gzip.open(out_dir / name, "wb", compresslevel=9) as fh:
+        # mtime=0: içerik aynıysa dosya da bayt bayt aynı kalır, git boşuna değişiklik görmez
+        with gzip.GzipFile(out_dir / name, "wb", compresslevel=9, mtime=0) as fh:
             fh.write(np.ascontiguousarray(arr.transpose(2, 1, 0)).tobytes())
 
     atlas = {
@@ -268,8 +307,37 @@ def main(case_dir, out_dir, overlay_dir=None, min_area=12):
     if overlay is None:
         atlas["systems"] = [s for s in atlas["systems"] if s["id"] != "kc_segment"]
     (out_dir / "atlas.json").write_text(json.dumps(atlas, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    print(f"Tamam: {len(structures)} yapı, boyut {atlas['dims']}, çıktı {out_dir}")
+    verify(out_dir)
+
+
+def verify(out_dir):
+    """Yazılan dosyaları geri okuyup denetler; özeti tek satırda, sorunları ayrı satırlarda basar."""
+    atlas = json.loads((out_dir / "atlas.json").read_text(encoding="utf-8"))
+    n = int(np.prod(atlas["dims"]))
+    structures = atlas["structures"]
+    problems, sizes = [], []
+    for name, dtype in (("ct.bin.gz", np.int16), ("labels.bin.gz", np.uint8), ("overlay.bin.gz", np.uint8)):
+        path = out_dir / name
+        if not path.exists():
+            if name != "overlay.bin.gz" or atlas["overlay"]:
+                problems.append(f"{name} yok")
+            continue
+        arr = np.frombuffer(gzip.open(path).read(), dtype=dtype)
+        sizes.append(f"{name} {path.stat().st_size / 1e6:.1f} MB")
+        if arr.size != n:
+            problems.append(f"{name} boyutu uyumsuz ({arr.size} != {n})")
+        elif dtype == np.uint8 and arr.max() > len(structures):
+            problems.append(f"{name} en büyük kimlik {arr.max()} > yapı sayısı {len(structures)}")
+    problems += [f"Türkçe adı eksik: {s['key']}" for s in structures if not s.get("tr")]
+    problems += [f"notu eksik: {s['key']}" for s in structures if s["system"] == "kc_segment" and not s.get("note")]
+    for p in problems:
+        print(f"  SORUN: {p}")
+    status = "Tamam" if not problems else f"{len(problems)} SORUN"
+    print(f"{status}: {len(structures)} yapı, {len(atlas['systems'])} sistem, boyut {atlas['dims']}, {', '.join(sizes)}")
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:4])
+    if sys.argv[1] == "--verify":
+        verify(Path(sys.argv[2]))
+    else:
+        main(*sys.argv[1:4])

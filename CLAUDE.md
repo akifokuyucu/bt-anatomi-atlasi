@@ -17,7 +17,7 @@ Hacimler bellekte `[z][y][x]` sırasındadır, `atlas.json`'daki `dims` ise `[x,
 
 ## Çalıştırma
 
-- Site: `.claude/launch.json` içindeki `atlas` sunucusu (`python -m http.server 8765 --directory docs`)
+- Site: `.claude/launch.json` içindeki `atlas` sunucusu (`python -m http.server 8770 --directory docs`)
 - Atlası yeniden üretmek: `rebuild-atlas` skill'i
 
 ## Kurallar

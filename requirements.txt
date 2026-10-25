@@ -1,6 +1,7 @@
 nibabel
 numpy
 scipy
+scikit-image
 remotezip
 # Yalnızca karaciğer segmentleri adımı için (PyTorch dahil, büyük)
 TotalSegmentator
