@@ -1,0 +1,6 @@
+nibabel
+numpy
+scipy
+remotezip
+# Yalnızca karaciğer segmentleri adımı için (PyTorch dahil, büyük)
+TotalSegmentator
