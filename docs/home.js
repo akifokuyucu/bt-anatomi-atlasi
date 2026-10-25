@@ -46,5 +46,5 @@ fill('data/cases.json',
 
 fill('data/lapa_cases.json',
   [['cases-laparoskopi', () => true]],
-  (c) => `lapa.html#c=${encodeURIComponent(c.id)}`,
-  (c) => `${c.frames} kare · ${c.n} yapı`);
+  (c) => `${c.page || 'lapa.html'}#c=${encodeURIComponent(c.id)}`,
+  (c) => (c.dur ? `${c.dur} sn video · ${c.n} yapı` : `${c.frames} kare · ${c.n} yapı`));

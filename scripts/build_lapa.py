@@ -160,6 +160,10 @@ def write_index(n_frames, n_structs):
     """docs/data/lapa_cases.json: ana sayfadaki laparoskopi kartları."""
     items = [{"id": cid, "title": m["title"], "eyebrow": m["eyebrow"], "text": m["text"], "img": f"img/{cid}.jpg",
               "frames": n_frames, "n": n_structs, "status": "ready"} for cid, m in CASES.items()]
+    # Video vakaları (build_lapa_video.py) korunur
+    path = ROOT / "docs" / "data" / "lapa_cases.json"
+    old = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+    items += [c for c in old if c.get("page") == "lapav.html"]
     items += [dict(p, status="planned") for p in PLANNED]
     (ROOT / "docs" / "data" / "lapa_cases.json").write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
 

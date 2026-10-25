@@ -10,6 +10,17 @@
   "status": "ready"
  },
  {
+  "id": "lapav01",
+  "title": "Safra kesesi torsiyonu · laparoskopik kolesistektomi",
+  "eyebrow": "LAPAROSKOPİ · VİDEO",
+  "text": "Video düz akar; filtreye basınca safra kesesi, karaciğer ve aletler üstüne gelir. Torsiyona uğramış gangrenli kese, derotasyon ve dekompresyon.",
+  "img": "img/lapav01.jpg",
+  "page": "lapav.html",
+  "dur": 30,
+  "n": 3,
+  "status": "ready"
+ },
+ {
   "id": "lapa-pelvis",
   "title": "Pelvik diseksiyon · üreter ve veziküler bezler",
   "eyebrow": "PELVİS · ROBOTİK",

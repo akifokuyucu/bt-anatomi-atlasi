@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d10">
+  <title>Laparoskopik Video Atlası</title>
+  <meta name="description" content="Gerçek bir laparoskopi videosu düz akar; filtre düğmesine basınca organlar ve aletler videonun üzerinde renkli ve Türkçe etiketli görünür.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="lapa.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html" title="Ana sayfa">
+      <span class="logo">◐</span>
+      <div>
+        <div class="eyebrow" id="eyebrow">LAPAROSKOPİ · VİDEO</div>
+        <h1 id="title">Laparoskopik Video Atlası</h1>
+      </div>
+    </a>
+    <div class="top-actions">
+      <span class="tag draft" title="Prototip: maskeler yarı otomatik, uzman onayı bekliyor">PROTOTİP</span>
+      <div class="seg" id="lang" title="Yapı adı dili">
+        <button data-lang="tr" class="on">TR</button>
+        <button data-lang="en">EN</button>
+        <button data-lang="la">LA</button>
+      </div>
+      <button id="shareBtn" class="btn" title="Bağlantıyı kopyala" aria-label="Bağlantıyı kopyala">🔗<span class="lbl"> Bağlantıyı kopyala</span></button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="viewer-wrap">
+      <div class="toolbar">
+        <div class="chips" id="filters" role="group" aria-label="Filtreler"></div>
+      </div>
+      <div class="viewer lapav" id="viewer">
+        <video id="video" muted playsinline preload="auto"></video>
+        <canvas id="canvas"></canvas>
+        <div class="tooltip" id="tooltip" hidden></div>
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <div id="loadingText">Video yükleniyor…</div>
+        </div>
+      </div>
+      <div class="slice-bar">
+        <button class="btn icon" id="play" aria-label="Oynat">▶</button>
+        <button class="btn icon" id="prev" aria-label="Önceki kare">‹</button>
+        <input type="range" id="seek" min="0" max="1000" value="0" step="1" aria-label="Zaman">
+        <button class="btn icon" id="next" aria-label="Sonraki kare">›</button>
+        <span class="mono" id="time">0:00 / 0:00</span>
+        <div class="seg" id="speed" title="Oynatma hızı">
+          <button data-r="0.5">½×</button>
+          <button data-r="1" class="on">1×</button>
+        </div>
+      </div>
+      <div class="viewer-head">
+        <label class="toggle"><input type="checkbox" id="labelsOn" checked> Etiketler</label>
+        <label class="toggle"><input type="checkbox" id="outlineOn" checked> Kontur</label>
+        <label class="toggle opacity">Dolgu <input type="range" id="opacity" min="0" max="90" value="40"></label>
+        <span class="spacer"></span>
+        <span class="mono muted" id="frameMeta">–</span>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="card" id="infoCard">
+        <div class="caption">SEÇİLİ YAPI</div>
+        <div id="info" class="info empty">Bir filtreyi açın, sonra videoda bir yapıya dokunun.</div>
+      </div>
+      <div class="card list-card">
+        <div class="row">
+          <span class="caption">VİDEODAKİ YAPILAR</span>
+          <span class="spacer"></span>
+          <button class="btn small" id="allOn">Tümü</button>
+          <button class="btn small" id="allOff">Hiçbiri</button>
+        </div>
+        <div id="list" class="list"></div>
+      </div>
+      <p class="credit" id="credit"></p>
+    </aside>
+  </main>
+
+  <script type="module" src="lapav.js"></script>
+</body>
+</html>

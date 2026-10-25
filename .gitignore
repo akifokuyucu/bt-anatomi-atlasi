@@ -11,3 +11,6 @@ CLAUDE.local.md
 # Yerel meta veri ve model önbelleği (proje klasöründe ama GitHub dışı)
 data/meta/
 .ml-cache/
+
+# Masaüstünde çalıştırılacak taşınabilir paketler (build_lapa_video.py --paket)
+paket/

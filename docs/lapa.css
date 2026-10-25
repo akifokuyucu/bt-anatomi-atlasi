@@ -20,3 +20,13 @@
 .item .pct { font-family: var(--mono); font-size: 10px; color: var(--muted); }
 
 .info .ctlink { text-decoration: none; }
+
+/* Video modu (lapav.html): video düz akar, katman üstteki tuvale çizilir.
+   En-boy oranı JS'te videodan atanır. */
+.viewer.lapav { flex: none; width: 100%; height: auto; min-height: 0; max-height: min(70vh, 760px); }
+.viewer.lapav video, .viewer.lapav #canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.viewer.lapav video { object-fit: contain; background: #000; }
+.viewer.lapav #canvas { cursor: pointer; }
+.lapav ~ .slice-bar .seg button { padding: 6px 9px; }
+#filters .chip { min-width: 0; padding: 8px 12px; }
+@media (max-width: 700px) { #time { display: none; } }
