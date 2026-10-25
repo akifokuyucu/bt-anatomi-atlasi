@@ -16,6 +16,7 @@ const state = {
   plane: 'axial',
   slices: {},
   systemsOn: new Set(),
+  hidden: new Set(),
   labels: true,
   outline: true,
   opacity: 0.45,
@@ -70,20 +71,29 @@ async function fetchBin(url, onProgress) {
 
 async function load() {
   const text = $('loadingText');
-  atlas = await (await fetch('data/atlas.json')).json();
+  // Küçük dizin dosyaları her açılışta doğrulanır; büyük hacimler sürüm parametresiyle önbelleğe alınır
+  const cases = (await (await fetch('data/cases.json', { cache: 'no-cache' })).json()).filter((c) => c.status === 'ready');
+  caseId = pickCase(cases);
+  const dir = `data/${caseId}`;
+  buildCaseSelect(cases);
+  atlas = await (await fetch(`${dir}/atlas.json`, { cache: 'no-cache' })).json();
   [nx, ny, nz] = atlas.dims;
-  const ctBuf = await fetchBin('data/ct.bin.gz', (got, total) => {
-    text.textContent = total
-      ? `BT yükleniyor… %${Math.min(100, Math.round((got / total) * 100))}`
-      : `BT yükleniyor… ${(got / 1e6).toFixed(1)} MB`;
-  });
-  text.textContent = 'Etiketler yükleniyor…';
-  const labBuf = await fetchBin('data/labels.bin.gz');
+  const v = atlas.v ? `?v=${atlas.v}` : '';
+  text.textContent = 'BT yükleniyor…';
+  const [ctBuf, labBuf, ovBuf] = await Promise.all([
+    fetchBin(`${dir}/ct.bin.gz${v}`, (got, total) => {
+      text.textContent = total
+        ? `BT yükleniyor… %${Math.min(100, Math.round((got / total) * 100))}`
+        : `BT yükleniyor… ${(got / 1e6).toFixed(1)} MB`;
+    }),
+    fetchBin(`${dir}/labels.bin.gz${v}`),
+    atlas.overlay ? fetchBin(`${dir}/${atlas.overlay.file}${v}`) : null,
+  ]);
   ct = new Int16Array(ctBuf);
   lab = new Uint8Array(labBuf);
   if (ct.length !== nx * ny * nz || lab.length !== ct.length) throw new Error('Hacim boyutu atlas.json ile uyuşmuyor');
-  if (atlas.overlay) {
-    ov = new Uint8Array(await fetchBin(`data/${atlas.overlay.file}`));
+  if (ovBuf) {
+    ov = new Uint8Array(ovBuf);
     if (ov.length !== ct.length) throw new Error('Katman hacmi boyutu uyuşmuyor');
     hiddenByOverlay = new Set(atlas.structures.filter((s) => atlas.overlay.hides.includes(s.key)).map((s) => s.id));
   }
@@ -98,7 +108,12 @@ async function load() {
   }
 
   const byKey = (k) => atlas.structures.find((s) => s.key === k);
-  const anchor = byKey('pancreas') || atlas.structures[0];
+  const anchor = byKey(atlas.start) || atlas.structures[0];
+  if (atlas.win) {
+    state.win = atlas.win.split(',').map(Number);
+    $('windowSel').value = atlas.win;
+  }
+  $('eyebrow').textContent = atlas.eyebrow;
   state.slices.axial = anchor.focus.axial;
   state.slices.coronal = anchor.focus.coronal;
   state.slices.sagittal = (byKey('aorta') || anchor).focus.sagittal;
@@ -108,11 +123,112 @@ async function load() {
     `Veri: <a href="https://zenodo.org/records/10047292" target="_blank" rel="noopener">${atlas.source}</a>. ` +
     'Segmentasyonlar otomatik/yarı otomatiktir. Eğitim amaçlıdır, tanı için kullanılamaz.';
 
+  readHash();
   buildSystems();
   buildList();
   bindEvents();
-  setPlane('axial');
+  setPlane(state.plane, true);
   $('loading').hidden = true;
+}
+
+// ---------- Dil: yapı adları Türkçe, İngilizce veya Latince ----------
+
+const LANGS = ['tr', 'en', 'la'];
+try { state.lang = LANGS.includes(localStorage.getItem('btatlas.lang')) ? localStorage.getItem('btatlas.lang') : 'tr'; } catch { state.lang = 'tr'; }
+
+// Latince adı olmayan yapılarda İngilizce'ye düşer
+const nm = (s) => (state.lang === 'en' ? s.en : state.lang === 'la' ? s.la || s.en : s.tr);
+
+function setLang(lang) {
+  state.lang = lang;
+  try { localStorage.setItem('btatlas.lang', lang); } catch { /* yoksay */ }
+  document.querySelectorAll('#lang button').forEach((b) => b.classList.toggle('on', b.dataset.lang === lang));
+  buildList();
+  if (state.quiz) quizNew(); else render();
+}
+
+// ---------- Vaka seçimi ----------
+// Vaka değişince sayfa yeniden yüklenir; veri vaka başına klasörde (data/<vaka>/)
+
+let caseId = '';
+
+function pickCase(cases) {
+  const ids = cases.map((c) => c.id);
+  const fromHash = new URLSearchParams(location.hash.slice(1)).get('c');
+  let saved = null;
+  try { saved = localStorage.getItem('btatlas.case'); } catch { /* yoksay */ }
+  return [fromHash, saved].find((id) => ids.includes(id)) || ids[0];
+}
+
+function buildCaseSelect(cases) {
+  const sel = $('caseSel');
+  sel.hidden = cases.length < 2;
+  const cats = { saglikli: 'Sağlıklı anatomi', patoloji: 'Patoloji' };
+  sel.innerHTML = Object.entries(cats)
+    .map(([k, name]) => [name, cases.filter((c) => c.category === k)])
+    .filter(([, list]) => list.length)
+    .map(([name, list]) => `<optgroup label="${name}">${list.map((c) => `<option value="${c.id}">${c.title}</option>`).join('')}</optgroup>`)
+    .join('');
+  sel.value = caseId;
+  sel.addEventListener('change', () => {
+    try { localStorage.setItem('btatlas.case', sel.value); } catch { /* yoksay */ }
+    location.hash = `c=${sel.value}`;
+    location.reload();
+  });
+}
+
+// ---------- Paylaşılabilir bağlantı ----------
+// Durum URL'nin # kısmında: p=düzlem, s=kesit, y=yapı, sys=sistemler, z=yakınlaştırma, w=pencere
+
+function readHash() {
+  const q = new URLSearchParams(location.hash.slice(1));
+  if (!q.size) return;
+  const p = q.get('p');
+  if (PLANE_TR[p]) state.plane = p;
+  const s = parseInt(q.get('s'), 10);
+  if (Number.isInteger(s)) state.slices[state.plane] = Math.max(0, Math.min(dimsOf(state.plane)[2] - 1, s));
+  const st = atlas.structures.find((x) => x.key === q.get('y'));
+  if (st) state.selected = st.id;
+  if (q.has('sys')) {
+    const ids = new Set(atlas.systems.map((x) => x.id));
+    state.systemsOn = new Set(q.get('sys').split('.').filter((x) => ids.has(x)));
+  }
+  const z = parseFloat(q.get('z'));
+  if (z >= 1 && z <= 8) state.zoom = z;
+  const w = q.get('w');
+  const opt = [...$('windowSel').options].find((o) => o.value === w);
+  if (opt) { state.win = w.split(',').map(Number); $('windowSel').value = w; }
+}
+
+let hashTimer = 0;
+function writeHash() {
+  clearTimeout(hashTimer);
+  hashTimer = setTimeout(() => {
+    if (state.quiz) return;
+    const q = new URLSearchParams({ c: caseId, p: state.plane, s: state.slices[state.plane] });
+    if (state.selected) q.set('y', structById[state.selected].key);
+    q.set('sys', [...state.systemsOn].join('.'));
+    if (state.zoom !== 1) q.set('z', state.zoom.toFixed(2));
+    q.set('w', state.win.join(','));
+    history.replaceState(null, '', `#${q}`);
+  }, 250);
+}
+
+async function copyLink() {
+  writeHash();
+  await new Promise((r) => setTimeout(r, 300));
+  const st = structById[state.selected];
+  const [, , n] = dimsOf(state.plane);
+  const v = sliderToSlice(state.plane, state.slices[state.plane]);
+  const text = `${st ? `${nm(st)} · ` : ''}${PLANE_TR[state.plane]} ${v + 1}/${n} — BT Anatomi Atlası\n${location.href}`;
+  const btn = $('shareBtn');
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.innerHTML = '✓<span class="lbl"> Kopyalandı</span>';
+  } catch {
+    prompt('Bağlantıyı kopyalayın:', text);
+  }
+  setTimeout(() => { btn.innerHTML = '🔗<span class="lbl"> Bağlantıyı kopyala</span>'; }, 1800);
 }
 
 function hexToRgb(hex) {
@@ -173,7 +289,7 @@ function screenToPixel(x, y) {
 const overlayOn = () => Boolean(ov) && state.systemsOn.has(atlas.overlay.system);
 
 // Sistemi açık ve katman tarafından gizlenmemiş yapı
-const isEnabled = (s) => state.systemsOn.has(s.system) && !(overlayOn() && hiddenByOverlay.has(s.id));
+const isEnabled = (s) => state.systemsOn.has(s.system) && !state.hidden.has(s.id) && !(overlayOn() && hiddenByOverlay.has(s.id));
 
 function visibleTable() {
   const vis = new Uint8Array(atlas.structures.length + 1);
@@ -324,7 +440,7 @@ function drawLabels(L) {
 
     for (const p of col) {
       const st = structById[p.id];
-      const text = ellipsize(st.tr, colW);
+      const text = ellipsize(nm(st), colW);
       const tw = ctx.measureText(text).width;
       const tx = side.left
         ? Math.max(6, Math.min(L.x0 - 12, L.gutter - 6) - tw)
@@ -365,6 +481,7 @@ function render() {
   updateSliceInfo();
   updateListPresence();
   updateInfo();
+  writeHash();
 }
 
 // ---------- Arayüz ----------
@@ -382,10 +499,10 @@ function updateSliceInfo() {
   $('zoomLabel').textContent = `${Math.round(state.zoom * 100)}%`;
 }
 
-function setPlane(plane) {
+function setPlane(plane, keepSlice = false) {
   state.plane = plane;
   state.pan = [0, 0];
-  if (state.selected && !state.quiz) state.slices[plane] = structById[state.selected].focus[plane];
+  if (state.selected && !state.quiz && !keepSlice) state.slices[plane] = structById[state.selected].focus[plane];
   document.querySelectorAll('#planes button').forEach((b) => b.classList.toggle('on', b.dataset.plane === plane));
   const [t, b, l, r] = ORIENT[plane];
   $('oTop').textContent = t;
@@ -413,6 +530,7 @@ function select(id, { focus = false } = {}) {
   state.selected = id;
   if (id) {
     const st = structById[id];
+    state.hidden.delete(id);
     if (!state.systemsOn.has(st.system)) state.systemsOn.add(st.system);
     // Katmanın gizlediği yapı (ör. bütün karaciğer) seçilirse katmanı kapat
     if (overlayOn() && hiddenByOverlay.has(id)) state.systemsOn.delete(atlas.overlay.system);
@@ -420,7 +538,11 @@ function select(id, { focus = false } = {}) {
     if (focus) state.slices[state.plane] = st.focus[state.plane];
   }
   render();
-  if (id) document.querySelector(`.item[data-id="${id}"]`)?.scrollIntoView({ block: 'nearest' });
+  if (id) {
+    const el = document.querySelector(`.item[data-id="${id}"]`);
+    el?.closest('details')?.setAttribute('open', '');
+    el?.scrollIntoView({ block: 'nearest' });
+  }
 }
 
 function buildSystems() {
@@ -454,12 +576,41 @@ function syncSystems() {
     c.setAttribute('aria-pressed', on);
   });
   document.querySelectorAll('.item').forEach((el) => {
-    el.classList.toggle('off', !isEnabled(structById[+el.dataset.id]));
+    const st = structById[+el.dataset.id];
+    el.classList.toggle('off', !isEnabled(st));
+    el.classList.toggle('hid', state.hidden.has(st.id));
   });
 }
 
 const norm = (t) => t.toLocaleLowerCase('tr').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ı/g, 'i');
 
+function itemRow(s) {
+  const row = document.createElement('div');
+  row.className = 'item';
+  row.dataset.id = s.id;
+  row.dataset.q = norm(`${s.tr} ${s.en} ${s.la || ''} ${s.key}`);
+  row.innerHTML =
+    `<span class="dot" style="background:${s.color}"></span><button class="iname">${nm(s)}</button>` +
+    '<span class="here"></span><button class="eye" aria-label="Göster / gizle" title="Göster / gizle">👁</button>';
+  row.querySelector('.iname').addEventListener('click', () => {
+    if (state.quiz) return;
+    select(s.id, { focus: true });
+  });
+  row.querySelector('.eye').addEventListener('click', () => toggleHidden([s.id]));
+  return row;
+}
+
+// Yapıları tek tek (ya da grup halinde) gizle/göster; hepsi gizliyse hepsini göster
+function toggleHidden(ids) {
+  if (state.quiz) return;
+  const allHidden = ids.every((id) => state.hidden.has(id));
+  for (const id of ids) { if (allHidden) state.hidden.delete(id); else state.hidden.add(id); }
+  if (state.selected && !isEnabled(structById[state.selected])) state.selected = 0;
+  syncSystems();
+  render();
+}
+
+// Sistem -> alt grup -> yapı; tek üyeli gruplar düz listelenir
 function buildList() {
   const list = $('list');
   list.innerHTML = '';
@@ -471,17 +622,25 @@ function buildList() {
     title.dataset.sys = sys.id;
     title.textContent = sys.name;
     list.appendChild(title);
+    const groups = new Map();
     for (const s of members) {
-      const b = document.createElement('button');
-      b.className = 'item';
-      b.dataset.id = s.id;
-      b.dataset.q = norm(`${s.tr} ${s.en} ${s.key}`);
-      b.innerHTML = `<span class="dot" style="background:${s.color}"></span><span>${s.tr}</span><span class="here"></span>`;
-      b.addEventListener('click', () => {
-        if (state.quiz) return;
-        select(s.id, { focus: true });
-      });
-      list.appendChild(b);
+      const g = s.group && members.filter((m) => m.group === s.group).length > 1 ? s.group : '';
+      if (!groups.has(g)) groups.set(g, []);
+      groups.get(g).push(s);
+    }
+    for (const [g, items] of groups) {
+      let host = list;
+      if (g) {
+        host = document.createElement('details');
+        host.className = 'grp';
+        host.innerHTML = `<summary><span class="gname">${g}</span><span class="gcount"></span><button class="eye" aria-label="Grubu göster / gizle" title="Grubu göster / gizle">👁</button></summary>`;
+        host.querySelector('.eye').addEventListener('click', (e) => {
+          e.preventDefault();
+          toggleHidden(items.map((i) => i.id));
+        });
+        list.appendChild(host);
+      }
+      for (const s of items) host.appendChild(itemRow(s));
     }
   }
   syncSystems();
@@ -501,7 +660,20 @@ function updateListPresence() {
     el.hidden = !show;
     if (show) visibleSys.add(structById[id].system);
   });
+  document.querySelectorAll('.grp').forEach((d) => {
+    const items = [...d.querySelectorAll('.item')];
+    const shown = items.filter((el) => !el.hidden);
+    d.hidden = !shown.length;
+    d.querySelector('.gcount').textContent = shown.length;
+    d.classList.toggle('hid', items.every((el) => el.classList.contains('hid')));
+    if (q && shown.length) d.open = true;
+  });
   document.querySelectorAll('.group-title').forEach((t) => { t.hidden = !visibleSys.has(t.dataset.sys); });
+}
+
+// "Etiket: metin" satırlarında etiketi kalın yazar; satırlar \n ile ayrılır
+function noteHtml(note) {
+  return note.split('\n').map((line) => line.replace(/^([^:]{2,20}):/, '<b>$1:</b>')).join('<br>');
 }
 
 function updateInfo() {
@@ -520,9 +692,9 @@ function updateInfo() {
   const here = sliceArea[st.id] > 0;
   box.className = 'info';
   box.innerHTML = `
-    <div class="name"><span class="swatch" style="background:${st.color}"></span>${st.tr}</div>
-    ${st.en !== st.tr ? `<div class="en">${st.en}</div>` : ''}
-    ${st.note ? `<p class="note">${st.note}</p>` : ''}
+    <div class="name"><span class="swatch" style="background:${st.color}"></span>${nm(st)}</div>
+    ${[...new Set([st.tr, st.en, st.la].filter((x) => x && x !== nm(st)))].map((x) => `<div class="en${x === st.la ? ' la' : ''}">${x}</div>`).join('')}
+    ${st.note ? `<p class="note">${noteHtml(st.note)}</p>` : ''}
     <div class="meta">
       <span class="tag">${systemName[st.system]}</span>
       <span class="tag">~${st.volumeMl} mL</span>
@@ -551,7 +723,7 @@ function showTooltip(x, y) {
   const hu = ct[base + u * du + v * dv];
   const l = sliceLabels[v * w + u];
   const vis = visibleTable();
-  const name = l && vis[l] && !state.quiz ? structById[l].tr : '';
+  const name = l && vis[l] && !state.quiz ? nm(structById[l]) : '';
   tip.innerHTML = `${name}<span class="hu">${hu} HU</span>`;
   tip.hidden = false;
   const vw = canvas.clientWidth;
@@ -712,7 +884,13 @@ function bindEvents() {
 
   $('quizBtn').addEventListener('click', () => (state.quiz ? quizExit() : quizStart()));
   $('quizExit').addEventListener('click', quizExit);
-  $('quizNext').addEventListener('click', quizNew);
+  $('quizNext').addEventListener('click', quizNext);
+  $('quizExam').addEventListener('click', () => quizStart(true));
+  $('shareBtn').addEventListener('click', copyLink);
+  document.querySelectorAll('#lang button').forEach((b) => {
+    b.classList.toggle('on', b.dataset.lang === state.lang);
+    b.addEventListener('click', () => setLang(b.dataset.lang));
+  });
 
   new ResizeObserver(() => draw()).observe($('viewer'));
 }
@@ -722,18 +900,46 @@ function bindEvents() {
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const shuffle = (arr) => arr.map((x) => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
 
-function quizStart() {
-  state.quiz = { score: 0, total: 0 };
+const EXAM_LEN = 20;
+
+// Zayıf noktalar: yapı anahtarı -> yanlış sayısı (yalnızca bu tarayıcıda saklanır)
+function loadWeak() {
+  try { return JSON.parse(localStorage.getItem('btatlas.weak')) || {}; } catch { return {}; }
+}
+function saveWeak(w) {
+  try { localStorage.setItem('btatlas.weak', JSON.stringify(w)); } catch { /* özel pencere vb. */ }
+}
+
+// Ağırlıklı seçim: yanlış cevaplanan yapılar daha sık sorulur
+function weightedPick(arr, weak) {
+  const w = arr.map((s) => 1 + 3 * Math.min(weak[s.key] || 0, 3));
+  let r = Math.random() * w.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < arr.length; i++) { r -= w[i]; if (r <= 0) return arr[i]; }
+  return arr[arr.length - 1];
+}
+
+// Karıştırılması en kolay komşular: sağ/sol eşi ve bitişik omurga/kaburga
+function lookalikes(s, pool) {
+  const swap = s.key.replace(/_(left|right)\b/, (_, d) => (d === 'left' ? '_right' : '_left'))
+    .replace(/^rib_(left|right)_/, (m, d) => `rib_${d === 'left' ? 'right' : 'left'}_`);
+  const keys = new Set([swap]);
+  const v = s.key.match(/^vertebrae_([CTL])(\d+)$/);
+  if (v) { keys.add(`vertebrae_${v[1]}${+v[2] - 1}`); keys.add(`vertebrae_${v[1]}${+v[2] + 1}`); }
+  return pool.filter((p) => p.id !== s.id && keys.has(p.key));
+}
+
+function quizStart(exam = false) {
+  state.quiz = { score: 0, total: 0, exam, wrong: [] };
   state.selected = 0;
   $('quiz').hidden = false;
-  $('quizBtn').textContent = '✕ Testi bitir';
+  $('quizBtn').innerHTML = '✕<span class="lbl"> Testi bitir</span>';
   quizNew();
 }
 
 function quizExit() {
   state.quiz = null;
   $('quiz').hidden = true;
-  $('quizBtn').textContent = '🎯 Kendini test et';
+  $('quizBtn').innerHTML = '🎯<span class="lbl"> Kendini test et</span>';
   render();
 }
 
@@ -751,8 +957,9 @@ function quizNew() {
   // Yapının göründüğü kesitlerin orta yarısından birini seç (daha büyük kesit alanı)
   let target;
   let slices = [];
+  const weak = loadWeak();
   while (!slices.length) {
-    target = pick(pool);
+    target = weightedPick(pool, weak);
     slices = [];
     anchors.forEach((entries, s) => { if (entries.some(([id]) => id === target.id)) slices.push(s); });
   }
@@ -763,14 +970,16 @@ function quizNew() {
 
   const same = shuffle(pool.filter((s) => s.id !== target.id && s.system === target.system));
   const other = shuffle(pool.filter((s) => s.id !== target.id && s.system !== target.system));
-  const options = shuffle([target, ...[...same, ...other].slice(0, 3)]);
+  const twins = shuffle(lookalikes(target, pool)).slice(0, 2);
+  const rest = [...same, ...other].filter((s) => !twins.includes(s));
+  const options = shuffle([target, ...[...twins, ...rest].slice(0, 3)]);
 
   Object.assign(q, { target, answered: false });
   const box = $('quizOptions');
   box.innerHTML = '';
   for (const opt of options) {
     const btn = document.createElement('button');
-    btn.textContent = opt.tr;
+    btn.textContent = nm(opt);
     btn.addEventListener('click', () => quizAnswer(opt, btn));
     box.appendChild(btn);
   }
@@ -787,21 +996,58 @@ function quizAnswer(opt, btn) {
   q.answered = true;
   q.total++;
   const ok = opt.id === q.target.id;
-  if (ok) q.score++;
+  if (ok) q.score++; else q.wrong.push(nm(q.target));
+  const weak = loadWeak();
+  const k = q.target.key;
+  weak[k] = ok ? Math.max(0, (weak[k] || 0) - 1) : (weak[k] || 0) + 1;
+  if (!weak[k]) delete weak[k];
+  saveWeak(weak);
   btn.classList.add(ok ? 'correct' : 'wrong');
   $('quizOptions').querySelectorAll('button').forEach((b) => {
     b.disabled = true;
-    if (b.textContent === q.target.tr) b.classList.add('correct');
+    if (b.textContent === nm(q.target)) b.classList.add('correct');
   });
   const fb = $('quizFeedback');
   fb.className = ok ? 'ok' : 'bad';
-  fb.textContent = ok ? 'Doğru! ✓' : `Yanlış — doğrusu: ${q.target.tr}`;
-  $('quizScore').textContent = `${q.score} / ${q.total}`;
+  fb.textContent = ok ? 'Doğru! ✓' : `Yanlış — doğrusu: ${nm(q.target)}`;
+  $('quizScore').textContent = q.exam ? `${q.score} / ${q.total} · ${EXAM_LEN} soru` : `${q.score} / ${q.total}`;
+  const last = q.exam && q.total >= EXAM_LEN;
+  $('quizNext').textContent = last ? 'Sonucu gör' : 'Sonraki →';
   $('quizNext').hidden = false;
+}
+
+function quizNext() {
+  const q = state.quiz;
+  if (q.exam && q.total >= EXAM_LEN) return quizResult();
+  quizNew();
+}
+
+function quizResult() {
+  const q = state.quiz;
+  const wrong = [...new Set(q.wrong)];
+  $('quizOptions').innerHTML = '';
+  $('quizNext').hidden = true;
+  $('quizFeedback').className = '';
+  $('quizFeedback').textContent = `Sınav bitti: ${q.score} / ${EXAM_LEN} (%${Math.round((q.score / EXAM_LEN) * 100)})` +
+    (wrong.length ? ` · Tekrar edilecekler: ${wrong.join(', ')}` : ' · Hepsi doğru!');
+  const again = document.createElement('button');
+  again.textContent = 'Yeni sınav';
+  again.addEventListener('click', () => quizStart(true));
+  $('quizOptions').appendChild(again);
 }
 
 load().catch((err) => {
   console.error(err);
   $('loadingText').textContent = `Yüklenemedi: ${err.message}`;
   document.querySelector('.spinner')?.remove();
+  const retry = document.createElement('button');
+  retry.className = 'btn small retry';
+  retry.textContent = 'Yeniden dene';
+  retry.addEventListener('click', () => location.reload());
+  $('loading').appendChild(retry);
 });
+
+// Servis çalışanı: sürüm parametreli hacimleri önbelleğe alır (tekrar ziyaretlerde ~15 MB yeniden inmez)
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  navigator.serviceWorker.register('sw.js').catch(() => { /* önbelleksiz de çalışır */ });
+}

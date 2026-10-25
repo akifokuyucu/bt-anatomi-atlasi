@@ -16,6 +16,7 @@ Verilirse Couinaud segmentleri ayrı bir katman olarak eklenir.
 """
 
 import gzip
+import hashlib
 import json
 import os
 import sys
@@ -31,6 +32,7 @@ from skimage.restoration import denoise_nl_means
 SYSTEMS = [
     ("organ", "Organlar", True),
     ("kc_segment", "Karaciğer segmentleri", False),
+    ("solunum", "Solunum", True),
     ("gis", "Sindirim", True),
     ("uriner", "Üriner", True),
     ("arter", "Arterler", True),
@@ -73,7 +75,189 @@ BASE = {
     "autochthon": ("erektör spina (otokton) kasları", "autochthonous back muscles", "kas", "#c06c84"),
     "heart": ("Kalp", "Heart", "toraks", "#ff6b6b"),
     "spinal_cord": ("Medulla spinalis", "Spinal cord", "toraks", "#ffd166"),
+    "trachea": ("Trakea", "Trachea", "solunum", "#7fd1e8"),
+    "thyroid_gland": ("Tiroid bezi", "Thyroid gland", "organ", "#c77d9a"),
+    "atrial_appendage_left": ("Sol atriyal appendiks", "Left atrial appendage", "toraks", "#ff9a8a"),
+    "pulmonary_vein": ("Pulmoner damarlar", "Pulmonary vessels", "ven", "#5a7bd8"),
+    "superior_vena_cava": ("Süperior vena kava", "Superior vena cava", "ven", "#2f6fe0"),
+    "brachiocephalic_vein": ("brakiyosefalik ven", "brachiocephalic vein", "ven", "#4a90e0"),
+    "brachiocephalic_trunk": ("Brakiyosefalik gövde", "Brachiocephalic trunk", "arter", "#ff5a6a"),
+    "common_carotid_artery": ("karotis komunis arter", "common carotid artery", "arter", "#ff7a85"),
+    "subclavian_artery": ("subklavian arter", "subclavian artery", "arter", "#e84a5c"),
+    "clavicula": ("klavikula", "clavicle", "kemik", "#e8dcb8"),
+    "scapula": ("skapula", "scapula", "kemik", "#dccfa4"),
+    "humerus": ("humerus", "humerus", "kemik", "#efe3bd"),
 }
+
+# Vaka tanımları: klasör adı -> arayüz başlığı, üst etiket, varsayılan pencere, ilk açılışta odaklanacak yapı
+CASES = {
+    "s0139": {"title": "Abdomen ve pelvis · BT portal venöz faz", "eyebrow": "ABDOMEN VE PELVİS", "win": "400,40", "start": "pancreas",
+              "category": "saglikli", "region": "abdomen"},
+    "s0372": {"title": "Toraks · BT arteriyel faz", "eyebrow": "TORAKS", "win": "400,40", "start": "heart",
+              "category": "saglikli", "region": "toraks"},
+}
+
+# Henüz verisi olmayan, ana sayfada "hazırlanıyor" kartı olarak görünen vakalar
+PLANNED = [
+    {"id": "kraniyal", "category": "saglikli", "region": "kraniyal", "title": "Kraniyal BT · sağlıklı",
+     "eyebrow": "KRANİYAL", "text": "Beyin, ventriküller, kafa tabanı ve venöz sinüsler; normal kraniyal BT veya BT anjiyo."},
+    {"id": "ileus", "category": "patoloji", "region": "abdomen", "title": "İleus (barsak tıkanıklığı)",
+     "eyebrow": "ABDOMEN", "text": "Dilate barsak ansları, hava-sıvı seviyeleri ve geçiş noktası; patolojik alan kırmızıyla işaretlenir."},
+    {"id": "ich", "category": "patoloji", "region": "kraniyal", "title": "İntrakraniyal kanama",
+     "eyebrow": "KRANİYAL", "text": "Parankimal, subaraknoid ve subdural kanama örnekleri; hiperdens alan kırmızıyla işaretlenir."},
+    {"id": "pe", "category": "patoloji", "region": "toraks", "title": "Pulmoner emboli (BT anjiyo)",
+     "eyebrow": "TORAKS · ANJİYO", "text": "Pulmoner arter dallarında dolum defekti; emboli kırmızıyla işaretlenir."},
+]
+# Latince ad (Terminologia Anatomica) ve kısa not, BASE anahtarıyla. Çiftli yapılarda sağ/sol varyantları aynı notu paylaşır.
+# la: (ad, cinsiyet m/f/n); çiftlilerde cinsiyete göre sinister/dexter eki eklenir.
+# Not şablonu (satırlar \n ile ayrılır): Komşuluk · BT'de tanıma · Varyant · Klinik ipucu
+# TASLAK: bir radyolog veya anatomist gözden geçirmeden yayın "doğrulanmış" sayılmaz (TODO 1.7).
+LATIN_SIDE = {"m": ("sinister", "dexter"), "f": ("sinistra", "dextra"), "n": ("sinistrum", "dextrum")}
+NOTES = {
+    "liver": ("Hepar", "n",
+        "Komşuluk: Sağ hemidiyafragma altında; mide, safra kesesi, duodenum, sağ böbrek ve sağ adrenal ile komşu.\n"
+        "BT'de tanıma: Portal venöz fazda homojen, dalaktan biraz düşük ya da benzer dansitede (~100–120 HU); yağlanmada dansite düşer.\n"
+        "Varyant: Riedel lobu (sağ lobun inferior uzantısı); papiller çıkıntı.\n"
+        "Klinik ipucu: Karaciğer dansitesi dalaktan belirgin düşükse hepatosteatozdan şüphelenilir."),
+    "spleen": ("Splen", "m",
+        "Komşuluk: Sol hemidiyafragma altında; mide, sol böbrek, pankreas kuyruğu ve splenik fleksura ile komşu.\n"
+        "BT'de tanıma: Portal fazda homojen ve karaciğerle benzer ya da biraz daha yüksek dansitede; arteriyel fazda heterojen (zebra) görünüm normaldir.\n"
+        "Varyant: Aksesuar dalak (splenül), lobülasyon ve yarık.\n"
+        "Klinik ipucu: Splenomegali sıklıkla kraniokaudal 12–13 cm üstü olarak kabul edilir; travmada laserasyon ve hematom araştırılır."),
+    "pancreas": ("Pancreas", "n",
+        "Komşuluk: Arkasında splenik ven; başı duodenum C halkası içinde, boynu portal ven/SMV birleşkesinin önünde, kuyruğu dalak hilusuna uzanır.\n"
+        "BT'de tanıma: Lobüle konturlu, yumuşak doku dansitesinde; yaşla yağ infiltrasyonu artar ve görünüm 'tüylü' olur.\n"
+        "Varyant: Pankreas divisum, annüler pankreas.\n"
+        "Klinik ipucu: Peripankreatik yağ dokuda bulanıklaşma akut pankreatit işaretidir; baş kitlesinde safra yolu ve pankreas kanalı birlikte genişleyebilir."),
+    "gallbladder": ("Vesica biliaris", "f",
+        "Komşuluk: Karaciğerin visseral yüzünde, segment IV ve V arasındaki safra kesesi yatağında; duodenum ve hepatik fleksura ile komşu.\n"
+        "BT'de tanıma: İçi sıvı dansitesinde (0–20 HU), ince duvarlı oval kese.\n"
+        "Varyant: Katlanmış fundus (Frig şapkası), septalı kese.\n"
+        "Klinik ipucu: Duvar kalınlaşması ve çevresinde sıvı kolesistit lehinedir; taşlar BT'de her zaman görünmez."),
+    "adrenal_gland": ("Glandula suprarenalis", "f",
+        "Komşuluk: Böbreğin üst kutbunun anteromedialinde, diyafram krusunun yanında; sağda İVK'nın arkasında, solda splenik ven/pankreas arkasında.\n"
+        "BT'de tanıma: İnce, Y veya ters V biçimli yumuşak doku yapısı; kol kalınlığı normalde diyafram krusundan fazla değildir.\n"
+        "Varyant: Aksesuar adrenal doku nadirdir.\n"
+        "Klinik ipucu: Nonkontrast BT'de <10 HU yağdan zengin adenom lehinedir."),
+    "kidney": ("Ren", "m",
+        "Komşuluk: Retroperitonda psoas kası üzerinde; sağda karaciğer ve duodenum, solda dalak, pankreas kuyruğu ve kolon ile komşu.\n"
+        "BT'de tanıma: Kortikomedüller fazda korteks parlak, piramitler daha düşük; nefrografik fazda homojen güçlü tutulum.\n"
+        "Varyant: At nalı böbrek, pelvik böbrek, duplike toplayıcı sistem.\n"
+        "Klinik ipucu: Sağ böbrek karaciğer nedeniyle genellikle solundan biraz daha aşağıdadır; kist-kitle ayrımında kontrast tutulumu belirleyicidir."),
+    "aorta": ("Aorta", "f",
+        "Komşuluk: Vertebra gövdelerinin önünde, hafif solda; sağında İVK, önünde pankreas ve duodenum üçüncü kısmı.\n"
+        "BT'de tanıma: Portal fazda ~150–200 HU ile parlak, yuvarlak lümen; duvar kalsifikasyonları hiperdens noktalar olarak görülür.\n"
+        "Varyant: Dallanma varyantları (çölyak-SMA ortak gövde, sol hepatik arterin sol gastrikten çıkması).\n"
+        "Klinik ipucu: Abdominal aort çapı >3 cm anevrizma olarak kabul edilir."),
+    "inferior_vena_cava": ("Vena cava inferior", "f",
+        "Komşuluk: Aortanın sağında, karaciğerin arka yüzünde (kaudat lob arkasında); renal venler kendisine açılır.\n"
+        "BT'de tanıma: Portal fazda homojen parlak; arteriyel fazda renal ven karışımı nedeniyle heterojen görünebilir (psödotrombüs).\n"
+        "Varyant: Sol taraflı veya duplike İVK, retroaortik sol renal ven.\n"
+        "Klinik ipucu: Geç arteriyel fazda karışım artefaktı trombüsle karıştırılabilir; portal fazda tekrar bakılır."),
+    "portal_vein_and_splenic_vein": ("Vena portae hepatis et vena splenica", "f",
+        "Komşuluk: Splenik ven pankreasın arka yüzünde seyredip SMV ile birleşerek portal veni oluşturur; portal ven hepatoduodenal ligamentte safra yolunun arkasında ilerler.\n"
+        "BT'de tanıma: Portal fazda aortayla benzer parlaklıkta; lümen içi dolum defekti trombüs düşündürür.\n"
+        "Varyant: Replasan sağ hepatik arter SMA'dan çıkıp portal venin arkasından seyredebilir.\n"
+        "Klinik ipucu: Portal ven çapı >13 mm portal hipertansiyon lehinedir; kavernöz transformasyon kronik trombüste izlenir."),
+    "stomach": ("Gaster", "m",
+        "Komşuluk: Sol üst kadranda karaciğer sol lobu, dalak, pankreas ve transvers kolon ile komşu.\n"
+        "BT'de tanıma: İçerik ve gaz nedeniyle değişken; duvarı mukozal kontrastlanma gösterir, kıvrımlar belirgindir.\n"
+        "Varyant: Boynuz biçimli veya aşağı sarkık (J) mide.\n"
+        "Klinik ipucu: Distansiyon olmadan duvar kalınlaşması yanlış pozitif olabilir; mide duvarı kalınlığı su ya da oral kontrastla değerlendirilir."),
+    "duodenum": ("Duodenum", "n",
+        "Komşuluk: Pankreas başını C biçiminde sarar; safra yolu ve pankreas kanalı ikinci kısmına açılır; üçüncü kısmı aorta ile SMA arasından geçer.\n"
+        "BT'de tanıma: Kollabe ise yumuşak doku duvarı; sıvıyla dolu ise ince duvarlı lümen.\n"
+        "Varyant: Duodenal divertikül (ikinci kısım, papilla yakını).\n"
+        "Klinik ipucu: Üçüncü kısmın SMA ile aorta arasında sıkışması SMA sendromuna yol açabilir."),
+    "urinary_bladder": ("Vesica urinaria", "f",
+        "Komşuluk: Pelvik kavitede pubik simfizin arkasında; erkekte arkasında rektum ve seminal veziküller, kadında uterus ve vajen.\n"
+        "BT'de tanıma: Dolu mesane sıvı dansitesinde (0–10 HU), ince düzgün duvar; kontrast verilmişse üriner faz sonrası yoğunlaşır.\n"
+        "Varyant: Divertikül, urakus kalıntısı.\n"
+        "Klinik ipucu: Mesane yeterince dolu değilse duvar kalınlaşması yanlış yorumlanabilir; fokal kalınlaşma sistoskopiyle ilişkilendirilir."),
+}
+
+
+# Notu henüz olmayan yapılar için yalnızca Latince ad: BASE anahtarı -> (ad, cinsiyet)
+LATIN_ONLY = {
+    "esophagus": ("Oesophagus", "m"), "small_bowel": ("Intestinum tenue", "n"), "colon": ("Colon", "n"),
+    "kidney_cyst": ("Cystis renalis", "f"), "prostate": ("Prostata", "f"), "iliac_artery": ("Arteria iliaca communis", "f"),
+    "iliac_vena": ("Vena iliaca communis", "f"), "sacrum": ("Os sacrum", "n"), "hip": ("Os coxae", "n"),
+    "femur": ("Femur", "n"), "costal_cartilages": ("Cartilagines costales", "f"), "sternum": ("Sternum", "n"),
+    "trachea": ("Trachea", "f"), "thyroid_gland": ("Glandula thyroidea", "f"),
+    "atrial_appendage_left": ("Auricula atrii sinistri", "f"), "pulmonary_vein": ("Venae pulmonales", "f"),
+    "superior_vena_cava": ("Vena cava superior", "f"), "brachiocephalic_vein": ("Vena brachiocephalica", "f"),
+    "brachiocephalic_trunk": ("Truncus brachiocephalicus", "m"), "common_carotid_artery": ("Arteria carotis communis", "f"),
+    "subclavian_artery": ("Arteria subclavia", "f"), "clavicula": ("Clavicula", "f"), "scapula": ("Scapula", "f"),
+    "humerus": ("Humerus", "m"),
+    "iliopsoas": ("Musculus iliopsoas", "m"), "gluteus_maximus": ("Musculus gluteus maximus", "m"),
+    "gluteus_medius": ("Musculus gluteus medius", "m"), "gluteus_minimus": ("Musculus gluteus minimus", "m"),
+    "autochthon": ("Musculus erector spinae", "m"), "heart": ("Cor", "n"), "spinal_cord": ("Medulla spinalis", "f"),
+}
+ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"]
+VERTEBRA_LA = {"C": "cervicalis", "T": "thoracica", "L": "lumbalis", "S": "sacralis"}
+LOBE_LA = {"upper": "superior", "middle": "medius", "lower": "inferior"}
+
+
+def latin_only(key):
+    """Üretilebilen Latince adlar (omurga, kaburga, akciğer lobu, segment, notsuz katalog yapıları)."""
+    if key.startswith("liver_segment_"):
+        return f"Segmentum hepatis {ROMAN[int(key.rsplit('_', 1)[1])]}"
+    if key.startswith("vertebrae_"):
+        lvl = key.split("_")[1]
+        return f"Vertebra {VERTEBRA_LA[lvl[0]]} {ROMAN[int(lvl[1:])]}"
+    if key.startswith("rib_"):
+        _, side, n = key.split("_")
+        return f"Costa {ROMAN[int(n)]} {'sinistra' if side == 'left' else 'dextra'}"
+    if key.startswith("lung_"):
+        parts = key.split("_")
+        return f"Lobus {LOBE_LA[parts[1]]} pulmonis {'sinistri' if parts[-1] == 'left' else 'dextri'}"
+    base, side = key, None
+    for suffix, i in (("_left", 0), ("_right", 1)):
+        if key.endswith(suffix) and key[: -len(suffix)] in LATIN_ONLY:
+            base, side = key[: -len(suffix)], i
+    if base in LATIN_ONLY:
+        name, gender = LATIN_ONLY[base]
+        return f"{name} {LATIN_SIDE[gender][side]}" if side is not None else name
+    return None
+
+
+GROUP_BY_BASE = {
+    "clavicula": "Omuz kuşağı ve kol", "scapula": "Omuz kuşağı ve kol", "humerus": "Omuz kuşağı ve kol",
+    "hip": "Pelvis ve femur", "sacrum": "Pelvis ve femur", "femur": "Pelvis ve femur",
+    "brachiocephalic_trunk": "Baş, boyun ve kol arterleri", "common_carotid_artery": "Baş, boyun ve kol arterleri",
+    "subclavian_artery": "Baş, boyun ve kol arterleri", "iliac_artery": "İliak damarlar", "iliac_vena": "İliak damarlar",
+    "superior_vena_cava": "Toraks venleri", "brachiocephalic_vein": "Toraks venleri", "pulmonary_vein": "Toraks venleri",
+    "gluteus_maximus": "Gluteal kaslar", "gluteus_medius": "Gluteal kaslar", "gluteus_minimus": "Gluteal kaslar",
+}
+
+
+def group_of(key):
+    """Yapı ağacındaki alt grup (Sistem -> alt grup -> yapı); gruplanmayanlar için None."""
+    if key.startswith("vertebrae_"):
+        return "Omurga"
+    if key.startswith("rib_"):
+        return "Kaburgalar"
+    if key.startswith("lung_"):
+        return "Akciğer lobları"
+    base = key
+    for suffix in ("_left", "_right"):
+        if key.endswith(suffix):
+            base = key[: -len(suffix)]
+    return GROUP_BY_BASE.get(base)
+
+
+def describe_extra(key):
+    """Anahtar için (latince, not) döner; not yoksa None. Çiftlilerde yan eki eklenir."""
+    base, side = key, None
+    for suffix, i in (("_left", 0), ("_right", 1)):
+        if key.endswith(suffix) and key[: -len(suffix)] in NOTES:
+            base, side = key[: -len(suffix)], i
+    if base not in NOTES:
+        return latin_only(key), None
+    name, gender, note = NOTES[base]
+    return (f"{name} {LATIN_SIDE[gender][side]}" if side is not None else name), note
+
+
 LUNG_LOBES = {"upper": "üst", "middle": "orta", "lower": "alt"}
 
 # Couinaud segmentleri: numara -> (Türkçe ad, İngilizce ad, renk, kısa not)
@@ -115,7 +299,7 @@ def describe(key):
         parts = key.split("_")  # lung_upper_lobe_left
         tr = "Sol" if parts[-1] == "left" else "Sağ"
         return (f"{tr} akciğer {LUNG_LOBES[parts[1]]} lob", f"{parts[-1].capitalize()} lung {parts[1]} lobe",
-                "toraks", "#a8dadc" if parts[-1] == "left" else "#94c9d9")
+                "solunum", "#a8dadc" if parts[-1] == "left" else "#94c9d9")
     for suffix, tr, en in (("_left", "Sol", "Left"), ("_right", "Sağ", "Right")):
         if key.endswith(suffix) and key[: -len(suffix)] in BASE:
             name_tr, name_en, system, color = BASE[key[: -len(suffix)]]
@@ -192,7 +376,15 @@ def load_masks(folder):
             print(f"  atlandı (katalogda yok): {key}")
             continue
         masks.append(m)
-        structures.append({"key": key, "tr": info[0], "en": info[1], "system": info[2], "color": info[3]})
+        entry = {"key": key, "tr": info[0], "en": info[1], "system": info[2], "color": info[3]}
+        if group_of(key):
+            entry["group"] = group_of(key)
+        la, note = describe_extra(key)
+        if la:
+            entry["la"] = la
+        if note:
+            entry["note"] = note
+        structures.append(entry)
     return structures, masks
 
 
@@ -236,6 +428,7 @@ def compute_anchors(volumes, n_ids, structures, min_area):
 
 def main(case_dir, out_dir, overlay_dir=None, min_area=12):
     case_dir, out_dir = Path(case_dir), Path(out_dir)
+    case = CASES[case_dir.name]
     out_dir.mkdir(parents=True, exist_ok=True)
 
     ct_img = nib.as_closest_canonical(nib.load(case_dir / "ct.nii.gz"))
@@ -292,9 +485,17 @@ def main(case_dir, out_dir, overlay_dir=None, min_area=12):
         with gzip.GzipFile(out_dir / name, "wb", compresslevel=9, mtime=0) as fh:
             fh.write(np.ascontiguousarray(arr.transpose(2, 1, 0)).tobytes())
 
+    write_thumb(out_dir, case_dir.name, case, structures, ct, labels)
+    # Veri sürümü: içerik değişince değişir; tarayıcı ve servis çalışanı önbelleği buna göre yenilenir
+    digest = hashlib.sha1(hu.tobytes()[::97] + labels.tobytes()[::97]).hexdigest()[:10]
+
     atlas = {
+        "v": digest,
         "case": case_dir.name,
-        "title": "Abdomen ve pelvis · BT portal venöz faz",
+        "title": case["title"],
+        "eyebrow": case["eyebrow"],
+        "win": case["win"],
+        "start": case["start"],
         "dims": [int(d) for d in ct.shape],
         "spacing": spacing,
         "systems": [{"id": i, "name": n, "default": d} for i, n, d in SYSTEMS],
@@ -308,6 +509,45 @@ def main(case_dir, out_dir, overlay_dir=None, min_area=12):
         atlas["systems"] = [s for s in atlas["systems"] if s["id"] != "kc_segment"]
     (out_dir / "atlas.json").write_text(json.dumps(atlas, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     verify(out_dir)
+    write_index(out_dir.parent)
+
+
+def write_thumb(out_dir, case_id, case, structures, ct, labels):
+    """Ana sayfa kartı için renkli aksiyel küçük görsel: docs/img/<vaka>.jpg"""
+    from PIL import Image
+
+    start = next((s for s in structures if s["key"] == case["start"]), structures[0])
+    z = start["focus"]["axial"]
+    g = np.clip((ct[:, :, z] - (40 - 200)) / 400, 0, 1)
+    rgb = np.stack([g] * 3, -1) * 255
+    lab = labels[:, :, z]
+    for sid, s in enumerate(structures, 1):
+        if s["system"] in ("kemik", "kas", "kc_segment"):
+            continue
+        m = lab == sid
+        if m.any():
+            c = np.array([int(s["color"][i:i + 2], 16) for i in (1, 3, 5)], dtype=np.float32)
+            rgb[m] = rgb[m] * 0.55 + c * 0.45
+    # [x, y] -> ekran: hastanın sağı solda, ön üstte
+    img = Image.fromarray(rgb.transpose(1, 0, 2)[::-1, ::-1].astype(np.uint8))
+    img = img.resize((640, round(640 * img.height / img.width)), Image.LANCZOS)
+    path = out_dir.parent.parent / "img"
+    path.mkdir(exist_ok=True)
+    img.save(path / f"{case_id}.jpg", quality=82, optimize=True)
+
+
+def write_index(data_dir):
+    """data/cases.json: klasörde atlas.json'u olan vakalar, CASES sırasıyla."""
+    items = []
+    for k, v in CASES.items():
+        f = data_dir / k / "atlas.json"
+        if f.exists():
+            a = json.loads(f.read_text(encoding="utf-8"))
+            items.append({"id": k, "title": v["title"], "eyebrow": v["eyebrow"], "n": len(a["structures"]),
+                          "mm": a["spacing"][0], "img": f"img/{k}.jpg", "category": v["category"],
+                          "region": v["region"], "status": "ready"})
+    items += [{**p, "status": "planned"} for p in PLANNED]
+    (data_dir / "cases.json").write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
 def verify(out_dir):

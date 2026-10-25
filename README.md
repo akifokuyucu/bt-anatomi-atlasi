@@ -33,7 +33,7 @@ Sonra tarayıcıda `http://localhost:8765` adresini açın. Kurulum veya derleme
 | Vaka: TotalSegmentator veri seti `s0139`, 30 yaş kadın, normal, portal venöz faz, 1,5 mm izotropik | `data/raw/s0139/` |
 | Karaciğer segmentleri: TotalSegmentator `liver_segments` görevi, CPU'da | `data/segments/s0139/` |
 | Atlas üretimi: kırpma, tek etiket hacmi, segment katmanı, Türkçe katalog, kesit başına etiket noktaları | `scripts/build_atlas.py` |
-| Web verisi: `ct.bin.gz` (int16 HU), `labels.bin.gz` ve `overlay.bin.gz` (uint8), `atlas.json` | `docs/data/` |
+| Web verisi: `ct.bin.gz` (int16 HU), `labels.bin.gz` ve `overlay.bin.gz` (uint8), `atlas.json` | `docs/data/<vaka>/` |
 
 Segmentler `total` görevinin karaciğer maskesine kırpılır; maskede segmentsiz kalan vokseller en yakın segmente atanır. Böylece segmentler karaciğeri boşluksuz böler.
 
@@ -44,7 +44,7 @@ python -m venv .venv
 .venv/Scripts/python -m pip install -r requirements.txt
 .venv/Scripts/python scripts/fetch_case.py s0139
 .venv/Scripts/TotalSegmentator -i data/raw/s0139/ct.nii.gz -o data/segments/s0139 -ta liver_segments --device cpu
-.venv/Scripts/python scripts/build_atlas.py data/raw/s0139 docs/data data/segments/s0139
+.venv/Scripts/python scripts/build_atlas.py data/raw/s0139 docs/data/s0139 data/segments/s0139
 ```
 
 TotalSegmentator yalnızca segment adımı için gerekir (PyTorch dahil ~1 GB). Üçüncü argüman verilmezse atlas segmentsiz üretilir.

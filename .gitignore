@@ -7,3 +7,7 @@ data/segments/run.log
 TODO.md
 CLAUDE.local.md
 .claude/
+
+# Yerel meta veri ve model önbelleği (proje klasöründe ama GitHub dışı)
+data/meta/
+.ml-cache/

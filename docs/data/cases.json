@@ -1,0 +1,60 @@
+[
+ {
+  "id": "s0139",
+  "title": "Abdomen ve pelvis · BT portal venöz faz",
+  "eyebrow": "ABDOMEN VE PELVİS",
+  "n": 74,
+  "mm": 1.5,
+  "img": "img/s0139.jpg",
+  "category": "saglikli",
+  "region": "abdomen",
+  "status": "ready"
+ },
+ {
+  "id": "s0372",
+  "title": "Toraks · BT arteriyel faz",
+  "eyebrow": "TORAKS",
+  "n": 96,
+  "mm": 1.5,
+  "img": "img/s0372.jpg",
+  "category": "saglikli",
+  "region": "toraks",
+  "status": "ready"
+ },
+ {
+  "id": "kraniyal",
+  "category": "saglikli",
+  "region": "kraniyal",
+  "title": "Kraniyal BT · sağlıklı",
+  "eyebrow": "KRANİYAL",
+  "text": "Beyin, ventriküller, kafa tabanı ve venöz sinüsler; normal kraniyal BT veya BT anjiyo.",
+  "status": "planned"
+ },
+ {
+  "id": "ileus",
+  "category": "patoloji",
+  "region": "abdomen",
+  "title": "İleus (barsak tıkanıklığı)",
+  "eyebrow": "ABDOMEN",
+  "text": "Dilate barsak ansları, hava-sıvı seviyeleri ve geçiş noktası; patolojik alan kırmızıyla işaretlenir.",
+  "status": "planned"
+ },
+ {
+  "id": "ich",
+  "category": "patoloji",
+  "region": "kraniyal",
+  "title": "İntrakraniyal kanama",
+  "eyebrow": "KRANİYAL",
+  "text": "Parankimal, subaraknoid ve subdural kanama örnekleri; hiperdens alan kırmızıyla işaretlenir.",
+  "status": "planned"
+ },
+ {
+  "id": "pe",
+  "category": "patoloji",
+  "region": "toraks",
+  "title": "Pulmoner emboli (BT anjiyo)",
+  "eyebrow": "TORAKS · ANJİYO",
+  "text": "Pulmoner arter dallarında dolum defekti; emboli kırmızıyla işaretlenir.",
+  "status": "planned"
+ }
+]

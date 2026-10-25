@@ -5,116 +5,101 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b0d10">
   <title>BT Anatomi Atlası</title>
+  <meta name="description" content="Gerçek BT kesitlerinde Türkçe etiketli, etkileşimli anatomi atlası. Abdomen-pelvis ve toraks vakaları, üç düzlem, test modu, paylaşılabilir bağlantılar.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="tr_TR">
+  <meta property="og:title" content="BT Anatomi Atlası">
+  <meta property="og:description" content="Gerçek BT kesitlerinde Türkçe etiketli anatomi. Kesitlerde gezin, yapıları keşfedin, kendinizi test edin.">
+  <meta property="og:url" content="https://akifokuyucu.github.io/bt-anatomi-atlasi/">
+  <meta property="og:image" content="https://akifokuyucu.github.io/bt-anatomi-atlasi/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="home.css">
+  <script>
+    // Eski paylaşım bağlantıları (#p=…&s=…) doğrudan atlasa gitsin
+    if (/(^#|&)(c|p|y)=/.test(location.hash)) location.replace('atlas.html' + location.hash);
+  </script>
 </head>
-<body>
+<body class="home">
   <header class="topbar">
-    <div class="brand">
+    <a class="brand" href="./">
       <span class="logo">◐</span>
       <div>
-        <div class="eyebrow">ABDOMEN VE PELVİS</div>
-        <h1 id="title">BT Anatomi Atlası</h1>
+        <div class="eyebrow">ETKİLEŞİMLİ ATLAS</div>
+        <div class="h1">BT Anatomi Atlası</div>
       </div>
-    </div>
-    <div class="top-actions">
-      <button id="quizBtn" class="btn accent">🎯 Kendini test et</button>
-    </div>
+    </a>
+    <nav class="top-actions">
+      <a class="navlink" href="#saglikli">Sağlıklı</a>
+      <a class="navlink" href="#patoloji">Patoloji</a>
+      <a class="navlink" href="#ozellikler">Özellikler</a>
+      <a class="navlink" href="#hakkinda">Hakkında</a>
+      <a class="btn accent" href="atlas.html">Atlası aç</a>
+    </nav>
   </header>
 
-  <section class="toolbar">
-    <div class="row">
-      <span class="caption">SİSTEMLER · AÇ / KAPAT</span>
-      <span class="spacer"></span>
-      <button class="btn small" id="allOn">Tümü</button>
-      <button class="btn small" id="allOff">Hiçbiri</button>
-    </div>
-    <div class="chips" id="systems"></div>
-    <div class="row wrap">
-      <div class="seg" id="planes">
-        <button data-plane="axial" class="on">Aksiyel</button>
-        <button data-plane="coronal">Koronal</button>
-        <button data-plane="sagittal">Sagittal</button>
+  <main>
+    <section class="hero">
+      <div class="hero-text">
+        <p class="caption">GERÇEK BT · TÜRKÇE ETİKET</p>
+        <h1>Anatomiyi gerçek BT kesitlerinde öğrenin</h1>
+        <p class="lead">Aksiyel, koronal ve sagittal kesitlerde gezinin; bir yapıya dokunun, adını Türkçe, İngilizce ve Latince görün; kendinizi test edin. Telefonda da çalışır, kurulum gerekmez.</p>
+        <div class="cta">
+          <a class="btn accent big" href="#saglikli">Sağlıklı atlas</a>
+          <a class="btn big" href="#patoloji">Patoloji atlası</a>
+        </div>
       </div>
-      <div class="seg" id="tools">
-        <button data-tool="scroll" class="on" title="Sürükleyerek kesit değiştir">↕ Kesit</button>
-        <button data-tool="pan" title="Sürükleyerek görüntüyü taşı">✥ Taşı</button>
-      </div>
-      <div class="seg">
-        <button id="zoomOut" aria-label="Uzaklaştır">−</button>
-        <button id="zoomLabel" class="ghost" title="Sığdır">100%</button>
-        <button id="zoomIn" aria-label="Yakınlaştır">+</button>
-      </div>
-      <select id="windowSel" class="select" aria-label="Pencere ayarı">
-        <option value="400,40">Yumuşak doku (W400 L40)</option>
-        <option value="180,90">Karaciğer (W180 L90)</option>
-        <option value="600,150">Damar (W600 L150)</option>
-        <option value="1800,400">Kemik (W1800 L400)</option>
-        <option value="1500,-600">Akciğer (W1500 L-600)</option>
-      </select>
-    </div>
-  </section>
+      <a class="hero-img" href="atlas.html" aria-label="Atlası aç">
+        <img src="img/s0139.jpg" alt="Renkli etiketli aksiyel abdomen BT kesiti" width="640" height="468">
+      </a>
+    </section>
 
-  <main class="layout">
-    <section class="viewer-wrap">
-      <div class="viewer-head">
-        <span id="planeInfo" class="mono">AKSİYEL</span>
-        <span class="spacer"></span>
-        <label class="toggle"><input type="checkbox" id="labelsOn" checked> Etiketler</label>
-        <label class="toggle"><input type="checkbox" id="outlineOn" checked> Kontur</label>
-        <label class="toggle opacity">Dolgu <input type="range" id="opacity" min="0" max="90" value="45"></label>
-      </div>
-      <div class="viewer" id="viewer">
-        <canvas id="canvas"></canvas>
-        <div class="orient top" id="oTop"></div>
-        <div class="orient bottom" id="oBottom"></div>
-        <div class="orient left" id="oLeft"></div>
-        <div class="orient right" id="oRight"></div>
-        <div class="tooltip" id="tooltip" hidden></div>
-        <div class="loading" id="loading">
-          <div class="spinner"></div>
-          <div id="loadingText">Atlas yükleniyor…</div>
-        </div>
-      </div>
-      <div class="slice-bar">
-        <button class="btn icon" id="prev" aria-label="Önceki kesit">‹</button>
-        <input type="range" id="slider" min="0" max="0" value="0" aria-label="Kesit">
-        <button class="btn icon" id="next" aria-label="Sonraki kesit">›</button>
-        <span class="mono" id="sliceInfo">– / –</span>
-      </div>
-      <div class="quiz" id="quiz" hidden>
-        <div class="quiz-head">
-          <span class="caption">KENDİNİ TEST ET · Vurgulanan yapı hangisi?</span>
-          <span class="spacer"></span>
-          <span class="mono" id="quizScore">0 / 0</span>
-          <button class="btn small" id="quizExit">Çık</button>
-        </div>
-        <div class="quiz-options" id="quizOptions"></div>
-        <div class="quiz-foot">
-          <span id="quizFeedback"></span>
-          <span class="spacer"></span>
-          <button class="btn accent small" id="quizNext" hidden>Sonraki →</button>
-        </div>
+    <section id="saglikli" class="block">
+      <div class="cat-head"><span class="badge ok">SAĞLIKLI ANATOMİ</span></div>
+      <h2>Normal BT: sağlıklı toraks, abdomen ve kraniyal</h2>
+      <p class="sub">Önce normali görün. Her bölge için patolojisiz, gerçek ve anonim bir BT; tüm yapılar Türkçe, İngilizce ve Latince adlarıyla etiketli.</p>
+      <div class="cards" id="cases-saglikli"><p class="muted">Vakalar yükleniyor…</p></div>
+    </section>
+
+    <section id="patoloji" class="block">
+      <div class="cat-head"><span class="badge bad">PATOLOJİ ATLASI</span></div>
+      <h2>Hastalıklı BT: patolojiyi tanıyın</h2>
+      <p class="sub">Normalden sapmayı öğrenmek için ayrı bir atlas. Hastalıklı alanın üzerine gelince (dokunun) kırmızıyla işaretlenir; tanı, BT bulguları ve ayırıcı tanı kartta görünür. Tanıyı gizleyip kendiniz bulmayı da deneyebileceksiniz.</p>
+      <div class="cards" id="cases-patoloji"></div>
+      <p class="note-box">Patoloji vakalarında lezyon işaretlemeleri yalnızca açık lisanslı, uzman onaylı verilerden alınır. Hazır olmayan vakalar "Hazırlanıyor" olarak gösterilir.</p>
+    </section>
+
+    <section id="ozellikler" class="block">
+      <h2>Neler yapabilirsiniz?</h2>
+      <div class="features">
+        <div class="feat"><b>Üç düzlemde gezin</b><span>Aksiyel, koronal ve sagittal kesitler; kaydırma, yakınlaştırma ve taşıma. Telefonda dokunmatik hareketlerle.</span></div>
+        <div class="feat"><b>Yapıya dokunun</b><span>Dokunduğunuz yapının adı, hacmi ve (notu olanlar için) komşulukları ile BT'deki görünümü bilgi kartında.</span></div>
+        <div class="feat"><b>TR · EN · LA</b><span>Yapı adlarını Türkçe, İngilizce veya Latince görün; arama üç dilde de çalışır.</span></div>
+        <div class="feat"><b>Kendinizi test edin</b><span>Vurgulanan yapıyı bulun. Yanlış yaptıklarınız daha sık sorulur; 20 soruluk sınav modu vardır.</span></div>
+        <div class="feat"><b>Yapı ağacı</b><span>Sistem, alt grup ve yapı düzeyinde göster/gizle: omurlar, kaburgalar, damarlar tek tek açılıp kapanır.</span></div>
+        <div class="feat"><b>Bağlantıyla paylaşın</b><span>Bulunduğunuz kesit, seçili yapı ve açık sistemler tek bir bağlantıda; derse veya gruba gönderin.</span></div>
       </div>
     </section>
 
-    <aside class="panel">
-      <div class="card" id="infoCard">
-        <div class="caption">SEÇİLİ YAPI</div>
-        <div id="info" class="info empty">Görüntüde bir yapıya veya etikete dokunun.</div>
-      </div>
-      <div class="card list-card">
-        <div class="row">
-          <span class="caption">YAPILAR</span>
-          <span class="spacer"></span>
-          <label class="toggle"><input type="checkbox" id="onlySlice"> Sadece bu kesit</label>
-        </div>
-        <input type="search" id="search" class="search" placeholder="Ara: pankreas, aorta, L3…">
-        <div id="list" class="list"></div>
-      </div>
-      <p class="credit" id="credit"></p>
-    </aside>
+    <section class="block soon">
+      <h2>Yolda olanlar</h2>
+      <ul>
+        <li>Kraniyal BT ve BT anjiyo vakaları; patoloji atlasında ilk vakalar</li>
+        <li>Adım adım rehberli turlar</li>
+        <li>Tüm yapılar için kısa anatomi notları (bir uzman gözden geçirmesiyle)</li>
+        <li>Üçlü kesit görünümü ve 3B model</li>
+      </ul>
+    </section>
   </main>
 
-  <script type="module" src="app.js"></script>
+  <footer id="hakkinda" class="foot">
+    <p><b>Eğitim amaçlıdır, tanı için kullanılamaz.</b> Yapı notları taslak niteliğindedir ve bir radyolog ya da anatomist tarafından gözden geçirilmemiştir.</p>
+    <p>Veri: <a href="https://zenodo.org/records/10047292" target="_blank" rel="noopener">TotalSegmentator veri seti v2.0.1</a> (Wasserthal ve ark., Radiology: AI 2023), CC BY 4.0. Anonim, açık lisanslı BT'ler kullanılır.</p>
+    <p><a href="https://github.com/akifokuyucu/bt-anatomi-atlasi/issues" target="_blank" rel="noopener">Hata bildir / öneri gönder</a> · <a href="https://github.com/akifokuyucu/bt-anatomi-atlasi" target="_blank" rel="noopener">Kaynak kod</a></p>
+  </footer>
+
+  <script type="module" src="home.js"></script>
 </body>
 </html>

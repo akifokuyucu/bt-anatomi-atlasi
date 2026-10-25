@@ -6,9 +6,11 @@ Gerçek bir abdomen-pelvis BT'si üzerinde Türkçe etiketli, tarayıcıda çal�
 
 | Yol | İçerik |
 |---|---|
-| `docs/index.html`, `docs/style.css` | Arayüz |
+| `docs/index.html`, `docs/home.js`, `docs/home.css` | Ana sayfa (vaka kartları `data/cases.json`'dan) |
+| `docs/atlas.html`, `docs/style.css` | Atlas arayüzü; durum `#c=vaka&p=düzlem&…` bağlantısında |
+| `docs/sw.js` | Servis çalışanı: `?v=` sürümlü `.bin.gz` hacimlerini önbelleğe alır; veri değişince `atlas.json`'daki `v` değişir |
 | `docs/app.js` | Tüm uygulama: veri yükleme (`load`), kesit çizimi (`renderSlice`, `draw`), etiketler (`drawLabels`), olaylar (`bindEvents`), test modu (`quiz*`) |
-| `docs/data/` | Üretilmiş web verisi: `ct.bin.gz` (int16 HU), `labels.bin.gz` ve `overlay.bin.gz` (uint8), `atlas.json` |
+| `docs/data/<vaka>/`, `docs/data/cases.json` | Vaka başına üretilmiş web verisi (vakalar `CASES` sözlüğünde, `build_atlas.py`): `ct.bin.gz` (int16 HU), `labels.bin.gz` ve `overlay.bin.gz` (uint8), `atlas.json` |
 | `scripts/build_atlas.py` | Atlas üretimi; Türkçe adlar, renkler ve sistemler `BASE` sözlüğünde, segment notları `LIVER_SEGMENTS`'te |
 | `scripts/fetch_case.py` | TotalSegmentator veri setinden tek vaka indirir |
 | `data/segments/` | Karaciğer segment maskeleri (NIfTI) |
@@ -33,7 +35,7 @@ Hacimler bellekte `[z][y][x]` sırasındadır, `atlas.json`'daki `dims` ise `[x,
 `docs/data/**`, `data/**` ve `.venv/**` ikili veya çok büyük dosyalardır (`atlas.json` tek başına ~170 KB). Bunları Read ile açma, `.venv` üzerinde `du` veya `find` çalıştırma. `atlas.json` gerekiyorsa yalnızca yapısını Python ile özetle:
 
 ```bash
-.venv/Scripts/python -c "import json;d=json.load(open('docs/data/atlas.json',encoding='utf-8'));print({k:len(v) if hasattr(v,'__len__') else v for k,v in d.items()})"
+.venv/Scripts/python -c "import json;d=json.load(open('docs/data/s0139/atlas.json',encoding='utf-8'));print({k:len(v) if hasattr(v,'__len__') else v for k,v in d.items()})"
 ```
 
 Uzun süren komutların (TotalSegmentator, build) çıktısını dosyaya yönlendir, yalnızca son satırlarına bak.
