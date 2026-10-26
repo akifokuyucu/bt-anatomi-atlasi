@@ -3,11 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b0d10">
+  <meta name="theme-color" content="#08090c">
   <title>Laparoskopik Anatomi Atlası</title>
   <meta name="description" content="Robotik cerrahi görüntülerinde Türkçe etiketli, etkileşimli anatomi atlası. Yapıları keşfedin, BT'deki karşılığını görün, kendinizi test edin.">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="lapa.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="premium.css">
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="ui.js" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -25,8 +31,8 @@
         <button data-lang="en">EN</button>
         <button data-lang="la">LA</button>
       </div>
-      <button id="shareBtn" class="btn" title="Bağlantıyı kopyala" aria-label="Bağlantıyı kopyala">🔗<span class="lbl"> Bağlantıyı kopyala</span></button>
-      <button id="quizBtn" class="btn accent">🎯<span class="lbl"> Kendini test et</span></button>
+      <button id="shareBtn" class="btn" title="Bağlantıyı kopyala" aria-label="Bağlantıyı kopyala"><span data-icon="link"></span><span class="lbl"> Bağlantıyı kopyala</span></button>
+      <button id="quizBtn" class="btn accent"><span data-icon="target"></span><span class="lbl"> Kendini test et</span></button>
     </div>
   </header>
 

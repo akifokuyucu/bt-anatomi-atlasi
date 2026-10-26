@@ -314,7 +314,7 @@ function buildList() {
       `<span class="dot" style="background:${s.color}"></span>` +
       `<button class="iname">${nm(s)}</button>` +
       `<span class="pct" title="Karede kapladığı alan">${pct(area[id])}</span>` +
-      `<button class="eye" title="Göster / gizle" aria-label="${nm(s)}: göster / gizle">👁</button>`;
+      `<button class="eye" title="Göster / gizle" aria-label="${nm(s)}: göster / gizle">${UI.eye()}</button>`;
     el.querySelector('.iname').addEventListener('click', () => select(id === state.selected ? 0 : id));
     el.querySelector('.eye').addEventListener('click', () => {
       state.hidden.has(id) ? state.hidden.delete(id) : state.hidden.add(id);
@@ -478,11 +478,11 @@ async function copyLink() {
   const btn = $('shareBtn');
   try {
     await navigator.clipboard.writeText(location.href);
-    btn.innerHTML = '✓<span class="lbl"> Kopyalandı</span>';
+    btn.innerHTML = UI.icon('check') + '<span class="lbl"> Kopyalandı</span>';
   } catch {
-    btn.innerHTML = '⚠<span class="lbl"> Kopyalanamadı</span>';
+    btn.innerHTML = UI.icon('alert') + '<span class="lbl"> Kopyalanamadı</span>';
   }
-  setTimeout(() => { btn.innerHTML = '🔗<span class="lbl"> Bağlantıyı kopyala</span>'; }, 1600);
+  setTimeout(() => { btn.innerHTML = UI.icon('link') + '<span class="lbl"> Bağlantıyı kopyala</span>'; }, 1600);
 }
 
 // ---------- Kendini test et ----------
@@ -492,7 +492,7 @@ function quizStart() {
   state.quiz = { score: 0, total: 0, back: { frame: state.frame, selected: state.selected } };
   state.selected = 0;
   $('quiz').hidden = false;
-  $('quizBtn').innerHTML = '✕<span class="lbl"> Testi bitir</span>';
+  $('quizBtn').innerHTML = UI.icon('x') + '<span class="lbl"> Testi bitir</span>';
   quizAsk();
 }
 
@@ -500,7 +500,7 @@ function quizExit() {
   const back = state.quiz?.back;
   state.quiz = null;
   $('quiz').hidden = true;
-  $('quizBtn').innerHTML = '🎯<span class="lbl"> Kendini test et</span>';
+  $('quizBtn').innerHTML = UI.icon('target') + '<span class="lbl"> Kendini test et</span>';
   state.selected = back?.selected || 0;
   showFrame(back?.frame ?? state.frame);
 }

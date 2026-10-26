@@ -8,6 +8,7 @@ Gerçek bir abdomen-pelvis BT'si üzerinde Türkçe etiketli, tarayıcıda çal�
 |---|---|
 | `docs/index.html`, `docs/home.js`, `docs/home.css` | Ana sayfa (vaka kartları `data/cases.json`'dan) |
 | `docs/atlas.html`, `docs/style.css` | Atlas arayüzü; durum `#c=vaka&p=düzlem&…` bağlantısında |
+| `docs/premium.css`, `docs/ui.js`, `docs/atlas-ui.js` | Tüm sayfalarda son yüklenen görünüm katmanı (koyu/açık tema, `data-theme`); `ui.js` SVG ikonlar (`UI.icon`) ve tema anahtarı, `atlas-ui.js` atlasta odak modu, alt gezinme çubuğu ve kaydırıcı balonu |
 | `docs/sw.js` | Servis çalışanı: `?v=` sürümlü `.bin.gz` hacimlerini önbelleğe alır; veri değişince `atlas.json`'daki `v` değişir |
 | `docs/app.js` | Tüm uygulama: veri yükleme (`load`), kesit çizimi (`renderSlice`, `draw`), etiketler (`drawLabels`), olaylar (`bindEvents`), test modu (`quiz*`) |
 | `docs/lapa.html`, `docs/lapa.js`, `docs/lapa.css` | Laparoskopik atlas (prototip); durum `#c=vaka&f=kare&y=yapı`, "BT'de göster" → `atlas.html#c=s0139&y=…` |

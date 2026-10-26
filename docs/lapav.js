@@ -290,7 +290,7 @@ function buildList() {
       `<span class="dot" style="background:${s.color}"></span>` +
       `<button class="iname">${nm(s)}</button>` +
       `<span class="pct" title="Videoda görüldüğü süre">%${Math.round((presence[s.id] / N) * 100)}</span>` +
-      `<button class="eye" title="Filtreyi aç / kapa" aria-label="${nm(s)}: filtreyi aç / kapa">👁</button>`;
+      `<button class="eye" title="Filtreyi aç / kapa" aria-label="${nm(s)}: filtreyi aç / kapa">${UI.eye()}</button>`;
     el.querySelector('.iname').addEventListener('click', () => select(s.id === state.selected ? 0 : s.id));
     el.querySelector('.eye').addEventListener('click', () => toggle(s.id));
     list.appendChild(el);
@@ -393,8 +393,8 @@ function bindEvents() {
     }
   });
 
-  video.addEventListener('play', () => { $('play').textContent = '❚❚'; $('play').setAttribute('aria-label', 'Durdur'); });
-  video.addEventListener('pause', () => { $('play').textContent = '▶'; $('play').setAttribute('aria-label', 'Oynat'); render(); writeHash(); });
+  video.addEventListener('play', () => { $('play').innerHTML = UI.icon('pause'); $('play').setAttribute('aria-label', 'Durdur'); });
+  video.addEventListener('pause', () => { $('play').innerHTML = UI.icon('play'); $('play').setAttribute('aria-label', 'Oynat'); render(); writeHash(); });
   $('play').addEventListener('click', togglePlay);
   $('prev').addEventListener('click', () => step(-1));
   $('next').addEventListener('click', () => step(1));
@@ -461,11 +461,11 @@ async function copyLink() {
   const btn = $('shareBtn');
   try {
     await navigator.clipboard.writeText(location.href);
-    btn.innerHTML = '✓<span class="lbl"> Kopyalandı</span>';
+    btn.innerHTML = UI.icon('check') + '<span class="lbl"> Kopyalandı</span>';
   } catch {
-    btn.innerHTML = '⚠<span class="lbl"> Kopyalanamadı</span>';
+    btn.innerHTML = UI.icon('alert') + '<span class="lbl"> Kopyalanamadı</span>';
   }
-  setTimeout(() => { btn.innerHTML = '🔗<span class="lbl"> Bağlantıyı kopyala</span>'; }, 1600);
+  setTimeout(() => { btn.innerHTML = UI.icon('link') + '<span class="lbl"> Bağlantıyı kopyala</span>'; }, 1600);
 }
 
 load();

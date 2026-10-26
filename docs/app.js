@@ -86,6 +86,7 @@ async function load() {
   text.textContent = 'BT yükleniyor…';
   const [ctBuf, labBuf, ovBuf, lesBuf] = await Promise.all([
     fetchBin(`${dir}/ct.bin.gz${v}`, (got, total) => {
+      if (total) $('loadBar').style.width = `${Math.min(100, (got / total) * 100)}%`;
       text.textContent = total
         ? `BT yükleniyor… %${Math.min(100, Math.round((got / total) * 100))}`
         : `BT yükleniyor… ${(got / 1e6).toFixed(1)} MB`;
@@ -247,11 +248,11 @@ async function copyLink() {
   const btn = $('shareBtn');
   try {
     await navigator.clipboard.writeText(text);
-    btn.innerHTML = '✓<span class="lbl"> Kopyalandı</span>';
+    btn.innerHTML = UI.icon('check') + '<span class="lbl"> Kopyalandı</span>';
   } catch {
     prompt('Bağlantıyı kopyalayın:', text);
   }
-  setTimeout(() => { btn.innerHTML = '🔗<span class="lbl"> Bağlantıyı kopyala</span>'; }, 1800);
+  setTimeout(() => { btn.innerHTML = UI.icon('link') + '<span class="lbl"> Bağlantıyı kopyala</span>'; }, 1800);
 }
 
 function hexToRgb(hex) {
@@ -454,7 +455,7 @@ function drawLabels(L) {
   if (!entries.length) return;
   const fontPx = L.cw < 520 ? 10 : 12;
   const lh = fontPx + 6;
-  ctx.font = `500 ${fontPx}px system-ui, -apple-system, "Segoe UI", sans-serif`;
+  ctx.font = `500 ${fontPx}px Inter, system-ui, -apple-system, "Segoe UI", sans-serif`;
   ctx.textBaseline = 'middle';
 
   const pts = entries.map(([id, u, v]) => ({
@@ -496,26 +497,41 @@ function drawLabels(L) {
       const c = st.color;
 
       ctx.globalAlpha = dim ? 0.45 : 1;
-      ctx.strokeStyle = c;
-      ctx.lineWidth = isSel ? 1.6 : 1;
+      // Bağlantı çizgisi: altına koyu iz, üstüne yapı rengi (görüntü üzerinde okunur kalır)
+      ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.moveTo(lineX, p.ly);
       ctx.lineTo(p.x, p.y);
+      ctx.strokeStyle = 'rgba(0,0,0,.55)';
+      ctx.lineWidth = isSel ? 3.4 : 2.6;
       ctx.stroke();
+      ctx.strokeStyle = c;
+      ctx.lineWidth = isSel ? 1.6 : 1;
+      ctx.stroke();
+      // Nokta: renkli göz, ince beyaz halka
       ctx.fillStyle = c;
       ctx.beginPath();
-      ctx.arc(p.x, p.y, isSel ? 3.5 : 2.5, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, isSel ? 3.8 : 2.8, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = '#000';
+      ctx.strokeStyle = 'rgba(255,255,255,.85)';
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      ctx.fillStyle = isSel ? c : 'rgba(0,0,0,.6)';
-      ctx.fillRect(tx - 3, p.ly - lh / 2 + 1, tw + 6, lh - 2);
-      ctx.fillStyle = isSel ? '#0b0d10' : c;
+      // Etiket: yarı saydam koyu hap, yapı renginde ince kenar; seçiliyse dolgulu
+      const bx = tx - 5, by = p.ly - lh / 2 + 1, bw = tw + 10, bh = lh - 2, br = Math.min(7, bh / 2);
+      ctx.beginPath();
+      ctx.roundRect(bx, by, bw, bh, br);
+      ctx.fillStyle = isSel ? c : 'rgba(8,9,12,.72)';
+      ctx.fill();
+      ctx.strokeStyle = isSel ? 'rgba(255,255,255,.7)' : c;
+      ctx.globalAlpha = (dim ? 0.45 : 1) * (isSel ? 1 : 0.55);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.globalAlpha = dim ? 0.45 : 1;
+      ctx.fillStyle = isSel ? '#08090c' : '#f2f4f8';
       ctx.fillText(text, tx, p.ly + 0.5);
       ctx.globalAlpha = 1;
-      labelHits.push({ id: p.id, x: tx - 3, y: p.ly - lh / 2, w: tw + 6, h: lh });
+      labelHits.push({ id: p.id, x: tx - 5, y: p.ly - lh / 2, w: tw + 10, h: lh });
     }
   }
 }
@@ -637,7 +653,7 @@ function itemRow(s) {
   row.dataset.q = norm(`${s.tr} ${s.en} ${s.la || ''} ${s.key}`);
   row.innerHTML =
     `<span class="dot" style="background:${s.color}"></span><button class="iname">${nm(s)}</button>` +
-    '<span class="here"></span><button class="eye" aria-label="Göster / gizle" title="Göster / gizle">👁</button>';
+    '<span class="here"></span><button class="eye" aria-label="Göster / gizle" title="Göster / gizle">' + UI.eye() + '</button>';
   row.querySelector('.iname').addEventListener('click', () => {
     if (state.quiz) return;
     select(s.id, { focus: true });
@@ -679,7 +695,7 @@ function buildList() {
       if (g) {
         host = document.createElement('details');
         host.className = 'grp';
-        host.innerHTML = `<summary><span class="gname">${g}</span><span class="gcount"></span><button class="eye" aria-label="Grubu göster / gizle" title="Grubu göster / gizle">👁</button></summary>`;
+        host.innerHTML = `<summary><span class="gname">${g}</span><span class="gcount"></span><button class="eye" aria-label="Grubu göster / gizle" title="Grubu göster / gizle">${UI.eye()}</button></summary>`;
         host.querySelector('.eye').addEventListener('click', (e) => {
           e.preventDefault();
           toggleHidden(items.map((i) => i.id));
@@ -991,6 +1007,8 @@ function bindEvents() {
   });
 
   new ResizeObserver(() => draw()).observe($('viewer'));
+  // Etiket yazı tipi geç yüklenirse yeniden çiz
+  document.fonts?.ready.then(() => draw());
 }
 
 // ---------- Test modu ----------
@@ -1030,14 +1048,14 @@ function quizStart(exam = false) {
   state.quiz = { score: 0, total: 0, exam, wrong: [] };
   state.selected = 0;
   $('quiz').hidden = false;
-  $('quizBtn').innerHTML = '✕<span class="lbl"> Testi bitir</span>';
+  $('quizBtn').innerHTML = UI.icon('x') + '<span class="lbl"> Testi bitir</span>';
   quizNew();
 }
 
 function quizExit() {
   state.quiz = null;
   $('quiz').hidden = true;
-  $('quizBtn').innerHTML = '🎯<span class="lbl"> Kendini test et</span>';
+  $('quizBtn').innerHTML = UI.icon('target') + '<span class="lbl"> Kendini test et</span>';
   render();
 }
 

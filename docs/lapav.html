@@ -3,11 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b0d10">
+  <meta name="theme-color" content="#08090c">
   <title>Laparoskopik Video Atlası</title>
   <meta name="description" content="Gerçek bir laparoskopi videosu düz akar; filtre düğmesine basınca organlar ve aletler videonun üzerinde renkli ve Türkçe etiketli görünür.">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="lapa.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="premium.css">
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="ui.js" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -25,7 +31,7 @@
         <button data-lang="en">EN</button>
         <button data-lang="la">LA</button>
       </div>
-      <button id="shareBtn" class="btn" title="Bağlantıyı kopyala" aria-label="Bağlantıyı kopyala">🔗<span class="lbl"> Bağlantıyı kopyala</span></button>
+      <button id="shareBtn" class="btn" title="Bağlantıyı kopyala" aria-label="Bağlantıyı kopyala"><span data-icon="link"></span><span class="lbl"> Bağlantıyı kopyala</span></button>
     </div>
   </header>
 
@@ -44,7 +50,7 @@
         </div>
       </div>
       <div class="slice-bar">
-        <button class="btn icon" id="play" aria-label="Oynat">▶</button>
+        <button class="btn icon" id="play" aria-label="Oynat"><span data-icon="play"></span></button>
         <button class="btn icon" id="prev" aria-label="Önceki kare">‹</button>
         <input type="range" id="seek" min="0" max="1000" value="0" step="1" aria-label="Zaman">
         <button class="btn icon" id="next" aria-label="Sonraki kare">›</button>
