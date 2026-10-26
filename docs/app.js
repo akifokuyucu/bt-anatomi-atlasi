@@ -180,7 +180,7 @@ function pickCase(cases) {
 function buildCaseSelect(cases) {
   const sel = $('caseSel');
   sel.hidden = cases.length < 2;
-  const cats = { saglikli: 'Sağlıklı anatomi', patoloji: 'Patoloji' };
+  const cats = { saglikli: 'BT atlası', patoloji: 'Patoloji BT atlası' };
   sel.innerHTML = Object.entries(cats)
     .map(([k, name]) => [name, cases.filter((c) => c.category === k)])
     .filter(([, list]) => list.length)
@@ -244,7 +244,7 @@ async function copyLink() {
   const st = structById[state.selected];
   const [, , n] = dimsOf(state.plane);
   const v = sliderToSlice(state.plane, state.slices[state.plane]);
-  const text = `${st ? `${nm(st)} · ` : ''}${PLANE_TR[state.plane]} ${v + 1}/${n} — BT Anatomi Atlası\n${location.href}`;
+  const text = `${st ? `${nm(st)} · ` : ''}${PLANE_TR[state.plane]} ${v + 1}/${n} — Klinik Atlas\n${location.href}`;
   const btn = $('shareBtn');
   try {
     await navigator.clipboard.writeText(text);

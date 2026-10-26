@@ -23,6 +23,7 @@
     coronal: '<rect x="4" y="3" width="16" height="18" rx="4"/><path d="M12 3v18" opacity=".35"/>',
     sagittal: '<path d="M8 3c6 0 9 3 9 9s-3 9-9 9"/><path d="M8 3v18" opacity=".35"/>',
     chevron: '<path d="m9 6 6 6-6 6"/>',
+    home: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   };
 
   const icon = (name, cls = '') =>
