@@ -72,3 +72,29 @@ main { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 .badge.new { color: #1a1405; background: var(--accent); border-color: var(--accent); font-size: 10px; padding: 1px 6px; }
 #laparoskopi .case:not(.planned):hover { border-color: var(--lap); }
 .note-box.lap { border-left-color: var(--lap); }
+
+/* Portal: pano ve araçlar */
+.hero.portal { grid-template-columns: 1fr; padding: 44px 0 28px; }
+.badge.pano { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+.badge.tool { color: var(--lap); border-color: color-mix(in srgb, var(--lap) 55%, var(--line)); }
+.pano-bar { display: grid; gap: 10px; margin-bottom: 16px; }
+.pano-bar input { width: 100%; max-width: 420px; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font: inherit; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; }
+.chip:hover { color: var(--text); }
+.chip[aria-pressed="true"] { color: var(--text); border-color: var(--accent); background: var(--panel); }
+.pano { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.pano-kart { display: grid; gap: 8px; align-content: start; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+.pano-kart.sabit { border-color: color-mix(in srgb, var(--accent) 60%, var(--line)); }
+.pano-kart h3 { margin: 0; font-size: 17px; }
+.pano-kart p { margin: 0; }
+.pano-kart .yorum { color: var(--muted); font-size: 14px; border-left: 2px solid var(--line); padding-left: 10px; }
+.pano-kart ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13px; }
+.pano-ust { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.pano-alt { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; margin-top: 4px; }
+.pano-alt .btn { text-decoration: none; white-space: nowrap; }
+.pano-etiket { display: flex; gap: 6px; flex-wrap: wrap; }
+.pano-etiket span { font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 1px 7px; }
+.tools .case { padding: 0; }
+.atlaslar-head { padding-bottom: 0; }
+.atlaslar-head .areas { padding-bottom: 8px; }

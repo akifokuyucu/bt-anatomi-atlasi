@@ -48,3 +48,93 @@ fill('data/lapa_cases.json',
   [['cases-laparoskopi', () => true]],
   (c) => `${c.page || 'lapa.html'}#c=${encodeURIComponent(c.id)}`,
   (c) => (c.dur ? `${c.dur} sn video · ${c.n} yapı` : `${c.frames} kare · ${c.n} yapı`));
+
+// Pano: pano/pano.json (branş, tür ve arama süzgeci)
+const TUR = { site: 'Site', haber: 'Haber', kilavuz: 'Kılavuz', video: 'Video', arac: 'Araç', duyuru: 'Duyuru' };
+const guvenliUrl = (u) => (/^(https?:\/\/|#|[\w./-]+\.html)/i.test(u) ? u : '#');
+const tarihTr = (t) => new Date(t + 'T00:00:00').toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+const yeniMi = (t) => (Date.now() - new Date(t + 'T00:00:00')) / 864e5 <= 14;
+
+function panoKart(k) {
+  const dis = /^https?:/i.test(k.url);
+  const a = document.createElement('article');
+  a.className = 'pano-kart' + (k.sabit ? ' sabit' : '');
+  a.innerHTML =
+    `<div class="pano-ust"><span class="badge tur-${esc(k.tur)}">${esc(TUR[k.tur] || k.tur)}</span>` +
+    (k.sabit ? '<span class="badge soon">Sabit</span>' : '') +
+    (yeniMi(k.tarih) ? '<span class="badge new">YENİ</span>' : '') + '</div>' +
+    `<h3>${esc(k.baslik)}</h3><p>${esc(k.ozet)}</p>` +
+    (k.yorum ? `<p class="yorum">${esc(k.yorum)}</p>` : '') +
+    ((k.ozellikler || []).length ? `<ul>${k.ozellikler.map((o) => `<li>${esc(o)}</li>`).join('')}</ul>` : '') +
+    `<div class="pano-alt"><span class="muted">${esc(k.kaynak || '')} · ${esc(tarihTr(k.tarih))}</span>` +
+    `<a class="btn" href="${esc(guvenliUrl(k.url))}"${dis ? ' target="_blank" rel="noopener"' : ''}>${dis ? 'Siteye git ↗' : 'Aç'}</a></div>` +
+    `<div class="pano-etiket">${(k.branslar || []).map((b) => `<span>${esc(b)}</span>`).join('')}</div>`;
+  return a;
+}
+
+async function panoyuKur() {
+  const liste = document.getElementById('pano-liste');
+  let kartlar;
+  try {
+    kartlar = await (await fetch('pano/pano.json', { cache: 'no-cache' })).json();
+  } catch {
+    liste.innerHTML = '<p class="muted">Pano yüklenemedi. Sayfayı yenileyin.</p>';
+    return;
+  }
+  kartlar.sort((a, b) => (b.sabit ? 1 : 0) - (a.sabit ? 1 : 0) || b.tarih.localeCompare(a.tarih));
+  const durum = { brans: '', tur: '', q: '' };
+  const benzersiz = (f) => [...new Set(kartlar.flatMap(f))];
+
+  const chipler = (id, degerler, etiket, anahtar) => {
+    const box = document.getElementById(id);
+    if (degerler.length < 2) { box.hidden = true; return; }
+    const dugme = (v, ad) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'chip'; b.textContent = ad; b.setAttribute('aria-pressed', String(durum[anahtar] === v));
+      b.onclick = () => { durum[anahtar] = v; box.querySelectorAll('.chip').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); ciz(); };
+      box.appendChild(b);
+    };
+    dugme('', etiket);
+    degerler.forEach((v) => dugme(v, etiket === 'Tüm türler' ? TUR[v] || v : v));
+  };
+  chipler('pano-bransler', benzersiz((k) => k.branslar || []), 'Tüm branşlar', 'brans');
+  chipler('pano-turler', benzersiz((k) => [k.tur]), 'Tüm türler', 'tur');
+  document.getElementById('pano-ara').addEventListener('input', (e) => { durum.q = e.target.value.trim().toLocaleLowerCase('tr'); ciz(); });
+
+  function ciz() {
+    liste.innerHTML = '';
+    const sonuc = kartlar.filter((k) =>
+      (!durum.brans || (k.branslar || []).includes(durum.brans)) &&
+      (!durum.tur || k.tur === durum.tur) &&
+      (!durum.q || [k.baslik, k.ozet, k.yorum, k.kaynak, ...(k.ozellikler || [])].join(' ').toLocaleLowerCase('tr').includes(durum.q)));
+    if (!sonuc.length) liste.innerHTML = '<p class="muted">Bu süzgeçle eşleşen kart yok.</p>';
+    sonuc.forEach((k) => liste.appendChild(panoKart(k)));
+  }
+  ciz();
+}
+
+// Araçlar: pano/araclar.json
+async function araclariKur() {
+  const box = document.getElementById('araclar-liste');
+  try {
+    const araclar = await (await fetch('pano/araclar.json', { cache: 'no-cache' })).json();
+    box.innerHTML = '';
+    if (!araclar.length) { box.innerHTML = '<p class="muted">İlk araç yakında burada olacak.</p>'; return; }
+    for (const t of araclar) {
+      const hazir = t.durum !== 'yakinda';
+      const el = document.createElement(hazir ? 'a' : 'div');
+      el.className = 'case tool' + (hazir ? '' : ' planned');
+      if (hazir) el.href = guvenliUrl(t.url);
+      el.innerHTML =
+        `<div class="case-body"><span class="caption">${esc((t.branslar || []).join(' · ') || 'ARAÇ')}</span><b>${esc(t.ad)}</b>` +
+        `<span class="muted">${esc(t.aciklama || '')}</span>` +
+        `<span class="badge ${hazir ? 'ok' : 'soon'}">${esc({ yayinda: 'Yayında', beta: 'Beta', yakinda: 'Yakında' }[t.durum] || 'Yayında')}</span></div>`;
+      box.appendChild(el);
+    }
+  } catch {
+    box.innerHTML = '<p class="muted">Araçlar yüklenemedi. Sayfayı yenileyin.</p>';
+  }
+}
+
+panoyuKur();
+araclariKur();

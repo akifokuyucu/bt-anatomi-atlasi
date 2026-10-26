@@ -1,0 +1,26 @@
+[
+  {
+    "id": "pano-acildi",
+    "tur": "duyuru",
+    "baslik": "Klinik Atlas artık bir portal",
+    "ozet": "Site; pano, araçlar ve atlaslar olarak yeniden düzenlendi. Atlaslar aşağıda aynen duruyor.",
+    "yorum": "Panoya beğenilen siteler ve haberler, kısa özellik notlarıyla eklenecek.",
+    "ozellikler": ["Branşa göre filtre", "Tür ve arama", "Araçlar bölümü"],
+    "url": "#araclar",
+    "kaynak": "Klinik Atlas",
+    "tarih": "2026-10-26",
+    "branslar": ["Radyoloji", "Genel cerrahi"],
+    "sabit": true
+  },
+  {
+    "id": "pano-lapa-video",
+    "tur": "duyuru",
+    "baslik": "Laparoskopi video modu yayında",
+    "ozet": "Ameliyat videosu düz akar; filtreye basınca organlar ve aletler videonun üzerine gelir.",
+    "ozellikler": ["SAM 2 ile izlenen maskeler", "BT atlasındaki karşılığına geçiş"],
+    "url": "#laparoskopi",
+    "kaynak": "Klinik Atlas",
+    "tarih": "2026-10-20",
+    "branslar": ["Genel cerrahi"]
+  }
+]
