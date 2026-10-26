@@ -12,31 +12,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="shell.css">
   <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="shell.js" defer></script>
   <script src="ui.js" defer></script>
 </head>
 <body class="home">
-  <header class="topbar">
-    <a class="brand" href="./">
-      <span class="logo">◐</span>
-      <div>
-        <div class="eyebrow">ARAÇLAR</div>
-        <div class="h1">Klinik Atlas</div>
-      </div>
-    </a>
-    <nav class="top-actions">
-      <a class="navlink" href="./#pano">Pano</a>
-      <a class="navlink" href="araclar.html" aria-current="page">Araçlar</a>
-      <a class="navlink" href="./#atlaslar">Atlaslar</a>
-      <a class="btn" href="./" title="Ana menüye dön"><span data-icon="home"></span><span class="lbl"> Ana menü</span></a>
-    </nav>
-  </header>
-
   <main>
+    <div class="page-head">
+      <nav class="crumbs" data-crumbs="Klinik Atlas=index.html|Araçlar"></nav>
+      <h1>Araçlar</h1>
+      <p class="lead">Tarayıcıda açılan, kurulum gerektirmeyen küçük yardımcılar; telefonda da çalışır. Hiçbiri veri toplamaz.</p>
+    </div>
+
     <section id="araclar" class="block">
-      <div class="cat-head"><span class="badge tool">ARAÇLAR</span></div>
-      <h2>Araçlar</h2>
-      <p class="sub">Tarayıcıda açılan, kurulum gerektirmeyen küçük yardımcılar; telefonda da çalışır. Hiçbiri veri toplamaz.</p>
       <div class="cards tools" id="araclar-liste"><p class="muted">Araçlar yükleniyor…</p></div>
     </section>
   </main>

@@ -12,26 +12,21 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="shell.css">
   <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="shell.js" defer></script>
   <script src="ui.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="devir.js" defer></script>
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="index.html" title="Ana sayfa">
-      <span class="logo">◐</span>
-      <div>
-        <div class="eyebrow">ARAÇ</div>
-        <h1>Devir Listesi Kâğıdı</h1>
-      </div>
-    </a>
-    <div class="top-actions">
-      <a class="btn" href="araclar.html" title="Araçlar sayfasına dön" aria-label="Araçlar"><span data-icon="home"></span><span class="lbl"> Araçlar</span></a>
-    </div>
+  <header class="topbar ctx">
+    <nav class="crumbs" data-crumbs="Klinik Atlas=index.html|Araçlar=araclar.html|Devir Listesi Kâğıdı"></nav>
+    <a class="btn" href="araclar.html"><span data-icon="chevron" style="transform:scaleX(-1);display:inline-flex"></span><span class="lbl"> Tüm araçlar</span></a>
   </header>
 
   <main class="devir">
+    <h1 class="page-title">Devir Listesi Kâğıdı</h1>
     <section class="kontrol card">
       <label class="alan">
         <span class="caption">KAÇ HASTA?</span>

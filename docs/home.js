@@ -24,9 +24,25 @@ function card(c, href, meta) {
   return a;
 }
 
+const istatistik = {};
+function ozetiCiz() {
+  const bt = istatistik['data/cases.json'], lap = istatistik['data/lapa_cases.json'];
+  const ilk = bt && bt.find((c) => c.status === 'ready' && c.category === 'saglikli');
+  const img = document.getElementById('pano-oneri-img');
+  if (ilk && img && !img.getAttribute('src')) img.src = ilk.img;
+  const ul = document.getElementById('hero-stats');
+  if (!ul || !bt || !lap) return;
+  const hazir = (l) => l.filter((c) => c.status === 'ready').length;
+  const yapi = Math.max(0, ...bt.map((c) => c.n || 0));
+  ul.innerHTML = [[hazir(bt), 'BT vakası'], [yapi, 'etiketli yapı'], [lap.length, 'laparoskopi vakası']]
+    .map(([n, t]) => `<li><b>${n}</b>${esc(t)}</li>`).join('');
+}
+
 async function fill(url, groups, href, meta) {
   try {
     const cases = await (await fetch(url, { cache: 'no-cache' })).json();
+    istatistik[url] = cases;
+    ozetiCiz();
     for (const [id, filter] of groups) {
       const box = document.getElementById(id);
       box.innerHTML = '';
@@ -83,6 +99,7 @@ async function panoyuKur() {
     liste.innerHTML = '<p class="muted">Pano yüklenemedi. Sayfayı yenileyin.</p>';
     return;
   }
+  document.getElementById('pano-bar').hidden = kartlar.length < 4;
   kartlar.sort((a, b) => (b.sabit ? 1 : 0) - (a.sabit ? 1 : 0) || b.tarih.localeCompare(a.tarih));
   const durum = { brans: '', tur: '', q: '' };
   const benzersiz = (f) => [...new Set(kartlar.flatMap(f))];

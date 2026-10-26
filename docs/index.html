@@ -21,7 +21,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="shell.css">
   <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="shell.js" defer></script>
   <script src="ui.js" defer></script>
   <script>
     // Eski paylaşım bağlantıları (#p=…&s=…) doğrudan atlasa gitsin
@@ -29,23 +31,6 @@
   </script>
 </head>
 <body class="home">
-  <header class="topbar">
-    <a class="brand" href="./">
-      <span class="logo">◐</span>
-      <div>
-        <div class="eyebrow">PANO · ARAÇLAR · ATLASLAR</div>
-        <div class="h1">Klinik Atlas</div>
-      </div>
-    </a>
-    <nav class="top-actions">
-      <a class="navlink" href="#pano">Pano</a>
-      <a class="navlink" href="araclar.html">Araçlar</a>
-      <a class="navlink" href="#atlaslar">Atlaslar</a>
-      <a class="navlink" href="#hakkinda">Hakkında</a>
-      <a class="btn accent" href="atlas.html">Atlası aç</a>
-    </nav>
-  </header>
-
   <main>
     <section class="hero portal">
       <div class="hero-text">
@@ -53,18 +38,32 @@
         <h1>Klinik çalışmanın yanında, tek sayfada</h1>
         <p class="lead">Seçilmiş siteler ve haberler panoda, günlük işe yarayan araçlar bir tık ötede, anatomi ise gerçek BT ve ameliyat görüntüleriyle atlaslarda.</p>
         <div class="cta">
-          <a class="btn accent big" href="#pano">Panoya bak</a>
-          <a class="btn big" href="araclar.html">Araçlar</a>
-          <a class="btn big" href="#atlaslar">Atlaslar</a>
+          <a class="btn accent big" href="atlas.html">Atlası aç</a>
+          <a class="btn big" href="araclar.html">Araçlara git</a>
         </div>
+        <ul class="hero-stats" id="hero-stats" aria-label="Site özeti"></ul>
       </div>
     </section>
 
     <section id="pano" class="block">
-      <div class="cat-head"><span class="badge pano">PANO</span></div>
-      <h2>Duvar: önerilen siteler ve haberler</h2>
-      <p class="sub">Beğenilen siteler, kılavuzlar ve gelişmeler; her kartta kısa özet ve neden işe yaradığı.</p>
-      <div class="pano-bar">
+      <div class="sec-head">
+        <div>
+          <div class="cat-head"><span class="badge pano">PANO</span></div>
+          <h2>Pano</h2>
+          <p class="sub">Beğenilen siteler, kılavuzlar ve gelişmeler. Pano henüz yeni; başa sabitlenen kart BT atlası.</p>
+        </div>
+      </div>
+      <a class="featured" id="pano-oneri" href="atlas.html">
+        <div class="featured-body">
+          <span class="caption">SABİT · ATLAS</span>
+          <h3>BT Anatomi Atlası</h3>
+          <p class="ozet">Gerçek ve anonim BT kesitlerinde Türkçe etiketli anatomi: üç düzlemde gezin, yapıya dokunun, kendinizi test edin.</p>
+          <ul class="featured-pts"><li>Aksiyel · koronal · sagittal</li><li>TR · EN · LA</li><li>Sınav modu</li></ul>
+          <span class="btn accent featured-go">Atlası aç <span data-icon="chevron"></span></span>
+        </div>
+        <div class="featured-media" aria-hidden="true"><img id="pano-oneri-img" alt="" width="640" height="468"><span class="tagpill">BT ATLASI</span></div>
+      </a>
+      <div class="pano-bar" id="pano-bar" hidden>
         <input id="pano-ara" type="search" placeholder="Panoda ara…" aria-label="Panoda ara">
         <div class="chips" id="pano-bransler" role="group" aria-label="Branş filtresi"></div>
         <div class="chips" id="pano-turler" role="group" aria-label="Tür filtresi"></div>
