@@ -35,7 +35,39 @@
       '<div class="top-actions sn-actions"></div>' +
     '</div>';
   document.body.prepend(nav);
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    navigator.serviceWorker.register('sw.js').catch(() => { /* önbelleksiz de çalışır */ });
+  }
   document.body.classList.add('has-sitenav');
+
+  // Klavye ve ekran okuyucu: içeriğe atla bağlantısı
+  const ana = document.querySelector('main') || document.querySelector('.layout');
+  if (ana) {
+    ana.id = ana.id || 'icerik';
+    ana.tabIndex = -1;
+    const atla = document.createElement('a');
+    atla.className = 'skip-link';
+    atla.href = '#' + ana.id;
+    atla.textContent = 'İçeriğe geç';
+    atla.addEventListener('click', (e) => { e.preventDefault(); ana.focus(); ana.scrollIntoView(); });
+    document.body.prepend(atla);
+  }
+
+  // Arama: düğme ve Ctrl+K / "/" kısayolu; arama paneli ilk kullanımda yüklenir (search.js)
+  const ara = document.createElement('button');
+  ara.type = 'button';
+  ara.className = 'btn sn-search';
+  ara.setAttribute('aria-label', 'Ara (Ctrl+K)');
+  ara.title = 'Ara (Ctrl+K)';
+  ara.innerHTML = ico('<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>') + '<span class="sn-search-ad">Ara</span><kbd>Ctrl K</kbd>';
+  nav.querySelector('.sn-actions').appendChild(ara);
+  let panel;
+  const ac = async () => { panel = panel || (await import('./search.js')).aramaPaneli(); panel.ac(); };
+  ara.addEventListener('click', ac);
+  addEventListener('keydown', (e) => {
+    const yazi = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName) || document.activeElement?.isContentEditable;
+    if (((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') || (e.key === '/' && !yazi)) { e.preventDefault(); ac(); }
+  });
 
   // Ana sayfada kaydırdıkça hangi bölümdeysek o menü öğesi vurgulansın
   if (anaSayfa && 'IntersectionObserver' in window) {

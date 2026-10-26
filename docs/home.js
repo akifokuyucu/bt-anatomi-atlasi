@@ -20,7 +20,11 @@ function card(c, href, meta) {
   a.innerHTML =
     `<img src="${esc(c.img)}" alt="" loading="lazy" width="640" height="468">` +
     `<div class="case-body"><span class="caption">${esc(c.eyebrow)}</span><b>${esc(c.title)}</b>` +
-    `<span class="muted">${esc(meta(c))}</span></div>`;
+    (c.text ? `<span class="muted">${esc(c.text)}</span>` : '') +
+    `<div class="rozetler">${meta(c).map((m) => `<span class="mini">${esc(m)}</span>`).join('')}${c.yeni ? '<span class="mini yeni">YENİ</span>' : ''}</div></div>`;
+  const im = a.querySelector('img');
+  const goster = () => im.classList.add('yuklendi');
+  if (im.complete) goster(); else { im.addEventListener('load', goster); im.addEventListener('error', goster); }
   return a;
 }
 
@@ -37,6 +41,9 @@ function ozetiCiz() {
   ul.innerHTML = [[hazir(bt), 'BT vakası'], [yapi, 'etiketli yapı'], [lap.length, 'laparoskopi vakası']]
     .map(([n, t]) => `<li><b>${n}</b>${esc(t)}</li>`).join('');
 }
+
+const iskelet = (n) => Array.from({ length: n }, () => '<div class="skel-kart" aria-hidden="true"><i class="g"></i><i class="s1"></i><i class="s2"></i></div>').join('');
+['cases-saglikli', 'cases-patoloji', 'cases-laparoskopi'].forEach((id) => { const b = document.getElementById(id); if (b) b.innerHTML = iskelet(3); });
 
 async function fill(url, groups, href, meta) {
   try {
@@ -60,12 +67,12 @@ async function fill(url, groups, href, meta) {
 fill('data/cases.json',
   ['saglikli', 'patoloji'].map((cat) => [`cases-${cat}`, (c) => c.category === cat]),
   (c) => `atlas.html#c=${encodeURIComponent(c.id)}`,
-  (c) => `${c.n} yapı · ${c.mm} mm kesit`);
+  (c) => [`${c.n} yapı`, `${c.mm} mm kesit`]);
 
 fill('data/lapa_cases.json',
   [['cases-laparoskopi', () => true]],
   (c) => `${c.page || 'lapa.html'}#c=${encodeURIComponent(c.id)}`,
-  (c) => (c.dur ? `${c.dur} sn video · ${c.n} yapı` : `${c.frames} kare · ${c.n} yapı`));
+  (c) => (c.dur ? [`${c.dur} sn video`, `${c.n} yapı`] : [`${c.frames} kare`, `${c.n} yapı`]));
 
 // Pano: pano/pano.json (branş, tür ve arama süzgeci)
 const TUR = { site: 'Site', haber: 'Haber', kilavuz: 'Kılavuz', video: 'Video', arac: 'Araç', duyuru: 'Duyuru' };
