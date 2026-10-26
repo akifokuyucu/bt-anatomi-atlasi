@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08090c">
+  <title>Devir Listesi Kağıdı</title>
+  <meta name="description" content="Servis devirleri için A4 kâğıdı hasta sayısına göre kutulara bölen, PDF olarak indiren araç.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="devir.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="premium.css">
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="ui.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="devir.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html" title="Ana sayfa">
+      <span class="logo">◐</span>
+      <div>
+        <div class="eyebrow">ARAÇ</div>
+        <h1>Devir Listesi Kâğıdı</h1>
+      </div>
+    </a>
+    <div class="top-actions">
+      <a class="btn" href="araclar.html" title="Araçlar sayfasına dön" aria-label="Araçlar"><span data-icon="home"></span><span class="lbl"> Araçlar</span></a>
+    </div>
+  </header>
+
+  <main class="devir">
+    <section class="kontrol card">
+      <label class="alan">
+        <span class="caption">KAÇ HASTA?</span>
+        <input type="number" id="n" min="1" max="60" value="16" inputmode="numeric">
+      </label>
+
+      <div class="alan">
+        <span class="caption">ÖNERİLEN DÜZENLER (satır × sütun)</span>
+        <div id="oneriler" class="chips"></div>
+      </div>
+
+      <div class="alan">
+        <span class="caption">KENDİN AYARLA</span>
+        <div class="satir">
+          <label>Satır <input type="number" id="r" min="1" max="15" inputmode="numeric"></label>
+          <span class="x">×</span>
+          <label>Sütun <input type="number" id="c" min="1" max="10" inputmode="numeric"></label>
+          <div class="seg" id="yon">
+            <button data-yon="p" class="on">Dikey</button>
+            <button data-yon="l">Yatay</button>
+          </div>
+        </div>
+      </div>
+
+      <label class="alan">
+        <span class="caption">BAŞLIK (isteğe bağlı)</span>
+        <input type="text" id="baslik" maxlength="60" placeholder="Örn. Genel Cerrahi Servisi · Devir">
+      </label>
+
+      <div class="alan secenekler">
+        <label class="toggle"><input type="checkbox" id="numara" checked> Hasta numarası</label>
+        <label class="toggle"><input type="checkbox" id="adSatiri" checked> Ad için ayraç çizgisi</label>
+        <label class="toggle"><input type="checkbox" id="tarih"> Tarih / saat alanı</label>
+        <label class="toggle"><input type="checkbox" id="kesik"> Kesik çizgi (katlama/kesme)</label>
+      </div>
+
+      <button class="btn accent big" id="indir">⬇ PDF indir</button>
+      <p class="muted not">Her şey tarayıcıda üretilir; hiçbir veri sunucuya gitmez. Kâğıt boş çıkar, hasta bilgisini elle yazarsınız.</p>
+    </section>
+
+    <section class="onizleme">
+      <div class="kagit" id="kagit" aria-label="A4 önizleme"></div>
+      <p class="muted" id="bilgi"></p>
+    </section>
+  </main>
+</body>
+</html>

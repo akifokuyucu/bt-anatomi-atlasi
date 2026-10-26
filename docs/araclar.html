@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08090c">
+  <title>Araçlar · Klinik Atlas</title>
+  <meta name="description" content="Klinik çalışmada işe yarayan, tarayıcıda açılan küçük araçlar: devir listesi kâğıdı ve daha fazlası.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="home.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="premium.css">
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="ui.js" defer></script>
+</head>
+<body class="home">
+  <header class="topbar">
+    <a class="brand" href="./">
+      <span class="logo">◐</span>
+      <div>
+        <div class="eyebrow">ARAÇLAR</div>
+        <div class="h1">Klinik Atlas</div>
+      </div>
+    </a>
+    <nav class="top-actions">
+      <a class="navlink" href="./#pano">Pano</a>
+      <a class="navlink" href="araclar.html" aria-current="page">Araçlar</a>
+      <a class="navlink" href="./#atlaslar">Atlaslar</a>
+      <a class="btn" href="./" title="Ana menüye dön"><span data-icon="home"></span><span class="lbl"> Ana menü</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="araclar" class="block">
+      <div class="cat-head"><span class="badge tool">ARAÇLAR</span></div>
+      <h2>Araçlar</h2>
+      <p class="sub">Tarayıcıda açılan, kurulum gerektirmeyen küçük yardımcılar; telefonda da çalışır. Hiçbiri veri toplamaz.</p>
+      <div class="cards tools" id="araclar-liste"><p class="muted">Araçlar yükleniyor…</p></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p><b>Eğitim ve çalışma kolaylığı içindir.</b> Araçlara hasta kimlik bilgisi girmeyin; çıktılar boş formdur.</p>
+  </footer>
+
+  <script type="module">
+    import { araclariKur } from './araclar.js';
+    araclariKur();
+  </script>
+</body>
+</html>

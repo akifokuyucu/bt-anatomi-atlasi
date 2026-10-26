@@ -1,4 +1,6 @@
 // Ana sayfa: BT kartları data/cases.json'dan, laparoskopi kartları data/lapa_cases.json'dan üretilir.
+import { araclariKur } from './araclar.js';
+
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
 // href: hazır vakanın açılacağı sayfa; meta: kartın alt satırı
@@ -111,29 +113,6 @@ async function panoyuKur() {
     sonuc.forEach((k) => liste.appendChild(panoKart(k)));
   }
   ciz();
-}
-
-// Araçlar: pano/araclar.json
-async function araclariKur() {
-  const box = document.getElementById('araclar-liste');
-  try {
-    const araclar = await (await fetch('pano/araclar.json', { cache: 'no-cache' })).json();
-    box.innerHTML = '';
-    if (!araclar.length) { box.innerHTML = '<p class="muted">İlk araç yakında burada olacak.</p>'; return; }
-    for (const t of araclar) {
-      const hazir = t.durum !== 'yakinda';
-      const el = document.createElement(hazir ? 'a' : 'div');
-      el.className = 'case tool' + (hazir ? '' : ' planned');
-      if (hazir) el.href = guvenliUrl(t.url);
-      el.innerHTML =
-        `<div class="case-body"><span class="caption">${esc((t.branslar || []).join(' · ') || 'ARAÇ')}</span><b>${esc(t.ad)}</b>` +
-        `<span class="muted">${esc(t.aciklama || '')}</span>` +
-        `<span class="badge ${hazir ? 'ok' : 'soon'}">${esc({ yayinda: 'Yayında', beta: 'Beta', yakinda: 'Yakında' }[t.durum] || 'Yayında')}</span></div>`;
-      box.appendChild(el);
-    }
-  } catch {
-    box.innerHTML = '<p class="muted">Araçlar yüklenemedi. Sayfayı yenileyin.</p>';
-  }
 }
 
 panoyuKur();

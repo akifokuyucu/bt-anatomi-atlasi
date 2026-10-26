@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "ad": "Devir Listesi Kâğıdı",
+    "aciklama": "Servis devri için A4'ü hasta sayısına göre satır × sütun kutulara böler; önerilen düzenlerden seç, PDF indir.",
+    "branslar": ["Klinik"],
+    "url": "devir.html",
+    "durum": "yayinda"
+  }
+]
