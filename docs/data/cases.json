@@ -22,6 +22,17 @@
   "status": "ready"
  },
  {
+  "id": "s0103",
+  "title": "Kraniyal BT · sağlıklı (kontrastsız)",
+  "eyebrow": "KRANİYAL",
+  "n": 53,
+  "mm": 1.5,
+  "img": "img/s0103.jpg",
+  "category": "saglikli",
+  "region": "kraniyal",
+  "status": "ready"
+ },
+ {
   "id": "pe01",
   "title": "Pulmoner emboli · BT anjiyo",
   "eyebrow": "TORAKS · ANJİYO",
@@ -31,15 +42,6 @@
   "category": "patoloji",
   "region": "toraks",
   "status": "ready"
- },
- {
-  "id": "kraniyal",
-  "category": "saglikli",
-  "region": "kraniyal",
-  "title": "Kraniyal BT · sağlıklı",
-  "eyebrow": "KRANİYAL",
-  "text": "Beyin, ventriküller, kafa tabanı ve venöz sinüsler; normal kraniyal BT veya BT anjiyo.",
-  "status": "planned"
  },
  {
   "id": "ileus",
