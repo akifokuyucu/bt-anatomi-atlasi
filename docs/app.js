@@ -327,19 +327,108 @@ function visibleTable() {
 
 // ---------- Çizim ----------
 
+// Ekran çözünürlüğüne göre kesit büyütme katsayısı: voksel başına cihaz pikseli (üst sınırlı)
+let hiF = 1;
+function hiFactor() {
+  const [w, h] = dimsOf(state.plane);
+  const k = layout().ku * (window.devicePixelRatio || 1);
+  return Math.max(1, Math.min(6, Math.ceil(k), Math.floor(Math.sqrt(3e6 / (w * h)))));
+}
+
+// Catmull-Rom (kübik) ağırlıkları: hedef piksel X için 4 kaynak dizin ve ağırlık
+function cubicTaps(n, f) {
+  const N = n * f;
+  const idx = new Int32Array(N * 4);
+  const wt = new Float32Array(N * 4);
+  for (let X = 0; X < N; X++) {
+    const x = (X + 0.5) / f - 0.5;
+    const i0 = Math.floor(x);
+    const t = x - i0;
+    const t2 = t * t;
+    const t3 = t2 * t;
+    const w = [(-t3 + 2 * t2 - t) / 2, (3 * t3 - 5 * t2 + 2) / 2, (-3 * t3 + 4 * t2 + t) / 2, (t3 - t2) / 2];
+    for (let j = 0; j < 4; j++) {
+      idx[X * 4 + j] = Math.min(n - 1, Math.max(0, i0 - 1 + j));
+      wt[X * 4 + j] = w[j];
+    }
+  }
+  return [idx, wt];
+}
+
+// Gri değerleri kübik enterpolasyonla f kat büyütür (yatay + dikey ayrık geçiş)
+function upsampleGray(src, w, h, f) {
+  const W = w * f;
+  const H = h * f;
+  const [xi, xw] = cubicTaps(w, f);
+  const [yi, yw] = cubicTaps(h, f);
+  const tmp = new Float32Array(W * h);
+  for (let v = 0; v < h; v++) {
+    const row = v * w;
+    for (let X = 0; X < W; X++) {
+      const q = X * 4;
+      tmp[v * W + X] = src[row + xi[q]] * xw[q] + src[row + xi[q + 1]] * xw[q + 1] +
+        src[row + xi[q + 2]] * xw[q + 2] + src[row + xi[q + 3]] * xw[q + 3];
+    }
+  }
+  const out = new Float32Array(W * H);
+  for (let Y = 0; Y < H; Y++) {
+    const q = Y * 4;
+    const r0 = yi[q] * W, r1 = yi[q + 1] * W, r2 = yi[q + 2] * W, r3 = yi[q + 3] * W;
+    const w0 = yw[q], w1 = yw[q + 1], w2 = yw[q + 2], w3 = yw[q + 3];
+    for (let X = 0; X < W; X++) {
+      out[Y * W + X] = tmp[r0 + X] * w0 + tmp[r1 + X] * w1 + tmp[r2 + X] * w2 + tmp[r3 + X] * w3;
+    }
+  }
+  return out;
+}
+
+// Etiket kimliklerini f kat büyütür: her hedef piksel, 4 komşu vokselin çift doğrusal ağırlıklarıyla oy verir.
+// Sınırlar basamaklı değil yumuşak çıkar; kimlikler asla karışmaz.
+function upsampleLabels(src, w, h, f) {
+  const W = w * f;
+  const H = h * f;
+  const out = new Uint8Array(W * H);
+  const fx = new Int32Array(W), tx = new Float32Array(W);
+  const fy = new Int32Array(H), ty = new Float32Array(H);
+  for (let X = 0; X < W; X++) { const x = (X + 0.5) / f - 0.5; fx[X] = Math.floor(x); tx[X] = x - fx[X]; }
+  for (let Y = 0; Y < H; Y++) { const y = (Y + 0.5) / f - 0.5; fy[Y] = Math.floor(y); ty[Y] = y - fy[Y]; }
+  for (let Y = 0; Y < H; Y++) {
+    const y0 = Math.max(0, fy[Y]), y1 = Math.min(h - 1, fy[Y] + 1), wy = ty[Y];
+    for (let X = 0; X < W; X++) {
+      const x0 = Math.max(0, fx[X]), x1 = Math.min(w - 1, fx[X] + 1), wx = tx[X];
+      const a = src[y0 * w + x0], b = src[y0 * w + x1], c = src[y1 * w + x0], d = src[y1 * w + x1];
+      let r = a;
+      if (a !== b || a !== c || a !== d) {
+        const wa = (1 - wx) * (1 - wy), wb = wx * (1 - wy), wc = (1 - wx) * wy, wd = wx * wy;
+        let best = -1;
+        for (const [l, wgt] of [[a, wa], [b, wb], [c, wc], [d, wd]]) {
+          const sum = (a === l ? wa : 0) + (b === l ? wb : 0) + (c === l ? wc : 0) + (d === l ? wd : 0);
+          if (sum > best) { best = sum; r = l; }
+        }
+      }
+      out[Y * W + X] = r;
+    }
+  }
+  return out;
+}
+
 function renderSlice() {
   const [w, h] = dimsOf(state.plane);
   const s = state.slices[state.plane];
-  if (off.width !== w || off.height !== h) {
-    off.width = w;
-    off.height = h;
+  const f = hiFactor();
+  hiF = f;
+  const W = w * f;
+  const H = h * f;
+  if (off.width !== W || off.height !== H) {
+    off.width = W;
+    off.height = H;
   }
   const [base, du, dv] = strides(state.plane, s);
-  const [W, L] = state.win;
-  const lo = L - W / 2;
-  const scale = 255 / W;
+  const [WW, L0] = state.win;
+  const lo = L0 - WW / 2;
+  const scale = 255 / WW;
   const n = w * h;
-  const gray = new Uint8ClampedArray(n);
+  const gray = new Float32Array(n);
   sliceLabels = new Uint8Array(n);
   sliceArea = new Uint32Array(atlas.structures.length + 1);
   const useOv = overlayOn();
@@ -361,20 +450,25 @@ function renderSlice() {
     }
   }
 
+  // Yüksek çözünürlüklü katmanlar: gri kübik, etiketler ve lezyon oylamayla büyütülür
+  const hg = f > 1 ? upsampleGray(gray, w, h, f) : gray;
+  const hl = f > 1 ? upsampleLabels(sliceLabels, w, h, f) : sliceLabels;
+  const hles = showLes ? (f > 1 ? upsampleLabels(sliceLes, w, h, f) : sliceLes) : null;
+
   const vis = visibleTable();
   const sel = state.quiz ? state.quiz.target.id : state.selected;
   const fillA = state.quiz ? 0.55 : state.opacity;
-  const img = offCtx.createImageData(w, h);
+  const img = offCtx.createImageData(W, H);
   const px = img.data;
-  for (let v = 0, p = 0; v < h; v++) {
-    for (let u = 0; u < w; u++, p++) {
-      const g = gray[p];
-      const l = sliceLabels[p];
+  for (let v = 0, p = 0; v < H; v++) {
+    for (let u = 0; u < W; u++, p++) {
+      const g = Math.max(0, Math.min(255, hg[p]));
+      const l = hl[p];
       let r = g, gg = g, b = g;
       if (l && vis[l]) {
         const edge = state.outline && (
-          (u > 0 && sliceLabels[p - 1] !== l) || (u < w - 1 && sliceLabels[p + 1] !== l) ||
-          (v > 0 && sliceLabels[p - w] !== l) || (v < h - 1 && sliceLabels[p + w] !== l));
+          (u > 0 && hl[p - 1] !== l) || (u < W - 1 && hl[p + 1] !== l) ||
+          (v > 0 && hl[p - W] !== l) || (v < H - 1 && hl[p + W] !== l));
         let a;
         if (edge) a = sel && l !== sel ? 0.45 : 0.95;
         else if (!sel) a = fillA;
@@ -384,11 +478,11 @@ function renderSlice() {
         gg = g + (c[1] - g) * a;
         b = g + (c[2] - g) * a;
       }
-      if (showLes && sliceLes[p]) {
+      if (hles && hles[p]) {
         // Lezyon: yapıların üstünde kırmızı dolgu; seçili lezyonun konturu beyaz
-        const q = sliceLes[p];
-        const edge = (u > 0 && sliceLes[p - 1] !== q) || (u < w - 1 && sliceLes[p + 1] !== q) ||
-          (v > 0 && sliceLes[p - w] !== q) || (v < h - 1 && sliceLes[p + w] !== q);
+        const q = hles[p];
+        const edge = (u > 0 && hles[p - 1] !== q) || (u < W - 1 && hles[p + 1] !== q) ||
+          (v > 0 && hles[p - W] !== q) || (v < H - 1 && hles[p + W] !== q);
         if (edge && q === state.lesion) {
           r = 255; gg = 255; b = 255;
         } else {
@@ -435,7 +529,9 @@ function draw() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, cw, ch);
   const L = layout();
-  ctx.imageSmoothingEnabled = L.ku < 4;
+  if (hiFactor() !== hiF) renderSlice();  // yakınlaştırma değişti: kesiti yeni çözünürlükte yeniden üret
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(off, L.x0, L.y0, L.dw, L.dh);
   labelHits = [];
   if (state.labels && !state.quiz) drawLabels(L);
