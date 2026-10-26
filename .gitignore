@@ -14,3 +14,6 @@ data/meta/
 
 # Masaüstünde çalıştırılacak taşınabilir paketler (build_lapa_video.py --paket)
 paket/
+
+# Yayında olmayan, yerelde saklanan işler
+arsiv/
