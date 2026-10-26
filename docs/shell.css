@@ -116,3 +116,11 @@ body.focus .sitenav { display: none; }
 /* .badge.pano, pano ızgarasının (.pano) kurallarını almasın */
 .badge.pano { display: inline-block; grid-template-columns: none; gap: 0; }
 a.btn { text-decoration: none; }
+
+/* ---------- Atlaslar sekmeleri ---------- */
+.area { cursor: pointer; }
+.area.on { border-color: var(--c); background: linear-gradient(180deg, color-mix(in srgb, var(--c) 12%, transparent), transparent 70%), var(--panel); box-shadow: 0 22px 44px -28px var(--c); }
+.area.on b::after { content: ""; display: block; width: 28px; height: 2px; margin-top: 6px; background: var(--c); border-radius: 2px; }
+.area:not(.on) { opacity: .82; }
+.area:not(.on):hover { opacity: 1; }
+#saglikli, #patoloji, #laparoskopi { border-top: 0; padding-top: 20px; }

@@ -134,3 +134,44 @@ async function panoyuKur() {
 
 panoyuKur();
 araclariKur();
+
+// Atlaslar: BT, patoloji ve laparoskopi bölümleri sekme gibi; aynı anda biri görünür.
+// #saglikli, #patoloji, #laparoskopi bağlantıları doğrudan ilgili sekmeyi açar.
+(() => {
+  const ids = ['saglikli', 'patoloji', 'laparoskopi'];
+  const nav = document.querySelector('.areas');
+  if (!nav) return;
+  nav.setAttribute('role', 'tablist');
+  const tabs = [...nav.querySelectorAll('.area')];
+  tabs.forEach((a) => a.setAttribute('role', 'tab'));
+  function sec(id) {
+    ids.forEach((k) => { document.getElementById(k).hidden = k !== id; });
+    tabs.forEach((a) => {
+      const on = a.getAttribute('href') === '#' + id;
+      a.classList.toggle('on', on);
+      a.setAttribute('aria-selected', String(on));
+      a.tabIndex = on ? 0 : -1;
+    });
+  }
+  tabs.forEach((a, i) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = a.getAttribute('href').slice(1);
+      sec(id);
+      history.replaceState(null, '', '#' + id);
+    });
+    a.addEventListener('keydown', (e) => {
+      const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+      if (!d) return;
+      const n = tabs[(i + d + tabs.length) % tabs.length];
+      n.focus(); n.click();
+    });
+  });
+  function hash() {
+    const id = location.hash.slice(1);
+    if (ids.includes(id)) { sec(id); document.getElementById(id).scrollIntoView(); }
+  }
+  sec('saglikli');
+  hash();
+  addEventListener('hashchange', hash);
+})();
