@@ -58,7 +58,44 @@
         <p class="muted not" id="yinelen"></p>
       </section>
 
+      <section class="card karsi" id="karsi-kutu" hidden>
+        <div class="k-bas">
+          <h2>Karşılaştır</h2>
+          <p class="muted">İstediğiniz tahlilleri seçin; artış ve azalışı tek grafikte izleyin. Noktanın üstüne gelince ayrıntı çıkar, grafikte sürükleyerek tarih aralığına yakınlaşabilirsiniz.</p>
+        </div>
+        <div class="k-picker">
+          <div class="k-picker-ust">
+            <input type="search" id="karsi-ara" placeholder="Tahlil ara ve seç…" autocomplete="off" aria-label="Tahlil ara">
+            <button class="btn" id="karsi-dikkat" type="button">Dikkat edilenleri seç</button>
+            <button class="btn" id="karsi-temizle" type="button">Seçimi temizle</button>
+          </div>
+          <div class="k-chips" id="karsi-chips" role="group" aria-label="Tahliller"></div>
+        </div>
+        <div class="k-kontrol">
+          <div class="seg" id="karsi-mod" role="group" aria-label="Gösterim">
+            <button type="button" data-mod="deger" aria-pressed="true">Gerçek değer</button>
+            <button type="button" data-mod="yuzde" aria-pressed="false">% değişim</button>
+            <button type="button" data-mod="ref" aria-pressed="false">Referansa göre</button>
+          </div>
+          <div class="seg" id="karsi-aralik" role="group" aria-label="Tarih aralığı">
+            <button type="button" data-ar="0" aria-pressed="true">Tümü</button>
+            <button type="button" data-ar="730" aria-pressed="false">Son 2 yıl</button>
+            <button type="button" data-ar="365" aria-pressed="false">Son 1 yıl</button>
+            <button type="button" data-ar="183" aria-pressed="false">Son 6 ay</button>
+          </div>
+          <button class="btn" id="karsi-png" type="button">⬇ PNG</button>
+        </div>
+        <div id="karsi-secili" class="k-secili"></div>
+        <p class="muted not" id="karsi-not"></p>
+        <div class="k-kap" id="karsi-kap">
+          <div id="karsi-grafik"></div>
+          <div class="k-ipucu" id="karsi-ipucu" hidden></div>
+        </div>
+        <div class="tablo-kap"><table id="karsi-tablo"></table></div>
+      </section>
+
       <section class="card" id="grafik-kutu" hidden>
+        <h2>Tüm tahliller</h2>
         <div class="filtre">
           <label>Yıl <select id="yil"></select></label>
           <label>Ara <input type="search" id="ara" placeholder="ör. kreatinin" autocomplete="off"></label>

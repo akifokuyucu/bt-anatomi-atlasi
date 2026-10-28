@@ -154,7 +154,7 @@ function seriler(yil) {
       const dk = anahtar + '|' + tarih + '|' + n.deger;
       if (gorulen.has(dk)) { yinelenen++; continue; }
       gorulen.add(dk);
-      if (!harita.has(anahtar)) harita.set(anahtar, { id: 's' + harita.size, ad: n.kanon, birim: n.birim, nokta: [] });
+      if (!harita.has(anahtar)) harita.set(anahtar, { id: 's' + harita.size, anahtar, ad: n.kanon, birim: n.birim, nokta: [] });
       harita.get(anahtar).nokta.push({ iso: tarih, t: Date.parse(tarih), v: n.deger, op: n.op, alt: n.alt, ust: n.ust, durum: durumu(n), dosya: d.ad });
     }
   }
@@ -280,6 +280,7 @@ function hepsiniCiz(tablo = true) {
     : '';
   $('yinelen').textContent = yinelenen ? `${yinelenen} yinelenen değer (aynı gün, aynı sonuç) tek nokta olarak sayıldı.` : '';
 
+  karsiCiz();
   if (tablo) tabloCiz();
 }
 
@@ -291,7 +292,7 @@ function kartHtml(s, d) {
   const baslik = `${s.ad}${s.birim ? ' (' + s.birim + ')' : ''}`;
   const altYazi = `Son: ${d.son.op}${TR.format(d.son.v)} ${s.birim} · ${tarihTR(d.son.iso)} · ${ref}`;
   return `<article class="g-kart${d.dikkat ? ' dikkat' : ''}" id="${s.id}" data-baslik="${esc(baslik)}" data-alt="${esc(altYazi)}">
-    <div class="g-ust"><b>${esc(s.ad)}</b><span><small>${esc(s.birim)}</small> <button type="button" class="g-png" data-png="${s.id}" title="Grafiği PNG indir" aria-label="${esc(s.ad)} grafiğini PNG indir">⬇ PNG</button></span></div>
+    <div class="g-ust"><b>${esc(s.ad)}</b><span><small>${esc(s.birim)}</small> <button type="button" class="g-karsi" data-karsi="${esc(s.anahtar)}" aria-pressed="false">＋ Karşılaştır</button> <button type="button" class="g-png" data-png="${s.id}" title="Grafiği PNG indir" aria-label="${esc(s.ad)} grafiğini PNG indir">⬇ PNG</button></span></div>
     <div class="g-son">Son: <b>${sonMetin}</b>${etiket} · ${esc(tarihTR(d.son.iso))} · ${ref}</div>
     ${grafikSvg(s)}</article>`;
 }
@@ -377,33 +378,363 @@ function pngIndir(id) {
   const kart = $(id);
   const svg = kart?.querySelector('svg');
   if (!svg) return;
-  const cs = getComputedStyle(document.documentElement);
-  const r = (a, y) => cs.getPropertyValue(a).trim() || y;
-  const R = { accent: r('--accent', '#e8bb5a'), ok: r('--ok', '#3ecf7a'), bad: r('--bad', '#e5646f'), muted: r('--muted', '#9aa2b0'), line: r('--line-hi', '#343c49'), bg: r('--panel-2', '#151a21'), text: r('--text', '#eceef3') };
+  const R = pngTema();
   const [, , W, H] = svg.getAttribute('viewBox').split(' ').map(Number);
   const ust = 46;
-  const stil = `.g-bant{fill:${R.ok};opacity:.16}.g-cizgi{fill:none;stroke:${R.accent};stroke-width:2;stroke-linejoin:round}` +
-    `.g-nokta{stroke:${R.bg};stroke-width:1.5;fill:${R.accent}}.g-nokta.yuksek,.g-nokta.dusuk{fill:${R.bad}}.g-nokta.normal{fill:${R.ok}}` +
-    `.g-eksen{stroke:${R.line};stroke-width:1}.g-yazi{fill:${R.muted};font:10px sans-serif}`;
+  const stil = pngStil(R);
   const xml = `<svg xmlns="http://www.w3.org/2000/svg" width="${W * 3}" height="${(H + ust) * 3}" viewBox="0 0 ${W} ${H + ust}">` +
     `<style>${stil}</style><rect width="100%" height="100%" fill="${R.bg}"/>` +
     `<text x="12" y="20" fill="${R.text}" font-family="sans-serif" font-size="14" font-weight="600">${esc(kart.dataset.baslik)}</text>` +
     `<text x="12" y="37" fill="${R.muted}" font-family="sans-serif" font-size="9.5">${esc(kart.dataset.alt)}</text>` +
     `<g transform="translate(0 ${ust})">${svg.innerHTML}</g></svg>`;
+  pngYaz(xml, W, H + ust, kart.dataset.baslik);
+}
+
+function pngTema() {
+  const cs = getComputedStyle(document.documentElement);
+  const r = (a, y) => cs.getPropertyValue(a).trim() || y;
+  return { accent: r('--accent', '#e8bb5a'), ok: r('--ok', '#3ecf7a'), bad: r('--bad', '#e5646f'), muted: r('--muted', '#9aa2b0'), line: r('--line-hi', '#343c49'), bg: r('--panel-2', '#151a21'), text: r('--text', '#eceef3') };
+}
+
+function pngStil(R) {
+  return `.g-bant{fill:${R.ok};opacity:.16}.g-cizgi{fill:none;stroke:${R.accent};stroke-width:2;stroke-linejoin:round}` +
+    `.g-nokta{stroke:${R.bg};stroke-width:1.5;fill:${R.accent}}.g-nokta.yuksek,.g-nokta.dusuk{fill:${R.bad}}.g-nokta.normal{fill:${R.ok}}` +
+    `.g-eksen{stroke:${R.line};stroke-width:1}.g-yazi{fill:${R.muted};font:10px sans-serif}` +
+    `.k-bant{fill:${R.ok};opacity:.14}.k-izgara{stroke:${R.line};stroke-width:1;opacity:.45}.k-eksen{stroke:${R.line};stroke-width:1}` +
+    `.k-sifir{stroke:${R.muted};stroke-width:1;stroke-dasharray:4 3}.k-cizgi{fill:none;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}` +
+    `.k-nokta{stroke:${R.bg};stroke-width:1.5}.k-nokta.dis{stroke:${R.bad};stroke-width:2.5}.k-yazi{fill:${R.muted};font:10px sans-serif}`;
+}
+
+// SVG metnini 3 kat \u00E7\u00F6z\u00FCn\u00FCrl\u00FCkte PNG olarak indirir
+function pngYaz(xml, W, H, ad) {
   const img = new Image();
   img.onload = () => {
     const c = document.createElement('canvas');
-    c.width = W * 3; c.height = (H + ust) * 3;
+    c.width = W * 3; c.height = H * 3;
     c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
     c.toBlob((b) => {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(b);
-      a.download = (kart.dataset.baslik || 'grafik').replace(/[^\w\u00C0-\u024F-]+/g, '_') + '.png';
+      a.download = (ad || 'grafik').replace(/[^\w\u00C0-\u024F-]+/g, '_') + '.png';
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     }, 'image/png');
   };
   img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
+}
+
+// ---------- Karşılaştırma: seçilen tahliller tek etkileşimli grafikte ----------
+const RENKLER = ['#e8bb5a', '#5ab0e8', '#e5646f', '#3ecf7a', '#b58cf0', '#f08c4a', '#4ad0c8', '#e86ab0'];
+const KL = 54, KR = 16, KT = 20, KB = 30, GUN = 864e5;
+let secili = [];        // seçili serilerin anahtarları (seçim sırasıyla)
+const renk = new Map(); // anahtar → renk
+const gizli = new Set(); // seçili ama çizilmeyen
+let mod = 'deger';      // deger | yuzde | ref
+let aralik = null;      // { t0, t1, etiket } ya da null (tümü)
+let otoSecildi = false;
+let karsiUyari = '';
+let cizim = null;       // son çizimin nokta konumları (imleç ve PNG için)
+
+function tumSeriler() { const y = yinelenen; const s = seriler(''); yinelenen = y; return s; }
+const aralikta = (n) => !aralik || (n.t >= aralik.t0 && n.t <= aralik.t1);
+const tarihKisa = (t, b) => new Date(t).toLocaleDateString('tr-TR', { timeZone: 'UTC', ...b });
+
+function sec(k) {
+  if (secili.includes(k)) return true;
+  if (secili.length >= RENKLER.length) { karsiUyari = `En fazla ${RENKLER.length} tahlil birlikte gösterilir; birini kaldırın.`; return false; }
+  const kullanilan = [...renk.values()];
+  secili.push(k);
+  renk.set(k, RENKLER.find((c) => !kullanilan.includes(c)));
+  karsiUyari = '';
+  return true;
+}
+function birak(k) { secili = secili.filter((x) => x !== k); renk.delete(k); gizli.delete(k); karsiUyari = ''; }
+
+function guzelTick(lo, hi, n = 5) {
+  const ham = (hi - lo) / n;
+  const mag = 10 ** Math.floor(Math.log10(ham));
+  const oran = ham / mag;
+  const adim = (oran < 1.5 ? 1 : oran < 3 ? 2 : oran < 7 ? 5 : 10) * mag;
+  const out = [];
+  for (let v = Math.ceil(lo / adim) * adim; v <= hi + adim * 1e-6; v += adim) out.push(+v.toPrecision(12));
+  return out;
+}
+
+function karsiCiz() {
+  const tum = tumSeriler();
+  const harita = new Map(tum.map((s) => [s.anahtar, s]));
+  secili = secili.filter((k) => harita.has(k));
+  for (const k of [...renk.keys()]) if (!harita.has(k)) { renk.delete(k); gizli.delete(k); }
+  $('karsi-kutu').hidden = !tum.length;
+  if (!tum.length) { otoSecildi = false; aralik = null; cizim = null; return; }
+  if (!otoSecildi) { // ilk yüklemede dikkat gerektirenlerden başla
+    otoSecildi = true;
+    const oneri = tum.filter((s) => degerlendir(s).dikkat);
+    (oneri.length ? oneri : tum).slice(0, 3).forEach((s) => sec(s.anahtar));
+  }
+
+  // Seçim çipleri (odak kaybolmasın)
+  const odak = document.activeElement?.closest?.('#karsi-chips') ? document.activeElement.dataset.k : null;
+  const sorgu = $('karsi-ara').value.trim().toLocaleLowerCase('tr');
+  $('karsi-chips').innerHTML = tum.filter((s) => !sorgu || s.ad.toLocaleLowerCase('tr').includes(sorgu)).map((s) => {
+    const acik = secili.includes(s.anahtar);
+    return `<button type="button" class="k-chip${degerlendir(s).dikkat ? ' dikkat' : ''}" data-k="${esc(s.anahtar)}" aria-pressed="${acik}"${acik ? ` style="--c:${renk.get(s.anahtar)}"` : ''}>${esc(s.ad)}</button>`;
+  }).join('') || '<span class="muted">Eşleşen tahlil yok.</span>';
+  if (odak != null) [...$('karsi-chips').children].find((b) => b.dataset.k === odak)?.focus();
+
+  const secs = secili.map((k) => harita.get(k));
+  $('karsi-secili').innerHTML = secs.map((s) => {
+    const g = gizli.has(s.anahtar);
+    return `<span class="k-lej${g ? ' kapali' : ''}"><button type="button" class="k-lej-ad" data-gizle="${esc(s.anahtar)}" aria-pressed="${!g}" title="Çizgiyi göster / gizle"><i style="background:${renk.get(s.anahtar)}"></i>${esc(s.ad)}${s.birim ? ` <small>${esc(s.birim)}</small>` : ''}</button>` +
+      `<button type="button" class="k-lej-sil" data-kaldir="${esc(s.anahtar)}" aria-label="${esc(s.ad)} seçimini kaldır">×</button></span>`;
+  }).join('');
+  document.querySelectorAll('#karsi-aralik [data-ar]').forEach((b) => b.setAttribute('aria-pressed', (aralik?.etiket ?? '0') === b.dataset.ar));
+
+  // Gösterim kipi: farklı birimler aynı eksene konamaz
+  const gor = secs.filter((s) => !gizli.has(s.anahtar));
+  const notlar = [];
+  let etkin = mod;
+  if (etkin === 'deger' && new Set(gor.map((s) => s.birim)).size > 1) {
+    // Referansı olan tahlillerde "referansa göre" daha okunur (uç değerler diğerlerini ezmez)
+    const hepsiRef = gor.every((s) => s.nokta.some((n) => n.alt != null && n.ust != null));
+    etkin = hepsiRef ? 'ref' : 'yuzde';
+    notlar.push(`Seçili tahlillerin birimleri farklı olduğundan ${hepsiRef ? 'referans aralığına göre' : 'ilk değere göre % değişim'} gösteriliyor; "Gerçek değer" için aynı birimli tahlilleri seçin.`);
+  }
+  document.querySelectorAll('#karsi-mod [data-mod]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.mod === etkin));
+  notlar.unshift({
+    deger: 'Gerçek değerler, tek eksende.',
+    yuzde: 'Her tahlil, seçili aralıktaki ilk değerine göre yüzde değişimle gösterilir; farklı birimleri karşılaştırmak için uygundur.',
+    ref: 'Her tahlil kendi referansına göre ölçeklenir: 0 = alt sınır, 1 = üst sınır. Yeşil bant normal aralıktır.',
+  }[etkin]);
+  if (aralik?.etiket === 'ozel') notlar.push(`Yakınlaştırıldı: ${tarihKisa(aralik.t0, { dateStyle: 'medium' })} – ${tarihKisa(aralik.t1, { dateStyle: 'medium' })}. Çift tıklayın ya da "Tümü"ne basın.`);
+  if (karsiUyari) notlar.push(karsiUyari);
+
+  // Çizilecek seriler
+  const cs = [];
+  for (const s of gor) {
+    const p = s.nokta.filter(aralikta);
+    if (!p.length) continue;
+    let pts;
+    if (etkin === 'deger') pts = p.map((n) => ({ n, y: n.v }));
+    else if (etkin === 'yuzde') {
+      const ilk = p[0].v;
+      if (ilk === 0) { notlar.push(`${s.ad}: ilk değer 0 olduğundan % hesaplanamadı.`); continue; }
+      pts = p.map((n) => ({ n, y: ((n.v - ilk) / Math.abs(ilk)) * 100 }));
+    } else {
+      pts = p.filter((n) => n.alt != null && n.ust != null && n.ust > n.alt).map((n) => ({ n, y: (n.v - n.alt) / (n.ust - n.alt) }));
+      if (!pts.length) { notlar.push(`${s.ad}: referans aralığı olmadığından gösterilemedi.`); continue; }
+    }
+    cs.push({ s, renk: renk.get(s.anahtar), pts });
+  }
+  $('karsi-not').textContent = notlar.join(' ');
+  karsiTablo(secs);
+  kartDugmeleri();
+
+  if (!cs.length) {
+    cizim = null;
+    $('karsi-grafik').innerHTML = `<p class="g-yok">${secili.length ? 'Seçili aralıkta gösterilecek değer yok.' : 'Grafik için yukarıdan en az bir tahlil seçin.'}</p>`;
+    $('karsi-ipucu').hidden = true;
+    return;
+  }
+
+  // Eksenler
+  const W = Math.max(300, Math.round($('karsi-grafik').clientWidth || 760));
+  const H = W < 520 ? 300 : 380;
+  const ts = cs.flatMap((c) => c.pts.map((p) => p.n.t));
+  let t0 = aralik ? aralik.t0 : Math.min(...ts), t1 = aralik ? aralik.t1 : Math.max(...ts);
+  if (t0 === t1) { t0 -= 15 * GUN; t1 += 15 * GUN; }
+  const ys = cs.flatMap((c) => c.pts.map((p) => p.y));
+  const hamMin = Math.min(...ys);
+  let bant = null; // [alt, ust] (null = açık uç)
+  if (etkin === 'ref') { ys.push(0, 1); bant = [0, 1]; }
+  else if (etkin === 'yuzde') ys.push(0);
+  else if (cs.length === 1) {
+    const nk = cs[0].s.nokta;
+    const alt = [...nk].reverse().find((n) => n.alt != null)?.alt ?? null;
+    const ust = [...nk].reverse().find((n) => n.ust != null)?.ust ?? null;
+    [alt, ust].forEach((v) => v != null && ys.push(v));
+    if (alt != null || ust != null) bant = [alt, ust];
+  }
+  let lo = Math.min(...ys), hi = Math.max(...ys);
+  if (lo === hi) { lo -= 1; hi += 1; }
+  const pay = (hi - lo) * 0.08;
+  lo -= pay; hi += pay;
+  if (etkin === 'deger' && hamMin >= 0 && lo < 0) lo = 0;
+  const px = (t) => KL + ((t - t0) / (t1 - t0)) * (W - KL - KR);
+  const py = (v) => KT + (1 - (v - lo) / (hi - lo)) * (H - KT - KB);
+  const fmtY = etkin === 'yuzde' ? (v) => (v > 0 ? '+' : '') + TR.format(Math.round(v)) + '%'
+    : etkin === 'ref' ? (v) => TR.format(+v.toFixed(2)) : (v) => TR.format(+v.toPrecision(3));
+
+  const gun = (t1 - t0) / GUN;
+  const bicim = gun > 400 ? { month: 'short', year: 'numeric' } : gun > 40 ? { day: 'numeric', month: 'short', year: '2-digit' } : { day: 'numeric', month: 'short' };
+  const nx = W < 420 ? 3 : 5;
+  const xTick = [...Array(nx)].map((_, i) => t0 + ((t1 - t0) * i) / (nx - 1));
+  const yTick = guzelTick(lo, hi, H < 340 ? 4 : 5).filter((v) => v >= lo && v <= hi);
+  const birimYazi = etkin === 'deger' ? (gor[0]?.birim || '') : etkin === 'yuzde' ? 'ilk değere göre % değişim' : '0 = referans alt sınırı · 1 = üst sınırı';
+
+  let g = '';
+  if (bant) {
+    const ya = py(Math.min(bant[1] ?? hi, hi)), yb = py(Math.max(bant[0] ?? lo, lo));
+    g += `<rect class="k-bant" x="${KL}" y="${ya.toFixed(1)}" width="${W - KL - KR}" height="${Math.max(yb - ya, 1).toFixed(1)}"/>`;
+  }
+  g += yTick.map((v) => `<line class="k-izgara" x1="${KL}" x2="${W - KR}" y1="${py(v).toFixed(1)}" y2="${py(v).toFixed(1)}"/><text class="k-yazi" x="${KL - 6}" y="${(py(v) + 3).toFixed(1)}" text-anchor="end">${esc(fmtY(v))}</text>`).join('');
+  if (etkin === 'yuzde' && lo < 0 && hi > 0) g += `<line class="k-sifir" x1="${KL}" x2="${W - KR}" y1="${py(0).toFixed(1)}" y2="${py(0).toFixed(1)}"/>`;
+  g += `<line class="k-eksen" x1="${KL}" x2="${KL}" y1="${KT}" y2="${H - KB}"/><line class="k-eksen" x1="${KL}" x2="${W - KR}" y1="${H - KB}" y2="${H - KB}"/>`;
+  g += xTick.map((t, i) => `<text class="k-yazi" x="${px(t).toFixed(1)}" y="${H - 10}" text-anchor="${i === 0 ? 'start' : i === nx - 1 ? 'end' : 'middle'}">${esc(tarihKisa(t, bicim))}</text>`).join('');
+  g += `<text class="k-yazi" x="${KL}" y="12">${esc(birimYazi)}</text>`;
+
+  const noktalar = [];
+  for (const c of cs) {
+    const koord = c.pts.map((p) => ({ x: px(p.n.t), y: py(p.y), c, p }));
+    noktalar.push(...koord);
+    if (koord.length > 1) g += `<polyline class="k-cizgi" stroke="${c.renk}" points="${koord.map((q) => `${q.x.toFixed(1)},${q.y.toFixed(1)}`).join(' ')}"/>`;
+    g += koord.map((q) => `<circle class="k-nokta${q.p.n.durum === 'yuksek' || q.p.n.durum === 'dusuk' ? ' dis' : ''}" cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" r="4.5" fill="${c.renk}"/>`).join('');
+  }
+  g += `<g id="k-ust" style="display:none"><line class="k-cap" id="k-cap" y1="${KT}" y2="${H - KB}"/><circle class="k-vur" id="k-vur" r="8"/></g>` +
+    `<rect id="k-sec" class="k-secim" y="${KT}" height="${H - KT - KB}" style="display:none"/>` +
+    `<rect id="k-fare" x="${KL}" y="${KT}" width="${W - KL - KR}" height="${H - KT - KB}" fill="transparent"/>`;
+  $('karsi-grafik').innerHTML = `<svg id="k-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Seçili tahlillerin zaman grafiği">${g}</svg>`;
+  $('karsi-ipucu').hidden = true;
+  cizim = {
+    W, H, t0, t1, etkin, fmtY, noktalar,
+    lejant: cs.map((c) => ({ ad: c.s.ad + (c.s.birim ? ` (${c.s.birim})` : ''), renk: c.renk })),
+    alt: `${{ deger: 'Gerçek değer', yuzde: '% değişim', ref: 'Referansa göre' }[etkin]} · ${tarihKisa(t0, { dateStyle: 'medium' })} – ${tarihKisa(t1, { dateStyle: 'medium' })}`,
+  };
+}
+
+function karsiTablo(secs) {
+  const yon = (f) => (f > 0 ? '↑' : f < 0 ? '↓' : '→');
+  const sat = secs.map((s) => {
+    const baslik = `<th><span class="k-nokta-i" style="background:${renk.get(s.anahtar)}"></span>${esc(s.ad)}${s.birim ? ` <small class="muted">${esc(s.birim)}</small>` : ''}</th>`;
+    const p = s.nokta.filter(aralikta);
+    const soluk = gizli.has(s.anahtar) ? ' class="soluk"' : '';
+    if (!p.length) return `<tr${soluk}>${baslik}<td colspan="6" class="muted">Bu aralıkta veri yok</td></tr>`;
+    const ilk = p[0], son = p.at(-1);
+    const hucre = (n) => `${esc(n.op)}${TR.format(n.v)}<small class="muted"> ${esc(tarihTR(n.iso))}</small>`;
+    let degisim = '<td class="muted">—</td>';
+    if (p.length > 1) {
+      const fark = son.v - ilk.v;
+      const yuzde = ilk.v !== 0 ? (fark / Math.abs(ilk.v)) * 100 : null;
+      const belirgin = yuzde != null && Math.abs(yuzde) >= 20 ? ' belirgin' : '';
+      degisim = `<td class="k-fark${belirgin}">${yon(fark)} ${fark > 0 ? '+' : ''}${TR.format(+fark.toPrecision(3))}${yuzde != null ? ` <small>(%${TR.format(Math.round(yuzde))})</small>` : ''}</td>`;
+    }
+    const durum = son.durum === 'yuksek' ? ' <span class="yuksek">yüksek</span>' : son.durum === 'dusuk' ? ' <span class="dusuk">düşük</span>' : '';
+    const enAz = p.reduce((a, n) => (n.v < a.v ? n : a)), enCok = p.reduce((a, n) => (n.v > a.v ? n : a));
+    return `<tr${soluk}>${baslik}<td>${hucre(ilk)}</td><td>${hucre(son)}${durum}</td>${degisim}<td>${hucre(enAz)}</td><td>${hucre(enCok)}</td><td>${p.length}</td></tr>`;
+  });
+  $('karsi-tablo').innerHTML = secs.length
+    ? '<tr><th>Tahlil</th><th>İlk</th><th>Son</th><th>Değişim</th><th>En düşük</th><th>En yüksek</th><th>Ölçüm</th></tr>' + sat.join('')
+    : '';
+}
+
+// Küçük grafik kartlarındaki "Karşılaştır" düğmeleri
+function kartDugmeleri() {
+  document.querySelectorAll('[data-karsi]').forEach((b) => {
+    const acik = secili.includes(b.dataset.karsi);
+    b.setAttribute('aria-pressed', acik);
+    b.textContent = acik ? '✓ Karşılaştırmada' : '＋ Karşılaştır';
+  });
+}
+
+// --- Fare / dokunma: ipucu ve sürükleyerek yakınlaştırma
+let surukle = null;
+function svgKonum(e) {
+  const r = $('k-svg').getBoundingClientRect();
+  return { x: ((e.clientX - r.left) * cizim.W) / r.width, y: ((e.clientY - r.top) * cizim.H) / r.height, r };
+}
+
+function imlec(e) {
+  if (!cizim) return;
+  const { x, y, r } = svgKonum(e);
+  let en = null, d = Infinity;
+  for (const q of cizim.noktalar) {
+    const dd = (q.x - x) ** 2 + (q.y - y) ** 2 * 0.15;
+    if (dd < d) { d = dd; en = q; }
+  }
+  if (!en) return;
+  const ayni = cizim.noktalar.filter((q) => q.p.n.t === en.p.n.t);
+  $('k-cap').setAttribute('x1', en.x); $('k-cap').setAttribute('x2', en.x);
+  $('k-vur').setAttribute('cx', en.x); $('k-vur').setAttribute('cy', en.y); $('k-vur').style.stroke = en.c.renk;
+  $('k-ust').style.display = '';
+  const ref = (n) => (n.alt != null || n.ust != null ? ` · ref ${n.alt != null ? TR.format(n.alt) : '…'}–${n.ust != null ? TR.format(n.ust) : '…'}` : '');
+  const ip = $('karsi-ipucu');
+  ip.innerHTML = `<div class="k-ip-tarih">${esc(tarihTR(en.p.n.iso))}</div>` + ayni.map((q) => {
+    const n = q.p.n;
+    const dur = n.durum === 'yuksek' ? ' <span class="yuksek">yüksek</span>' : n.durum === 'dusuk' ? ' <span class="dusuk">düşük</span>' : '';
+    const yuzde = cizim.etkin === 'yuzde' ? ` <span class="muted">(${esc(cizim.fmtY(q.p.y))})</span>` : '';
+    return `<div class="k-ip-sat"><span class="k-nokta-i" style="background:${q.c.renk}"></span><span>${esc(q.c.s.ad)}</span><b>${esc(n.op)}${TR.format(n.v)} ${esc(q.c.s.birim)}</b>${yuzde}${dur}<small class="muted">${esc(ref(n).replace(/^ · /, ''))}</small></div>`;
+  }).join('');
+  ip.hidden = false;
+  const kap = $('karsi-kap').getBoundingClientRect();
+  const sol = (en.x / cizim.W) * r.width + (r.left - kap.left);
+  const ust = (en.y / cizim.H) * r.height + (r.top - kap.top);
+  ip.style.left = sol + 'px';
+  ip.style.top = Math.min(Math.max(ust, 50), kap.height - 50) + 'px';
+  ip.classList.toggle('sol', sol > kap.width * 0.55);
+}
+
+function ipucuGizle() {
+  if ($('k-ust')) $('k-ust').style.display = 'none';
+  $('karsi-ipucu').hidden = true;
+}
+
+const harita_ = $('karsi-grafik');
+harita_.addEventListener('pointerdown', (e) => {
+  if (e.target.id !== 'k-fare' || !cizim) return;
+  surukle = { x0: svgKonum(e).x, hareket: false };
+  e.target.setPointerCapture?.(e.pointerId);
+});
+harita_.addEventListener('pointermove', (e) => {
+  if (!cizim || e.target.id !== 'k-fare') return;
+  if (!surukle) { imlec(e); return; }
+  const x = Math.min(Math.max(svgKonum(e).x, KL), cizim.W - KR);
+  if (Math.abs(x - surukle.x0) > 6) {
+    surukle.hareket = true;
+    ipucuGizle();
+    const r = $('k-sec');
+    r.setAttribute('x', Math.min(x, surukle.x0)); r.setAttribute('width', Math.abs(x - surukle.x0)); r.style.display = '';
+  }
+});
+const surukleBitir = (e) => {
+  if (!surukle || !cizim) return;
+  const s = surukle;
+  surukle = null;
+  $('k-sec')?.style && ($('k-sec').style.display = 'none');
+  if (!s.hareket) { if (e.pointerType !== 'mouse') imlec(e); return; }
+  const x = Math.min(Math.max(svgKonum(e).x, KL), cizim.W - KR);
+  const t = (px) => cizim.t0 + ((px - KL) / (cizim.W - KL - KR)) * (cizim.t1 - cizim.t0);
+  const [a, b] = [t(s.x0), t(x)].sort((m, n) => m - n);
+  if (b - a < GUN) return; // en az bir gün
+  aralik = { t0: Math.floor(a / GUN) * GUN, t1: Math.ceil(b / GUN) * GUN, etiket: 'ozel' };
+  karsiCiz();
+};
+harita_.addEventListener('pointerup', surukleBitir);
+harita_.addEventListener('pointercancel', () => { surukle = null; });
+harita_.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !surukle) ipucuGizle(); });
+harita_.addEventListener('dblclick', () => { if (aralik) { aralik = null; karsiCiz(); } });
+
+// PNG: eksen, çizgiler ve açıklama
+function karsiPng() {
+  const svg = $('k-svg');
+  if (!svg || !cizim) return;
+  const R = pngTema();
+  const kopya = svg.cloneNode(true);
+  kopya.querySelectorAll('#k-ust,#k-sec,#k-fare').forEach((el) => el.remove());
+  let lx = 12, satir = 0, lej = '';
+  for (const l of cizim.lejant) {
+    const w = l.ad.length * 6.4 + 26;
+    if (lx + w > cizim.W - 12 && lx > 12) { lx = 12; satir++; }
+    const ly = 56 + satir * 16;
+    lej += `<circle cx="${lx + 4}" cy="${ly - 3.5}" r="4" fill="${l.renk}"/><text x="${lx + 13}" y="${ly}" fill="${R.text}" font-family="sans-serif" font-size="11">${esc(l.ad)}</text>`;
+    lx += w;
+  }
+  const ust = 56 + satir * 16 + 12;
+  const xml = `<svg xmlns="http://www.w3.org/2000/svg" width="${cizim.W * 3}" height="${(cizim.H + ust) * 3}" viewBox="0 0 ${cizim.W} ${cizim.H + ust}">` +
+    `<style>${pngStil(R)}</style><rect width="100%" height="100%" fill="${R.bg}"/>` +
+    `<text x="12" y="20" fill="${R.text}" font-family="sans-serif" font-size="14" font-weight="600">Tahlil karşılaştırması</text>` +
+    `<text x="12" y="37" fill="${R.muted}" font-family="sans-serif" font-size="9.5">${esc(cizim.alt)}</text>${lej}` +
+    `<g transform="translate(0 ${ust})">${kopya.innerHTML}</g></svg>`;
+  pngYaz(xml, cizim.W, cizim.H + ust, 'tahlil-karsilastirma');
 }
 
 // ---------- Olaylar ----------
@@ -421,7 +752,59 @@ addEventListener('drop', (e) => e.preventDefault());
 $('ornek').addEventListener('click', ornekYukle);
 $('csv').addEventListener('click', csvIndir);
 $('yazdir').addEventListener('click', () => { $('satir-kutu').open = false; print(); });
-$('grafikler').addEventListener('click', (e) => { const id = e.target.closest('[data-png]')?.dataset.png; if (id) pngIndir(id); });
+$('grafikler').addEventListener('click', (e) => {
+  const id = e.target.closest('[data-png]')?.dataset.png;
+  if (id) { pngIndir(id); return; }
+  const k = e.target.closest('[data-karsi]')?.dataset.karsi;
+  if (k) { if (secili.includes(k)) birak(k); else sec(k); karsiCiz(); }
+});
+
+// Karşılaştırma denetimleri
+$('karsi-chips').addEventListener('click', (e) => {
+  const k = e.target.closest('[data-k]')?.dataset.k;
+  if (!k) return;
+  if (secili.includes(k)) birak(k); else sec(k);
+  karsiCiz();
+});
+$('karsi-secili').addEventListener('click', (e) => {
+  const gizle = e.target.closest('[data-gizle]')?.dataset.gizle;
+  const kaldir = e.target.closest('[data-kaldir]')?.dataset.kaldir;
+  if (gizle) { if (gizli.has(gizle)) gizli.delete(gizle); else gizli.add(gizle); }
+  else if (kaldir) birak(kaldir);
+  else return;
+  karsiCiz();
+});
+$('karsi-mod').addEventListener('click', (e) => {
+  const m = e.target.closest('[data-mod]')?.dataset.mod;
+  if (m) { mod = m; karsiCiz(); }
+});
+$('karsi-aralik').addEventListener('click', (e) => {
+  const gun = e.target.closest('[data-ar]')?.dataset.ar;
+  if (gun == null) return;
+  if (gun === '0') aralik = null;
+  else {
+    const son = Math.max(...tumSeriler().map((s) => s.nokta.at(-1).t));
+    aralik = { t0: son - +gun * GUN, t1: son, etiket: gun };
+  }
+  karsiCiz();
+});
+$('karsi-ara').addEventListener('input', karsiCiz);
+$('karsi-dikkat').addEventListener('click', () => {
+  secili = []; renk.clear(); gizli.clear();
+  tumSeriler().filter((s) => degerlendir(s).dikkat).forEach((s) => sec(s.anahtar));
+  karsiCiz();
+});
+$('karsi-temizle').addEventListener('click', () => { secili = []; renk.clear(); gizli.clear(); karsiUyari = ''; karsiCiz(); });
+$('karsi-png').addEventListener('click', karsiPng);
+// Genişlik değişince (döndürme, pencere) grafiği yeniden ölç
+let boyutZaman;
+new ResizeObserver(() => {
+  clearTimeout(boyutZaman);
+  boyutZaman = setTimeout(() => {
+    const w = Math.round($('karsi-grafik').clientWidth);
+    if (cizim && Math.abs(w - cizim.W) > 4) karsiCiz();
+  }, 120);
+}).observe($('karsi-kap'));
 $('satirlar').addEventListener('change', (e) => { if (e.target.dataset.alan) satirDuzelt(e.target); });
 $('temizle').addEventListener('click', () => { dosyalar = []; sayac = 0; hepsiniCiz(); durum('Tüm veriler bellekten silindi.'); });
 ['yil', 'ara', 'sadeceDikkat'].forEach((id) => $(id).addEventListener('input', hepsiniCiz));
