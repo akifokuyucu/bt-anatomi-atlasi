@@ -58,6 +58,36 @@
 #satirlar button:hover { color: var(--bad, #e5646f); }
 .tahlil summary { cursor: pointer; font-size: 14px; }
 
+/* Düzenlenebilir satır tablosu */
+#satirlar input.duz { background: transparent; color: var(--text); border: 1px solid transparent; border-radius: 6px; padding: 3px 6px; font: inherit; width: 84px; }
+#satirlar input.duz.genis { width: 170px; }
+#satirlar input[type=date].duz { width: 128px; }
+#satirlar input.duz:hover { border-color: var(--line); }
+#satirlar input.duz:focus { outline: none; border-color: var(--accent); background: var(--panel); }
+
+/* Metin sonuçlar tablosu */
+#metin-tablo { border-collapse: collapse; font-size: 13px; }
+#metin-tablo th, #metin-tablo td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+#metin-tablo tr:first-child th { color: var(--muted); font-weight: 500; }
+#metin-tablo tr > th:first-child { position: sticky; left: 0; background: var(--panel); font-weight: 500; }
+.m-anormal { color: var(--bad, #e5646f); font-weight: 600; }
+.m-normal { color: var(--ok, #3ecf7a); }
+.g-png { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 6px; font: inherit; font-size: 11px; padding: 1px 6px; cursor: pointer; }
+.g-png:hover { color: var(--text); border-color: var(--accent); }
+.g-ust > span { display: inline-flex; gap: 6px; align-items: baseline; }
+.tahlil .not { font-size: 12px; margin: 0; }
+
+@media print {
+  :root, :root[data-theme] { --bg: #fff; --panel: #fff; --panel-2: #fff; --text: #111; --muted: #555; --line: #ccc; --line-hi: #aaa; --accent: #8a5206; }
+  body { background: #fff !important; color: #111; }
+  .sitenav, .topbar, .skip-link, .yan, .filtre, .g-png, #satir-kutu, .foot { display: none !important; }
+  .tahlil { display: block; padding: 0; }
+  .tahlil .card { border: 0; box-shadow: none; padding: 8px 0; background: none; }
+  .grafikler { grid-template-columns: repeat(2, 1fr); }
+  .g-kart { break-inside: avoid; }
+  #metin-tablo tr > th:first-child { position: static; }
+}
+
 @media (max-width: 860px) {
   .tahlil { grid-template-columns: 1fr; padding: 12px; }
   .tahlil .yan { position: static; }

@@ -44,6 +44,7 @@
         <div class="satir-btn">
           <button class="btn" id="ornek" type="button">Örnek veriyle dene</button>
           <button class="btn" id="csv" type="button" disabled>CSV indir</button>
+          <button class="btn" id="yazdir" type="button" disabled>Yazdır / PDF</button>
           <button class="btn" id="temizle" type="button" disabled>Her şeyi temizle</button>
         </div>
       </section>
@@ -53,6 +54,7 @@
       <section class="card" id="ozet-kutu" hidden>
         <h2>Dikkat edilecekler</h2>
         <ul id="ozet" class="ozet"></ul>
+        <p class="muted not" id="yinelen"></p>
       </section>
 
       <section class="card" id="grafik-kutu" hidden>
@@ -64,8 +66,13 @@
         <div id="grafikler" class="grafikler"></div>
       </section>
 
+      <section class="card" id="metin-kutu" hidden>
+        <h2>Metin sonuçlar</h2>
+        <div class="tablo-kap"><table id="metin-tablo"></table></div>
+      </section>
+
       <details class="card" id="satir-kutu" hidden>
-        <summary>Okunan satırlar (<span id="satir-say">0</span>) · yanlış okunanı silebilirsiniz</summary>
+        <summary>Okunan satırlar (<span id="satir-say">0</span>) · yanlış okunanı düzeltebilir ya da silebilirsiniz</summary>
         <div class="tablo-kap"><table id="satirlar"></table></div>
       </details>
 

@@ -109,13 +109,15 @@ const ORNEK = [
   ['ornek-2023-03.pdf', ['ÖRNEK LABORATUVARI', 'Hasta: Örnek Kişi', 'Doğum Tarihi: 01.01.1960', 'Rapor Tarihi: 14.03.2023',
     'Test  Sonuç  Birim  Referans',
     'Hemoglobin  13,2  g/dL  12,0 - 16,0', 'Lökosit  6,8  10^3/uL  4,0 - 10,0', 'Kreatinin  0,9  mg/dL  0,5 - 1,1',
-    'ALT  24  U/L  0 - 35', 'Glukoz  98  mg/dL  70 - 100', 'CRP  2,1  mg/L  0 - 5', 'TSH  2,4  mIU/L  0,4 - 4,0']],
+    'ALT  24  U/L  0 - 35', 'Glukoz  98  mg/dL  70 - 100', 'CRP  2,1  mg/L  0 - 5', 'TSH  2,4  mIU/L  0,4 - 4,0',
+    'Nitrit  NEGATİF  Negatif', 'Protein  NEGATİF  Negatif']],
   ['ornek-2023-11.pdf', ['ÖRNEK LABORATUVARI', 'Numune Tarihi: 02/11/2023',
     'HGB  12,4  g/dL  12,0 - 16,0', 'WBC  7,9  10^3/uL  4,0 - 10,0', 'Creatinine  1,0  mg/dL  0,5 - 1,1',
     'SGPT  41 H  U/L  0 - 35', 'Açlık Kan Şekeri  112 H  mg/dL  70 - 100', 'C Reaktif Protein  4,8  mg/L  0 - 5', 'TSH  2,9  mIU/L  0,4 - 4,0']],
   ['ornek-2024-06.pdf', ['ÖRNEK LABORATUVARI', 'Rapor Tarihi: 20.06.2024',
     'Hemoglobin  11,1 L  g/dL  12,0 - 16,0', 'Lökosit  11,6 H  10^3/uL  4,0 - 10,0', 'Kreatinin  1,3 H  mg/dL  0,5 - 1,1',
-    'ALT  58 H  U/L  0 - 35', 'Glukoz  131 H  mg/dL  70 - 100', 'CRP  38,4 H  mg/L  0 - 5', 'TSH  3,1  mIU/L  0,4 - 4,0']],
+    'ALT  58 H  U/L  0 - 35', 'Glukoz  131 H  mg/dL  70 - 100', 'CRP  38,4 H  mg/L  0 - 5', 'TSH  3,1  mIU/L  0,4 - 4,0',
+    'Nitrit  POZİTİF  Negatif', 'Protein  NEGATİF  Negatif']],
   ['ornek-2025-02.pdf', ['ÖRNEK LABORATUVARI', 'Rapor Tarihi: 05.02.2025',
     'Hemoglobin  12,6  g/dL  12,0 - 16,0', 'Lökosit  7,2  10^3/uL  4,0 - 10,0', 'Kreatinin  1,0  mg/dL  0,5 - 1,1',
     'ALT  30  U/L  0 - 35', 'Glukoz  104 H  mg/dL  70 - 100', 'CRP  3,0  mg/L  0 - 5', 'TSH  2,6  mIU/L  0,4 - 4,0']],
@@ -136,13 +138,21 @@ function durumu(n) {
   return n.alt != null || n.ust != null ? 'normal' : 'belirsiz';
 }
 
+let yinelenen = 0; // aynı gün, aynı tahlil, aynı değer: tek nokta sayılır (ör. iki PDF'te de aynı rapor)
+
 function seriler(yil) {
   const harita = new Map();
+  const gorulen = new Set();
+  yinelenen = 0;
   for (const d of dosyalar) {
     for (const n of d.satirlar) {
+      if (n.deger == null) continue; // metin sonuçlar ayrı tabloda
       const tarih = n.tarih || d.tarih;
       if (!tarih || (yil && !tarih.startsWith(yil))) continue;
       const anahtar = n.kanon + '|' + n.birim;
+      const dk = anahtar + '|' + tarih + '|' + n.deger;
+      if (gorulen.has(dk)) { yinelenen++; continue; }
+      gorulen.add(dk);
       if (!harita.has(anahtar)) harita.set(anahtar, { id: 's' + harita.size, ad: n.kanon, birim: n.birim, nokta: [] });
       harita.get(anahtar).nokta.push({ iso: tarih, t: Date.parse(tarih), v: n.deger, op: n.op, alt: n.alt, ust: n.ust, durum: durumu(n), dosya: d.ad });
     }
@@ -163,6 +173,27 @@ function degerlendir(s) {
   }
   const disinda = son.durum === 'yuksek' || son.durum === 'dusuk';
   return { son, onceki, trend, disinda, dikkat: disinda || !!trend };
+}
+
+// Metin sonuçlar (NEGATİF, Normal …): tahlil × tarih tablosu
+function metinTablo(yil) {
+  const satir = new Map();
+  const tarihler = new Set();
+  for (const d of dosyalar) {
+    for (const n of d.satirlar) {
+      if (n.deger != null || !n.metin) continue;
+      const tarih = n.tarih || d.tarih;
+      if (!tarih || (yil && !tarih.startsWith(yil))) continue;
+      tarihler.add(tarih);
+      if (!satir.has(n.kanon)) satir.set(n.kanon, new Map());
+      const h = satir.get(n.kanon);
+      const m = h.get(tarih);
+      if (!m) h.set(tarih, { metin: [n.metin], durum: n.durum_metin });
+      else if (m.metin.includes(n.metin)) yinelenen++;
+      else { m.metin.push(n.metin); if (n.durum_metin === 'anormal') m.durum = 'anormal'; }
+    }
+  }
+  return { tarihler: [...tarihler].sort(), satirlar: [...satir].sort((a, b) => a[0].localeCompare(b[0], 'tr')) };
 }
 
 // ---------- SVG grafik ----------
@@ -201,10 +232,11 @@ function grafikSvg(s) {
 }
 
 // ---------- Çizim ----------
-function hepsiniCiz() {
+function hepsiniCiz(tablo = true) {
   const var_ = dosyalar.length > 0;
   $('temizle').disabled = !var_;
   $('csv').disabled = !dosyalar.some((d) => d.satirlar.length);
+  $('yazdir').disabled = $('csv').disabled;
   dosyaListesi();
 
   const yillar = [...new Set(dosyalar.flatMap((d) => d.satirlar.map((n) => (n.tarih || d.tarih).slice(0, 4))).filter(Boolean))].sort();
@@ -213,6 +245,7 @@ function hepsiniCiz() {
   $('yil').value = yillar.includes(secili) ? secili : '';
 
   const tum = seriler($('yil').value);
+  const mt = metinTablo($('yil').value);
   const sorgu = $('ara').value.trim().toLocaleLowerCase('tr');
   const ham = tum.map((s) => ({ s, d: degerlendir(s) }));
   const gorunen = ham.filter(({ s, d }) =>
@@ -226,14 +259,27 @@ function hepsiniCiz() {
 
   // Dikkat özeti: önce aralık dışı, sonra belirgin değişim
   const dikkat = ham.filter(({ d }) => d.dikkat).sort((a, b) => b.d.disinda - a.d.disinda);
-  $('ozet-kutu').hidden = !tum.length;
-  $('ozet').innerHTML = dikkat.length ? dikkat.map(({ s, d }) => {
+  const metinDikkat = mt.satirlar.map(([ad, h]) => ({ ad, son: h.get([...h.keys()].sort().at(-1)) })).filter((x) => x.son.durum === 'anormal');
+  $('ozet-kutu').hidden = !tum.length && !mt.satirlar.length;
+  const sayisalChip = dikkat.map(({ s, d }) => {
     const etiket = d.disinda ? (d.son.durum === 'yuksek' ? 'yüksek' : 'düşük') : '';
     const tr = d.trend ? `${d.trend.yon === 'artış' ? '↑' : '↓'} %${Math.abs(Math.round(d.trend.yuzde))} ${d.trend.yon}` : '';
     return `<li><a class="${d.disinda ? 'bad' : 'trend'}" href="#${s.id}">${esc(s.ad)} <em>${[etiket, tr].filter(Boolean).join(' · ')}</em></a></li>`;
-  }).join('') : '<li class="muted">Son değerlerde aralık dışı ya da belirgin değişim yok.</li>';
+  });
+  const metinChip = metinDikkat.map((x) => `<li><a class="bad" href="#metin-kutu">${esc(x.ad)} <em>${esc(x.son.metin.join(' / '))}</em></a></li>`);
+  $('ozet').innerHTML = [...sayisalChip, ...metinChip].join('') || '<li class="muted">Son değerlerde aralık dışı ya da belirgin değişim yok.</li>';
 
-  tabloCiz();
+  $('metin-kutu').hidden = !mt.satirlar.length;
+  $('metin-tablo').innerHTML = mt.satirlar.length
+    ? '<tr><th>Tahlil</th>' + mt.tarihler.map((t) => `<th>${esc(tarihTR(t))}</th>`).join('') + '</tr>' +
+      mt.satirlar.map(([ad, h]) => `<tr><th>${esc(ad)}</th>${mt.tarihler.map((t) => {
+        const m = h.get(t);
+        return m ? `<td class="m-${m.durum}">${esc(m.metin.join(' / '))}</td>` : '<td class="muted">—</td>';
+      }).join('')}</tr>`).join('')
+    : '';
+  $('yinelen').textContent = yinelenen ? `${yinelenen} yinelenen değer (aynı gün, aynı sonuç) tek nokta olarak sayıldı.` : '';
+
+  if (tablo) tabloCiz();
 }
 
 function kartHtml(s, d) {
@@ -241,8 +287,10 @@ function kartHtml(s, d) {
   const etiket = d.son.durum === 'yuksek' ? ' <span class="yuksek">yüksek</span>' : d.son.durum === 'dusuk' ? ' <span class="dusuk">düşük</span>' : '';
   const ref = d.son.alt != null || d.son.ust != null
     ? `Referans: ${d.son.alt != null ? TR.format(d.son.alt) : '…'} – ${d.son.ust != null ? TR.format(d.son.ust) : '…'}` : 'Referans aralığı yok';
-  return `<article class="g-kart${d.dikkat ? ' dikkat' : ''}" id="${s.id}">
-    <div class="g-ust"><b>${esc(s.ad)}</b><small>${esc(s.birim)}</small></div>
+  const baslik = `${s.ad}${s.birim ? ' (' + s.birim + ')' : ''}`;
+  const altYazi = `Son: ${d.son.op}${TR.format(d.son.v)} ${s.birim} · ${tarihTR(d.son.iso)} · ${ref}`;
+  return `<article class="g-kart${d.dikkat ? ' dikkat' : ''}" id="${s.id}" data-baslik="${esc(baslik)}" data-alt="${esc(altYazi)}">
+    <div class="g-ust"><b>${esc(s.ad)}</b><span><small>${esc(s.birim)}</small> <button type="button" class="g-png" data-png="${s.id}" title="Grafiği PNG indir" aria-label="${esc(s.ad)} grafiğini PNG indir">⬇ PNG</button></span></div>
     <div class="g-son">Son: <b>${sonMetin}</b>${etiket} · ${esc(tarihTR(d.son.iso))} · ${ref}</div>
     ${grafikSvg(s)}</article>`;
 }
@@ -266,24 +314,95 @@ function tabloCiz() {
   for (const d of dosyalar) d.satirlar.forEach((n, i) => satirlar.push({ d, n, i }));
   satirlar.sort((a, b) => (a.n.tarih || a.d.tarih || '').localeCompare(b.n.tarih || b.d.tarih || '') || a.n.kanon.localeCompare(b.n.kanon, 'tr'));
   $('satir-say').textContent = satirlar.length;
-  $('satirlar').innerHTML = '<tr><th>Tarih</th><th>Tahlil</th><th>Değer</th><th>Birim</th><th>Referans</th><th>Dosya</th><th></th></tr>' +
-    satirlar.map(({ d, n, i }) => `<tr><td>${esc(tarihTR(n.tarih || d.tarih))}</td><td>${esc(n.kanon)}${n.kanon !== n.ad ? ` <span class="muted">(${esc(n.ad)})</span>` : ''}</td>
-      <td>${esc(n.op)}${TR.format(n.deger)}</td><td>${esc(n.birim)}</td>
-      <td>${n.alt != null ? TR.format(n.alt) : '…'} – ${n.ust != null ? TR.format(n.ust) : '…'}</td><td>${esc(d.ad)}</td>
-      <td><button type="button" data-satir-sil="${d.id}:${i}" aria-label="Satırı sil">×</button></td></tr>`).join('');
+  const girdi = (alan, v, k, genis = false) =>
+    `<input class="duz${genis ? ' genis' : ''}" data-alan="${alan}" data-k="${k}" value="${esc(v ?? '')}" aria-label="${alan}" autocomplete="off">`;
+  const sayi = (v) => (v != null ? String(v).replace('.', ',') : '');
+  $('satirlar').innerHTML = '<tr><th>Tarih</th><th>Tahlil</th><th>Değer / sonuç</th><th>Birim</th><th>Ref. alt</th><th>Ref. üst</th><th>Dosya</th><th></th></tr>' +
+    satirlar.map(({ d, n, i }) => {
+      const k = `${d.id}:${i}`;
+      const metin = n.deger == null;
+      const deger = metin ? girdi('metin', n.metin, k) : girdi('deger', (n.op || '') + sayi(n.deger), k);
+      return `<tr><td><input type="date" class="duz" data-alan="tarih" data-k="${k}" value="${esc(n.tarih || d.tarih || '')}" aria-label="tarih"></td>
+      <td>${girdi('kanon', n.kanon, k, true)}</td><td>${deger}</td>
+      <td>${metin ? '' : girdi('birim', n.birim, k)}</td>
+      <td>${metin ? '' : girdi('alt', sayi(n.alt), k)}</td><td>${metin ? '' : girdi('ust', sayi(n.ust), k)}</td>
+      <td>${esc(d.ad)}</td>
+      <td><button type="button" data-satir-sil="${k}" aria-label="Satırı sil">×</button></td></tr>`;
+    }).join('');
+}
+
+// Tablodan elle düzeltme: yanlış okunan ad, değer, birim ya da referansı değiştirir
+function satirDuzelt(girdi) {
+  const [id, i] = girdi.dataset.k.split(':').map(Number);
+  const n = dosyalar.find((x) => x.id === id)?.satirlar[i];
+  if (!n) return;
+  const v = girdi.value.trim();
+  const sayiyaCevir = (t) => { const x = parseFloat(t.replace(',', '.')); return Number.isFinite(x) ? x : NaN; };
+  const alan = girdi.dataset.alan;
+  if (alan === 'kanon') { if (v) n.kanon = v; }
+  else if (alan === 'tarih') n.tarih = v;
+  else if (alan === 'birim') n.birim = v;
+  else if (alan === 'metin') {
+    n.metin = v;
+    if (n.ref_metin) n.durum_metin = n.ref_metin.trim().toLocaleLowerCase('tr') === v.toLocaleLowerCase('tr') ? 'normal' : 'anormal';
+  } else if (alan === 'deger') {
+    const x = sayiyaCevir(v.replace(/^[<>≤≥]/, ''));
+    if (Number.isNaN(x)) { tabloCiz(); return; }
+    n.deger = x; n.op = v.match(/^[<>≤≥]/)?.[0] || ''; n.isaret = '';
+  } else if (alan === 'alt' || alan === 'ust') {
+    const x = v ? sayiyaCevir(v) : null;
+    if (Number.isNaN(x)) { tabloCiz(); return; }
+    n[alan] = x;
+  }
+  hepsiniCiz(false); // odak kaybolmasın diye tablo yeniden çizilmez
 }
 
 // ---------- CSV (isteğe bağlı, kullanıcı indirir) ----------
 function csvIndir() {
   const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const satirlar = ['Tarih;Tahlil;Değer;Birim;Ref alt;Ref üst;Dosya'];
+  const sayiTR = (v) => (v == null ? '' : String(v).replace('.', ','));
   for (const d of dosyalar) for (const n of d.satirlar)
-    satirlar.push([n.tarih || d.tarih, n.kanon, String(n.deger).replace('.', ','), n.birim, n.alt ?? '', n.ust ?? '', d.ad].map(q).join(';'));
+    satirlar.push([n.tarih || d.tarih, n.kanon, n.deger == null ? n.metin : (n.op || '') + sayiTR(n.deger), n.birim, sayiTR(n.alt), sayiTR(n.ust), d.ad].map(q).join(';'));
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob(['﻿' + satirlar.join('\r\n')], { type: 'text/csv;charset=utf-8' }));
   a.download = 'tahlil-degerleri.csv';
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+// ---------- PNG: grafik kartını görsel olarak indir ----------
+function pngIndir(id) {
+  const kart = $(id);
+  const svg = kart?.querySelector('svg');
+  if (!svg) return;
+  const cs = getComputedStyle(document.documentElement);
+  const r = (a, y) => cs.getPropertyValue(a).trim() || y;
+  const R = { accent: r('--accent', '#e8bb5a'), ok: r('--ok', '#3ecf7a'), bad: r('--bad', '#e5646f'), muted: r('--muted', '#9aa2b0'), line: r('--line-hi', '#343c49'), bg: r('--panel-2', '#151a21'), text: r('--text', '#eceef3') };
+  const [, , W, H] = svg.getAttribute('viewBox').split(' ').map(Number);
+  const ust = 46;
+  const stil = `.g-bant{fill:${R.ok};opacity:.16}.g-cizgi{fill:none;stroke:${R.accent};stroke-width:2;stroke-linejoin:round}` +
+    `.g-nokta{stroke:${R.bg};stroke-width:1.5;fill:${R.accent}}.g-nokta.yuksek,.g-nokta.dusuk{fill:${R.bad}}.g-nokta.normal{fill:${R.ok}}` +
+    `.g-eksen{stroke:${R.line};stroke-width:1}.g-yazi{fill:${R.muted};font:10px sans-serif}`;
+  const xml = `<svg xmlns="http://www.w3.org/2000/svg" width="${W * 3}" height="${(H + ust) * 3}" viewBox="0 0 ${W} ${H + ust}">` +
+    `<style>${stil}</style><rect width="100%" height="100%" fill="${R.bg}"/>` +
+    `<text x="12" y="20" fill="${R.text}" font-family="sans-serif" font-size="14" font-weight="600">${esc(kart.dataset.baslik)}</text>` +
+    `<text x="12" y="37" fill="${R.muted}" font-family="sans-serif" font-size="9.5">${esc(kart.dataset.alt)}</text>` +
+    `<g transform="translate(0 ${ust})">${svg.innerHTML}</g></svg>`;
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement('canvas');
+    c.width = W * 3; c.height = (H + ust) * 3;
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    c.toBlob((b) => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = (kart.dataset.baslik || 'grafik').replace(/[^\w\u00C0-\u024F-]+/g, '_') + '.png';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }, 'image/png');
+  };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
 }
 
 // ---------- Olaylar ----------
@@ -300,6 +419,9 @@ addEventListener('drop', (e) => e.preventDefault());
 
 $('ornek').addEventListener('click', ornekYukle);
 $('csv').addEventListener('click', csvIndir);
+$('yazdir').addEventListener('click', () => { $('satir-kutu').open = false; print(); });
+$('grafikler').addEventListener('click', (e) => { const id = e.target.closest('[data-png]')?.dataset.png; if (id) pngIndir(id); });
+$('satirlar').addEventListener('change', (e) => { if (e.target.dataset.alan) satirDuzelt(e.target); });
 $('temizle').addEventListener('click', () => { dosyalar = []; sayac = 0; hepsiniCiz(); durum('Tüm veriler bellekten silindi.'); });
 ['yil', 'ara', 'sadeceDikkat'].forEach((id) => $(id).addEventListener('input', hepsiniCiz));
 

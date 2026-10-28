@@ -205,8 +205,41 @@ def satir_oku(satir):
         "alt": alt,
         "ust": ust,
         "isaret": isaret,
+        "metin": "",
         "ham": satir.strip(),
     }
+
+
+# Sayısal olmayan sonuçlar (NEGATİF, Normal, Pozitif +++ …). Serbest metin (ör. sediment açıklaması) alınmaz.
+METIN_SONUC = {"negatif", "pozitif", "normal", "anormal", "eser", "reaktif", "nonreaktif", "non reaktif",
+               "saptanmadi", "saptandi", "var", "yok", "berrak", "bulanik", "sari", "acik sari", "koyu sari", "kehribar"}
+OLUMSUZ = {"negatif", "normal", "yok", "saptanmadi", "nonreaktif", "non reaktif", "berrak"}
+OLUMLU = {"pozitif", "anormal", "var", "reaktif", "saptandi"}
+
+
+def metin_sonuc_mu(t):
+    k = katla(t)
+    return k in METIN_SONUC or bool(re.fullmatch(r"\+{1,4}|\d\+|pozitif \(?\+{1,4}\)?", t.strip().lower()))
+
+
+def metin_satiri(satir):
+    h = [c.strip() for c in re.split(r"\s{2,}", satir.replace(" ", " ").strip()) if c.strip()]
+    if not (2 <= len(h) <= 4) or not metin_sonuc_mu(h[1]):
+        return None
+    ad = h[0].strip(" :.-")
+    if len(re.findall(r"[A-Za-zÇĞİÖŞÜçğıöşü]", ad)) < 2 or len(ad.split()) > 6 or re.search(r"[;<>=,]", ad):
+        return None
+    if any(a in ad.lower() for a in ATLA_ANAHTAR + ("tarih",)):
+        return None
+    sonuc = h[1]
+    ref = h[2] if len(h) > 2 and not SAYI.match(h[2]) else ""
+    if ref:
+        durum = "normal" if katla(ref) == katla(sonuc) else "anormal"
+    else:
+        k = katla(sonuc)
+        durum = "normal" if k in OLUMSUZ else "anormal" if (k in OLUMLU or "+" in sonuc) else "belirsiz"
+    return {"ad": ad, "kanon": kanonik(ad), "deger": None, "op": "", "birim": "", "alt": None, "ust": None,
+            "isaret": "", "metin": sonuc, "ref_metin": ref, "durum_metin": durum, "ham": satir.strip()}
 
 
 BLOK_TARIH = re.compile(r"^\s*(\d{1,2})\.(\d{1,2})\.(\d{4})(?!\d)(.*)$")
@@ -235,7 +268,7 @@ def ayristir(dosya, satirlar_json):
             if son and son["alt"] is None and son["ust"] is None:
                 son["alt"] = sayi(n.group(1))
             continue
-        r = satir_oku(s)
+        r = satir_oku(s) or metin_satiri(s)
         if r:
             if "idrar" in grup.lower():
                 r["kanon"] = "İdrar " + r["kanon"]
