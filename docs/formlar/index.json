@@ -1,0 +1,5 @@
+[
+  { "id": "vizit", "ad": "Vizit / Günlük Hasta Notu", "aciklama": "SOAP, sistem sistem ya da kısa not düzeniyle günlük vizit notu." },
+  { "id": "nobet", "ad": "Nöbet Devir Notu", "aciklama": "I-PASS, SBAR ya da çok hastalı devir listesi." },
+  { "id": "konsultasyon", "ad": "Konsültasyon İstem Formu", "aciklama": "Tek net soru, kısa öykü ve aciliyet kutularıyla istem." }
+]

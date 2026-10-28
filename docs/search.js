@@ -8,6 +8,7 @@ const json = (u) => fetch(u).then((r) => (r.ok ? r.json() : [])).catch(() => [])
 const SAYFALAR = [
   ['Pano', 'Seçilmiş siteler, kılavuzlar ve haberler', 'index.html#pano'],
   ['Araçlar', 'Klinik çalışmada işe yarayan küçük araçlar', 'araclar.html'],
+  ['Gizlilik ve Kullanım Koşulları', 'Hangi veri işlenir, kullanım koşulları ve sorumluluk sınırları', 'gizlilik.html'],
   ['BT atlası', 'Normal toraks, abdomen ve kraniyal BT', 'index.html#saglikli'],
   ['Patoloji BT atlası', 'Lezyonu işaretli vakalar, tanı kartı', 'index.html#patoloji'],
   ['Laparoskopi atlası', 'Ameliyat görüntüsünde anatomi', 'index.html#laparoskopi'],

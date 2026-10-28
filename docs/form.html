@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08090c">
+  <title>Klinik Formlar · Klinik Atlas</title>
+  <meta name="description" content="Vizit notu, nöbet devir notu ve konsültasyon istemi: düzeni seç, doldur, yazdır ya da panoya kopyala. Veri sunucuya gitmez, kaydedilmez.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="form.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="shell.css">
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="shell.js" defer></script>
+  <script src="ui.js" defer></script>
+</head>
+<body>
+  <header class="topbar ctx">
+    <nav class="crumbs" data-crumbs="Klinik Atlas=index.html|Araçlar=araclar.html|Klinik Formlar"></nav>
+    <a class="btn" href="araclar.html"><span data-icon="chevron" style="transform:scaleX(-1);display:inline-flex"></span><span class="lbl"> Tüm araçlar</span></a>
+  </header>
+
+  <main class="formsayfa">
+    <aside class="kontrol card">
+      <h1 class="page-title" id="baslik">Klinik Formlar</h1>
+      <p class="gizlilik">🔒 Yazdıklarınız yalnızca bu sekmede durur; sunucuya gitmez, kaydedilmez, sayfayı yenileyince silinir. <b>Hasta ad-soyad, TC ve protokol numarası yazmayın.</b></p>
+
+      <div class="alan">
+        <span class="caption">FORM</span>
+        <div class="sekmeler" id="formlar" role="tablist" aria-label="Form seç"></div>
+      </div>
+      <div class="alan">
+        <span class="caption">DÜZEN</span>
+        <div class="sekmeler" id="duzenler" role="tablist" aria-label="Düzen seç"></div>
+        <p class="muted not" id="duzen-aciklama"></p>
+      </div>
+      <div class="alan" id="secenek-kutu">
+        <span class="caption">BÖLÜMLER</span>
+        <div id="secenekler" class="secenekler"></div>
+      </div>
+
+      <div class="satir-btn">
+        <button class="btn accent" id="yazdir" type="button">⬇ Yazdır / PDF</button>
+        <button class="btn" id="kopyala" type="button">Panoya kopyala</button>
+        <button class="btn" id="ornek" type="button">Örnek doldur</button>
+        <button class="btn" id="temizle" type="button">Temizle</button>
+      </div>
+      <p class="muted not" id="bilgi" role="status" aria-live="polite"></p>
+      <p class="muted not">Yazdırırken "PDF olarak kaydet"i seçerseniz PDF alırsınız. Boş çıktı için önce Temizle'ye basın. Panoya kopyalanan metinde yalnızca doldurduğunuz alanlar bulunur.</p>
+    </aside>
+
+    <section class="onizleme">
+      <div class="kagit" id="kagit" aria-label="Form önizleme"></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p><b>Eğitim ve çalışma kolaylığı içindir.</b> Formlar genel şablonlardır; kurumunuzun zorunlu formlarının yerini tutmaz ve tıbbi tavsiye değildir. <a href="gizlilik.html">Gizlilik ve Kullanım Koşulları</a></p>
+  </footer>
+
+  <script type="module" src="form.js"></script>
+</body>
+</html>

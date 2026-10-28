@@ -1,0 +1,92 @@
+{
+  "id": "vizit",
+  "ad": "Vizit / Günlük Hasta Notu",
+  "baslik": "VİZİT NOTU",
+  "aciklama": "Günlük vizit notu. Düzeni seç, alanları doldur ya da boş çıktı al.",
+  "secenekler": [
+    { "id": "vital", "etiket": "Vital bulgu tablosu", "varsayilan": true },
+    { "id": "kontrol", "etiket": "Günlük kontrol kutuları (profilaksi, mobilizasyon…)", "varsayilan": true }
+  ],
+  "ust": [
+    { "tip": "alan", "id": "tarih", "etiket": "Tarih / saat", "genislik": "yarim" },
+    { "tip": "alan", "id": "yer", "etiket": "Servis · oda / yatak", "genislik": "yarim" },
+    { "tip": "alan", "id": "hasta", "etiket": "Hasta (yaş, cinsiyet, baş harfler)", "genislik": "yarim", "ipucu": "Ad-soyad, TC, protokol yazmayın" },
+    { "tip": "alan", "id": "tani", "etiket": "Tanı / ameliyat", "genislik": "yarim" },
+    { "tip": "alan", "id": "gun", "etiket": "Yatış günü / POD", "genislik": "yarim", "ornekler": ["Yatış 3. gün", "POD 1", "POD 2", "POD 3"] },
+    { "tip": "alan", "id": "yazan", "etiket": "Yazan hekim", "genislik": "yarim" }
+  ],
+  "duzenler": [
+    {
+      "id": "soap",
+      "ad": "SOAP",
+      "aciklama": "Öznel, objektif, değerlendirme, plan",
+      "bolumler": [
+        { "tip": "metin", "id": "s", "etiket": "S — Öznel (şikâyetler, gece olayları)", "satir": 3,
+          "ornekler": ["Şikâyeti yok", "Ağrı VAS 3/10", "Bulantı-kusma yok", "Gaz-gayta çıkışı var", "Oral alımı iyi", "Gece ateşi olmadı"] },
+        { "tip": "tablo", "id": "vital", "secenek": "vital", "etiket": "Vital bulgular", "sutunlar": ["Ateş", "TA", "Nabız", "SS", "SpO₂", "İdrar (ml/24s)", "Dren (ml/24s)"], "satir": 2 },
+        { "tip": "metin", "id": "o", "etiket": "O — Objektif (fizik muayene)", "satir": 4,
+          "ornekler": ["Genel durum iyi, şuur açık", "Batın rahat, defans ve rebound yok", "Yara yeri temiz, akıntı yok", "Dren seröz", "Solunum sesleri bilateral doğal"] },
+        { "tip": "metin", "id": "lab", "etiket": "Laboratuvar / görüntüleme", "satir": 3,
+          "ornekler": ["Hb stabil", "CRP düşüş eğiliminde", "Kontrol tetkik yarın sabah"] },
+        { "tip": "metin", "id": "a", "etiket": "A — Değerlendirme", "satir": 3 },
+        { "tip": "metin", "id": "p", "etiket": "P — Plan", "satir": 4,
+          "ornekler": ["Oral rejime devam", "Mobilizasyon", "Antibiyoterapiye devam", "Dren takibi", "Taburculuk planlanabilir", "Konsültasyon istendi"] },
+        { "tip": "onay", "id": "kontrol", "secenek": "kontrol", "etiket": "Günlük kontrol",
+          "secenekler": ["DVT profilaksisi", "Mide koruyucu", "Mobilizasyon", "Fizyoterapi", "Dren/kateter endikasyonu gözden geçirildi", "Antibiyotik süresi gözden geçirildi"] }
+      ],
+      "ornek": {
+        "tarih": "28.10.2026 08:30", "yer": "Genel Cerrahi · 214 / 2", "hasta": "54 E, A.B.", "tani": "Akut kolesistit · laparoskopik kolesistektomi",
+        "gun": "POD 1", "yazan": "Dr. Örnek",
+        "s": "Ağrı VAS 3/10\nBulantı-kusma yok\nGaz çıkışı var",
+        "vital": [["36,7", "120/75", "78", "16", "98", "1800", "40"], ["", "", "", "", "", "", ""]],
+        "o": "Genel durum iyi, şuur açık\nBatın rahat, defans ve rebound yok\nPort yerleri temiz",
+        "lab": "Hb stabil\nCRP düşüş eğiliminde",
+        "a": "Postoperatif 1. gün, komplikasyon yok.",
+        "p": "Oral rejime devam\nMobilizasyon\nDren takibi",
+        "kontrol": ["DVT profilaksisi", "Mobilizasyon"]
+      }
+    },
+    {
+      "id": "sistem",
+      "ad": "Sistem sistem",
+      "aciklama": "Yoğun bakım ve karmaşık hastalar için",
+      "bolumler": [
+        { "tip": "tablo", "id": "vital", "secenek": "vital", "etiket": "Vital bulgular", "sutunlar": ["Ateş", "TA", "Nabız", "SS", "SpO₂", "İdrar (ml/24s)", "Dren (ml/24s)"], "satir": 2 },
+        { "tip": "metin", "id": "nor", "etiket": "Nörolojik", "satir": 2, "ornekler": ["GKS 15, oryante koopere", "Sedasyon yok"] },
+        { "tip": "metin", "id": "kvs", "etiket": "Kardiyovasküler", "satir": 2, "ornekler": ["Hemodinami stabil, ritim sinüs", "Vazopresör ihtiyacı yok"] },
+        { "tip": "metin", "id": "sol", "etiket": "Solunum", "satir": 2, "ornekler": ["Oda havasında SpO₂ normal", "Oksijen destekli", "Solunum sesleri bilateral doğal"] },
+        { "tip": "metin", "id": "gis", "etiket": "Gastrointestinal / beslenme", "satir": 2, "ornekler": ["Oral alım var", "Gaz-gayta çıkışı var", "Batın rahat"] },
+        { "tip": "metin", "id": "ren", "etiket": "Renal / sıvı-elektrolit", "satir": 2, "ornekler": ["İdrar çıkışı yeterli", "Sıvı dengesi (+)", "Elektrolitler normal"] },
+        { "tip": "metin", "id": "enf", "etiket": "Enfeksiyon / ateş", "satir": 2, "ornekler": ["Ateşi yok", "Antibiyoterapi gün 3"] },
+        { "tip": "metin", "id": "hem", "etiket": "Hematoloji", "satir": 2, "ornekler": ["Hb stabil", "Transfüzyon ihtiyacı yok"] },
+        { "tip": "metin", "id": "yara", "etiket": "Yara / dren / kateter", "satir": 2, "ornekler": ["Yara temiz", "Dren seröz", "Foley çekildi"] },
+        { "tip": "metin", "id": "agri", "etiket": "Ağrı", "satir": 1, "ornekler": ["VAS 2/10", "Ağrısı kontrol altında"] },
+        { "tip": "metin", "id": "p", "etiket": "Plan", "satir": 4 },
+        { "tip": "onay", "id": "kontrol", "secenek": "kontrol", "etiket": "Günlük kontrol",
+          "secenekler": ["DVT profilaksisi", "Mide koruyucu", "Mobilizasyon", "Fizyoterapi", "Dren/kateter endikasyonu gözden geçirildi", "Antibiyotik süresi gözden geçirildi"] }
+      ],
+      "ornek": {
+        "tarih": "28.10.2026 08:30", "yer": "Yoğun Bakım · 3", "hasta": "67 K, C.D.", "tani": "Kolon rezeksiyonu sonrası", "gun": "POD 2", "yazan": "Dr. Örnek",
+        "vital": [["37,2", "110/70", "88", "18", "97", "1500", "60"], ["", "", "", "", "", "", ""]],
+        "nor": "GKS 15, oryante koopere", "kvs": "Hemodinami stabil, ritim sinüs", "sol": "Oda havasında SpO₂ normal",
+        "gis": "Sıvı diyet başlandı", "ren": "İdrar çıkışı yeterli", "enf": "Ateşi yok", "hem": "Hb stabil",
+        "yara": "Yara temiz\nDren seröz", "agri": "VAS 2/10", "p": "Servise çıkış planlandı",
+        "kontrol": ["DVT profilaksisi", "Mide koruyucu"]
+      }
+    },
+    {
+      "id": "kisa",
+      "ad": "Kısa not",
+      "aciklama": "Poliklinik ve hızlı kontrol için tek bloklu not",
+      "bolumler": [
+        { "tip": "metin", "id": "durum", "etiket": "Durum / şikâyet", "satir": 2 },
+        { "tip": "metin", "id": "bulgu", "etiket": "Bulgu", "satir": 3 },
+        { "tip": "metin", "id": "p", "etiket": "Plan", "satir": 3 }
+      ],
+      "ornek": {
+        "tarih": "28.10.2026 09:10", "yer": "Servis · 8", "hasta": "40 K, E.F.", "tani": "Apendektomi sonrası", "gun": "POD 1", "yazan": "Dr. Örnek",
+        "durum": "Şikâyeti yok, oral alıyor.", "bulgu": "Genel durum iyi, batın rahat, yara temiz.", "p": "Taburculuk, kontrol 1 hafta sonra."
+      }
+    }
+  ]
+}

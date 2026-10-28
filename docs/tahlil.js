@@ -18,6 +18,7 @@ function betikYukle(url) {
   return (betikler[url] ||= new Promise((ok, hata) => {
     const s = document.createElement('script');
     s.src = url;
+    s.crossOrigin = 'anonymous';
     s.onload = ok;
     s.onerror = () => hata(new Error('Yüklenemedi: ' + url));
     document.head.appendChild(s);

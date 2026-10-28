@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08090c">
+  <title>Gizlilik ve Kullanım Koşulları · Klinik Atlas</title>
+  <meta name="description" content="Klinik Atlas hangi veriyi işler, hangi veriyi işlemez; araçların kullanım koşulları ve sorumluluk sınırları.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="home.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="shell.css">
+  <style>
+    .yasal { max-width: 760px; }
+    .yasal h2 { font-size: 20px; margin: 28px 0 8px; }
+    .yasal p, .yasal li { color: var(--text); line-height: 1.65; }
+    .yasal ul { padding-left: 1.2em; display: grid; gap: 6px; }
+    .yasal .ozet { border: 1px solid var(--line-hi); border-radius: 12px; padding: 14px 16px; background: var(--panel); }
+    .yasal .ozet ul { margin: 6px 0 0; }
+    .yasal table { border-collapse: collapse; width: 100%; font-size: 14px; }
+    .yasal th, .yasal td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .yasal th { color: var(--muted); font-weight: 500; }
+    .yasal .tarih { color: var(--muted); font-size: 13px; }
+  </style>
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="shell.js" defer></script>
+  <script src="ui.js" defer></script>
+</head>
+<body class="home">
+  <main class="yasal">
+    <div class="page-head">
+      <nav class="crumbs" data-crumbs="Klinik Atlas=index.html|Gizlilik ve Kullanım Koşulları"></nav>
+      <h1>Gizlilik ve Kullanım Koşulları</h1>
+      <p class="lead">Klinik Atlas'ta kişisel veri toplamıyoruz. Araçlara yazdığınız ve yüklediğiniz hiçbir şey cihazınızdan dışarı çıkmaz.</p>
+      <p class="tarih">Son güncelleme: 28 Ekim 2026</p>
+    </div>
+
+    <section class="ozet" aria-label="Kısaca">
+      <b>Kısaca</b>
+      <ul>
+        <li>Hesap, üyelik, çerez ya da reklam yok. İzleme ve istatistik aracı kullanmıyoruz.</li>
+        <li>Formlar ve tahlil aracı verinizi <b>tarayıcınızın belleğinde</b> işler. Sunucuya göndermez, kaydetmez; sekmeyi kapatınca silinir.</li>
+        <li><b>Hasta kimliği (ad-soyad, TC kimlik no, protokol no, telefon) hiçbir alana yazılmamalı, yüklenen belgelerde bulunmamalıdır.</b></li>
+        <li>İçerik eğitim ve çalışma kolaylığı içindir; tanı ve tedavi kararı için kullanılamaz.</li>
+      </ul>
+    </section>
+
+    <h2>1. Hangi veri nerede işlenir?</h2>
+    <table>
+      <tr><th>Özellik</th><th>Ne olur?</th></tr>
+      <tr><td>Klinik Formlar</td><td>Yazdıklarınız sayfanın belleğinde durur. Yazdırma ve "panoya kopyala" işlemleri cihazınızda yapılır. Sayfayı yenileyince ya da kapatınca silinir.</td></tr>
+      <tr><td>Tahlil Takibi</td><td>Seçtiğiniz PDF'ler tarayıcınızda okunur ve ayrıştırılır (PDF.js ve Pyodide ile). Dosya ve değerler sunucuya gönderilmez, tarayıcı depolamasına yazılmaz. "Her şeyi temizle" ile ya da sekmeyi kapatarak silinir. CSV ve PNG çıktıları siz indirirseniz cihazınıza kaydedilir.</td></tr>
+      <tr><td>Devir Listesi Kâğıdı</td><td>PDF cihazınızda üretilir. Kâğıt boş çıkar.</td></tr>
+      <tr><td>BT ve laparoskopi atlasları</td><td>Anonim, açık lisanslı veri setlerinden üretilmiş görüntüler gösterilir. Bu sayfalar hakkında kişisel veri tutulmaz.</td></tr>
+      <tr><td>Tema tercihi</td><td>Koyu/açık tema seçiminiz yalnızca tarayıcınızda saklanır (<code>localStorage</code>). Sitenin sunucusuna gönderilmez.</td></tr>
+      <tr><td>Çevrimdışı önbellek</td><td>Site sayfaları ve kullandığınız kütüphaneler hızlı açılmak için tarayıcınızda önbelleğe alınabilir. Önbellekte hasta verisi yoktur. Tarayıcı ayarlarından silebilirsiniz.</td></tr>
+    </table>
+
+    <h2>2. Üçüncü taraflar</h2>
+    <p>Site <b>GitHub Pages</b> üzerinde yayınlanır; yazı tipleri Google Fonts'tan, kütüphaneler (PDF.js, Pyodide, jsPDF vb.) cdnjs ve jsDelivr gibi içerik dağıtım ağlarından gelir. Bir sayfayı açtığınızda bu hizmetler IP adresiniz ve tarayıcı bilginiz gibi standart bağlantı bilgilerini kendi politikalarına göre görebilir. Bunlar yalnızca sayfa ve kütüphane dosyalarını sunar; formlara ve tahlil aracına yazdığınız ya da yüklediğiniz içerik bu hizmetlere gönderilmez.</p>
+
+    <h2>3. Kişisel veriler (KVKK)</h2>
+    <p>Klinik Atlas, 6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında kişisel veri toplamaz, kaydetmez ve aktarmaz; sitede bir kullanıcı veritabanı yoktur. Kullanıcıların araçlara kişisel sağlık verisi girmesi önerilmez. Gerçek hasta bilgisiyle çalışırken kendi kurumunuzun bilgi güvenliği ve hasta mahremiyeti kurallarına uymak sizin sorumluluğunuzdadır. Kurum cihazlarında kurumunuzun izin vermediği bir hizmeti kullanmayın.</p>
+
+    <h2>4. Kullanım koşulları</h2>
+    <ul>
+      <li><b>Eğitim amaçlıdır.</b> İçerik ve araçlar tıbbi tavsiye, tanı ya da tedavi önerisi değildir; tıbbi cihaz değildir. Klinik kararlar sağlık profesyonelinin muayene ve kurumun kılavuzlarına dayanan değerlendirmesiyle verilir.</li>
+      <li><b>Formlar genel şablonlardır.</b> Kurumunuzun yasal olarak zorunlu tuttuğu formların, onam metinlerinin ve resmî kayıt sistemlerinin yerini tutmaz.</li>
+      <li><b>Tahlil Takibi otomatik okur ve hata yapabilir.</b> Değerler, birimler ve referans aralıkları yanlış okunabilir ya da atlanabilir. Kararlardan önce asıl rapora bakın. "Dikkat edilecekler" listesi bir yorum ya da tanı değildir; yalnızca değerleri yan yana getirir.</li>
+      <li><b>Yanlış kullanım.</b> Siteyi yasa dışı amaçla, başkasının sağlık verisini izinsiz işlemek için ya da hizmeti aksatacak biçimde kullanmayın.</li>
+      <li><b>Garanti yok.</b> Site olduğu gibi sunulur; doğruluk, kesintisiz çalışma ve belirli bir amaca uygunluk garanti edilmez. Kullanımdan doğan sonuçlardan site sahibi sorumlu tutulamaz. Yasal olarak sınırlanamayan haklarınız saklıdır.</li>
+      <li><b>Değişiklik.</b> Bu metin ve araçlar önceden haber verilmeden güncellenebilir.</li>
+    </ul>
+
+    <h2>5. Veri kaynakları ve lisanslar</h2>
+    <p>Yalnızca anonim, açık lisanslı veri setleri kullanılır: TotalSegmentator veri seti (CC BY 4.0), READ PE CT (CC0 1.0), Dresden Surgical Anatomy Dataset (CC BY 4.0) ve Boer ve ark. laparoskopi videosu (CC BY 2.0). Ayrıntılı atıflar <a href="index.html#hakkinda">ana sayfanın alt bilgisinde</a> yer alır. Sitenin kaynak kodu <a href="https://github.com/akifokuyucu/bt-anatomi-atlasi" target="_blank" rel="noopener">GitHub'da</a> herkese açıktır.</p>
+
+    <h2>6. İletişim ve bildirim</h2>
+    <p>Hata, güvenlik sorunu ya da öneri için <a href="https://github.com/akifokuyucu/bt-anatomi-atlasi/issues" target="_blank" rel="noopener">GitHub'da bir kayıt açın</a>. Bu kayıtlar herkese açıktır; bu yüzden içine hasta bilgisi, belge ya da kişisel veri yazmayın.</p>
+  </main>
+
+  <footer class="foot">
+    <p><b>Eğitim ve çalışma kolaylığı içindir; tanı için kullanılamaz.</b></p>
+  </footer>
+</body>
+</html>

@@ -13,7 +13,7 @@
   // Hangi menü öğesi bu sayfaya ait
   const bolum =
     anaSayfa ? '' :
-    /^(araclar|devir|tahlil)\.html$/.test(sayfa) ? 'araclar' :
+    /^(araclar|devir|tahlil|form)\.html$/.test(sayfa) ? 'araclar' :
     /^(atlas|lapa|lapav)\.html$/.test(sayfa) ? 'atlaslar' : '';
 
   const OGE = [
@@ -90,6 +90,23 @@
       });
     });
   }
+
+  // Gizlilik bağlantısı: her alt sayfanın altında; alt bilgi yoksa (atlas ekranları hariç) oluşturulur
+  document.addEventListener('DOMContentLoaded', () => {
+    if (sayfa === 'gizlilik.html' || bolum === 'atlaslar') return;
+    let foot = document.querySelector('footer.foot');
+    if (!foot) {
+      if (anaSayfa) return;
+      foot = document.createElement('footer');
+      foot.className = 'foot';
+      document.body.appendChild(foot);
+    }
+    if (!foot.querySelector('a[href="gizlilik.html"]')) {
+      const p = document.createElement('p');
+      p.innerHTML = '<a href="gizlilik.html">Gizlilik ve Kullanım Koşulları</a>';
+      foot.appendChild(p);
+    }
+  });
 
   // Alt sayfalarda konum izi: Klinik Atlas › Araçlar › Devir Listesi gibi; ".crumbs" yer tutucusu doldurulur
   document.addEventListener('DOMContentLoaded', () => {

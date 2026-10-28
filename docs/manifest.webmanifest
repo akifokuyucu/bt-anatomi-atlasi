@@ -15,6 +15,7 @@
   ],
   "shortcuts": [
     { "name": "Araçlar", "url": "araclar.html" },
+    { "name": "Klinik formlar", "url": "form.html" },
     { "name": "BT atlası", "url": "atlas.html" }
   ]
 }

@@ -1,0 +1,65 @@
+{
+  "id": "konsultasyon",
+  "ad": "Konsültasyon İstem Formu",
+  "baslik": "KONSÜLTASYON İSTEMİ",
+  "aciklama": "Konsültasyon isterken tek net soru, kısa öykü ve aciliyetle istem.",
+  "secenekler": [
+    { "id": "onemli", "etiket": "Önemli bilgi kutuları (alerji, antikoagülan…)", "varsayilan": true },
+    { "id": "yanit", "etiket": "Konsültan yanıt alanı", "varsayilan": true }
+  ],
+  "ust": [
+    { "tip": "alan", "id": "tarih", "etiket": "Tarih / saat", "genislik": "yarim" },
+    { "tip": "alan", "id": "isteyen", "etiket": "İsteyen birim · hekim · dahili", "genislik": "yarim" },
+    { "tip": "alan", "id": "hasta", "etiket": "Hasta (yatak, yaş, cinsiyet, baş harfler)", "genislik": "yarim", "ipucu": "Ad-soyad, TC, protokol yazmayın" },
+    { "tip": "alan", "id": "brans", "etiket": "İstenen branş", "genislik": "yarim",
+      "ornekler": ["Dahiliye", "Kardiyoloji", "Anestezi ve Reanimasyon", "Enfeksiyon Hastalıkları", "Göğüs Hastalıkları", "Nöroloji", "Endokrinoloji", "Nefroloji", "Gastroenteroloji", "Radyoloji", "Psikiyatri", "Diyet / Beslenme", "Fizik Tedavi"] }
+  ],
+  "duzenler": [
+    {
+      "id": "standart",
+      "ad": "Standart istem",
+      "aciklama": "Yazılı konsültasyon, öykü ve tetkiklerle",
+      "bolumler": [
+        { "tip": "onay", "id": "aciliyet", "tek": true, "etiket": "Aciliyet", "secenekler": ["Acil (hemen)", "Aynı gün", "Elektif (48 saat içinde)"] },
+        { "tip": "metin", "id": "soru", "etiket": "Konsültasyon sorusu (tek, net)", "satir": 2,
+          "ornekler": ["Preoperatif kardiyak risk değerlendirmesi", "Antikoagülan / antiagregan yönetimi", "Yeni gelişen ritim bozukluğu değerlendirmesi", "Ateş ve enfeksiyon odağı, antibiyotik önerisi", "Postoperatif ağrı yönetimi", "Beslenme desteği önerisi", "Diyabet regülasyonu", "Böbrek fonksiyon bozukluğu değerlendirmesi", "Yara bakımı önerisi"] },
+        { "tip": "metin", "id": "oyku", "etiket": "Kısa öykü ve konsültasyon nedeni", "satir": 3 },
+        { "tip": "metin", "id": "bulgu", "etiket": "Bulgular ve tetkikler", "satir": 3 },
+        { "tip": "metin", "id": "tedavi", "etiket": "Mevcut tedavi / ilaçlar ve yapılanlar", "satir": 3 },
+        { "tip": "onay", "id": "onemli", "secenek": "onemli", "etiket": "Önemli bilgiler",
+          "secenekler": ["Alerji var", "Antikoagülan kullanıyor", "Antiagregan kullanıyor", "Gebelik olasılığı", "Böbrek yetmezliği", "İzolasyon gerekli"] },
+        { "tip": "metin", "id": "yanit", "secenek": "yanit", "etiket": "Konsültan yanıtı (konsültan doldurur)", "satir": 5 },
+        { "tip": "alan", "id": "konsultan", "secenek": "yanit", "etiket": "Konsültan hekim · tarih / saat", "genislik": "tam" }
+      ],
+      "ornek": {
+        "tarih": "28.10.2026 10:00", "isteyen": "Genel Cerrahi · Dr. Örnek · dahili 1234", "hasta": "214/2 · 67 K, C.D.", "brans": "Kardiyoloji",
+        "aciliyet": ["Aynı gün"],
+        "soru": "Preoperatif kardiyak risk değerlendirmesi",
+        "oyku": "Sağ hemikolektomi planlanıyor. Hipertansiyon ve tip 2 diyabet öyküsü var.",
+        "bulgu": "EKG sinüs ritmi. TA 130/80, nabız 78.",
+        "tedavi": "ACE inhibitörü ve metformin kullanıyor.",
+        "onemli": ["Antiagregan kullanıyor"], "yanit": "", "konsultan": ""
+      }
+    },
+    {
+      "id": "acil",
+      "ad": "Acil / telefon konsültasyonu",
+      "aciklama": "Telefonla bildirilen acil istem kaydı",
+      "bolumler": [
+        { "tip": "metin", "id": "soru", "etiket": "Konsültasyon sorusu", "satir": 2 },
+        { "tip": "tablo", "id": "vital", "etiket": "Güncel vital bulgular", "sutunlar": ["Ateş", "TA", "Nabız", "SS", "SpO₂", "Şuur"], "satir": 1 },
+        { "tip": "metin", "id": "oyku", "etiket": "Durum ve kısa öykü", "satir": 3 },
+        { "tip": "onay", "id": "bildirim", "etiket": "Bildirim", "secenekler": ["Telefonla bildirildi", "Hekim görmeye geldi", "Yazılı istem de açıldı"] },
+        { "tip": "alan", "id": "kime", "etiket": "Kime bildirildi · saat", "genislik": "tam" },
+        { "tip": "metin", "id": "yanit", "secenek": "yanit", "etiket": "Konsültan yanıtı / talimat", "satir": 4 }
+      ],
+      "ornek": {
+        "tarih": "28.10.2026 03:10", "isteyen": "Genel Cerrahi · Dr. Örnek", "hasta": "214/2 · 54 E, A.B.", "brans": "Anestezi ve Reanimasyon",
+        "soru": "Hipotansiyon, yoğun bakım değerlendirmesi",
+        "vital": [["37,8", "85/50", "118", "24", "93", "Uykuya meyilli"]],
+        "oyku": "Postoperatif 1. gün, yeni başlayan hipotansiyon ve taşikardi.",
+        "bildirim": ["Telefonla bildirildi"], "kime": "Anestezi nöbetçisi · 03:12", "yanit": ""
+      }
+    }
+  ]
+}

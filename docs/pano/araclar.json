@@ -16,5 +16,32 @@
     ],
     "url": "tahlil.html",
     "durum": "beta"
+  },
+  {
+    "ad": "Vizit / Günlük Hasta Notu",
+    "aciklama": "SOAP, sistem sistem ya da kısa not düzeninde vizit notu; yazdır, PDF al ya da panoya kopyala.",
+    "branslar": [
+      "Klinik"
+    ],
+    "url": "form.html#f=vizit",
+    "durum": "beta"
+  },
+  {
+    "ad": "Nöbet Devir Notu",
+    "aciklama": "I-PASS, SBAR ve çok hastalı devir listesi; yatay A4 çıktı seçeneğiyle.",
+    "branslar": [
+      "Klinik"
+    ],
+    "url": "form.html#f=nobet",
+    "durum": "beta"
+  },
+  {
+    "ad": "Konsültasyon İstem Formu",
+    "aciklama": "Tek net soru, kısa öykü ve aciliyet kutularıyla standart ya da acil telefon konsültasyonu.",
+    "branslar": [
+      "Klinik"
+    ],
+    "url": "form.html#f=konsultasyon",
+    "durum": "beta"
   }
 ]

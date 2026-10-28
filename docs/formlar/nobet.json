@@ -1,0 +1,87 @@
+{
+  "id": "nobet",
+  "ad": "Nöbet Devir Notu",
+  "baslik": "NÖBET DEVİR NOTU",
+  "aciklama": "Nöbet ve vardiya devri. Tek hasta için I-PASS ya da SBAR, tüm servis için devir listesi.",
+  "secenekler": [
+    { "id": "alici", "etiket": "Alıcının geri bildirim alanı", "varsayilan": true }
+  ],
+  "ust": [
+    { "tip": "alan", "id": "tarih", "etiket": "Tarih / saat", "genislik": "yarim" },
+    { "tip": "alan", "id": "servis", "etiket": "Servis / birim", "genislik": "yarim" },
+    { "tip": "alan", "id": "devreden", "etiket": "Devreden hekim", "genislik": "yarim" },
+    { "tip": "alan", "id": "devralan", "etiket": "Devralan hekim", "genislik": "yarim" }
+  ],
+  "duzenler": [
+    {
+      "id": "ipass",
+      "ad": "I-PASS (tek hasta)",
+      "aciklama": "Hastalık şiddeti, hasta özeti, yapılacaklar, olası senaryolar, alıcı özeti",
+      "bolumler": [
+        { "tip": "alan", "id": "hasta", "etiket": "Hasta (yatak, yaş, baş harfler)", "genislik": "yarim", "ipucu": "Ad-soyad, TC yazmayın" },
+        { "tip": "alan", "id": "tani", "etiket": "Tanı / ameliyat", "genislik": "yarim" },
+        { "tip": "onay", "id": "siddet", "tek": true, "etiket": "I — Hastalık şiddeti", "secenekler": ["Stabil", "Dikkat / izlem gerekli", "Kararsız (acil)"] },
+        { "tip": "metin", "id": "ozet", "etiket": "P — Hasta özeti (öykü, ana olaylar, mevcut tedavi)", "satir": 4,
+          "ornekler": ["Alerjisi yok", "Antikoagülan kullanıyor", "Genel durum stabil", "Ameliyat sonrası ilk gün", "İzolasyon gerekli"] },
+        { "tip": "tablo", "id": "yapilacak", "etiket": "A — Yapılacaklar", "sutunlar": ["Yapılacak", "Saat", "Sorumlu", "Tamam"], "genislik": [5, 1, 2, 1], "satir": 4 },
+        { "tip": "metin", "id": "senaryo", "etiket": "S — Durum farkındalığı ve olası senaryolar (eğer … ise …)", "satir": 3,
+          "ornekler": ["Ateş çıkarsa kültür al, hekime bildir", "Dren çıkışı belirgin artarsa muayene et", "Ağrı kontrol altında değilse analjezi planını gözden geçir", "Şuur değişirse acil değerlendir", "Kan şekeri yüksek seyrederse insülin protokolü"] },
+        { "tip": "metin", "id": "alici", "secenek": "alici", "etiket": "S — Alıcının özeti / sorular", "satir": 2 }
+      ],
+      "ornek": {
+        "tarih": "28.10.2026 17:00", "servis": "Genel Cerrahi", "devreden": "Dr. Örnek", "devralan": "Dr. Deneme",
+        "hasta": "214/2 · 54 E, A.B.", "tani": "Lap. kolesistektomi, POD 1",
+        "siddet": ["Stabil"],
+        "ozet": "Komplikasyonsuz ameliyat sonrası 1. gün.\nOral rejime başlandı.\nAlerji yok.",
+        "yapilacak": [["Akşam Hb kontrolü", "20:00", "Nöbetçi", ""], ["Dren çıkışı takibi", "Gece", "Hemşire", ""], ["", "", "", ""], ["", "", "", ""]],
+        "senaryo": "Ateş çıkarsa kültür al, hekime bildir\nDren çıkışı belirgin artarsa muayene et",
+        "alici": "Dren ve Hb takibi tamam."
+      }
+    },
+    {
+      "id": "sbar",
+      "ad": "SBAR (telefon / acil bildirim)",
+      "aciklama": "Aranan hekime tek hasta için kısa ve yapılı bildirim",
+      "bolumler": [
+        { "tip": "alan", "id": "hasta", "etiket": "Hasta (yatak, yaş, baş harfler)", "genislik": "yarim", "ipucu": "Ad-soyad, TC yazmayın" },
+        { "tip": "alan", "id": "aranan", "etiket": "Aranan hekim / birim", "genislik": "yarim" },
+        { "tip": "metin", "id": "s", "etiket": "S — Durum (kimsiniz, hasta kim, şimdi ne oluyor?)", "satir": 2,
+          "ornekler": ["Genel cerrahi servisinden arıyorum", "Hastada yeni başlayan ateş var", "Hastada tansiyon düşüklüğü var", "Hastada solunum sıkıntısı gelişti"] },
+        { "tip": "tablo", "id": "vital", "etiket": "Güncel vital bulgular", "sutunlar": ["Ateş", "TA", "Nabız", "SS", "SpO₂", "Şuur"], "satir": 1 },
+        { "tip": "metin", "id": "b", "etiket": "B — Öykü (neden yatıyor, ameliyat, ilaçlar, alerji)", "satir": 3 },
+        { "tip": "metin", "id": "a", "etiket": "A — Değerlendirme (sorun nedir, ne düşünüyorsunuz?)", "satir": 3 },
+        { "tip": "metin", "id": "r", "etiket": "R — İstek (ne yapılmasını istiyorsunuz, ne zamana kadar?)", "satir": 3,
+          "ornekler": ["Hastayı değerlendirmenizi rica ediyorum", "Tetkik istemi konusunda önerinizi rica ediyorum", "Tedavi değişikliği önerinizi rica ediyorum", "Yoğun bakıma devir için değerlendirmenizi rica ediyorum"] },
+        { "tip": "metin", "id": "yanit", "secenek": "alici", "etiket": "Aranan hekimin yanıtı / talimat", "satir": 3 }
+      ],
+      "ornek": {
+        "tarih": "28.10.2026 02:15", "servis": "Genel Cerrahi", "devreden": "Dr. Örnek", "devralan": "",
+        "hasta": "214/2 · 54 E, A.B.", "aranan": "Dahiliye nöbetçisi",
+        "s": "Genel cerrahi servisinden arıyorum.\nHastada yeni başlayan ateş var.",
+        "vital": [["38,6", "105/65", "104", "20", "96", "Açık"]],
+        "b": "Lap. kolesistektomi sonrası 1. gün, bilinen ek hastalık yok, alerji yok.",
+        "a": "Postoperatif erken dönem ateş, enfeksiyon odağı belirsiz.",
+        "r": "Hastayı değerlendirmenizi rica ediyorum",
+        "yanit": ""
+      }
+    },
+    {
+      "id": "liste",
+      "ad": "Çok hastalı devir listesi",
+      "aciklama": "Servisin tüm hastaları tek sayfada, yatay A4",
+      "yon": "yatay",
+      "bolumler": [
+        { "tip": "tablo", "id": "liste", "etiket": "Devir listesi (Şiddet: S stabil · D dikkat · K kararsız)",
+          "sutunlar": ["Yatak", "Hasta (baş harf, yaş)", "Tanı / ameliyat", "Şiddet", "Önemli notlar", "Yapılacak", "Eğer … ise"], "genislik": [1, 2.2, 3, 1.2, 3, 3, 3], "satir": 12 }
+      ],
+      "ornek": {
+        "tarih": "28.10.2026 17:00", "servis": "Genel Cerrahi", "devreden": "Dr. Örnek", "devralan": "Dr. Deneme",
+        "liste": [
+          ["1", "A.B., 54 E", "Lap. kolesistektomi POD 1", "S", "Alerji yok", "Akşam Hb", "Ateş çıkarsa kültür"],
+          ["2", "C.D., 67 K", "Sağ hemikolektomi POD 2", "D", "Antikoagülan kullanıyor", "Dren takibi", "Dren artarsa muayene"],
+          ["3", "E.F., 40 K", "Apendektomi POD 1", "S", "", "Taburculuk planı", ""]
+        ]
+      }
+    }
+  ]
+}
