@@ -13,7 +13,7 @@
   // Hangi menü öğesi bu sayfaya ait
   const bolum =
     anaSayfa ? '' :
-    /^(araclar|devir)\.html$/.test(sayfa) ? 'araclar' :
+    /^(araclar|devir|tahlil)\.html$/.test(sayfa) ? 'araclar' :
     /^(atlas|lapa|lapav)\.html$/.test(sayfa) ? 'atlaslar' : '';
 
   const OGE = [

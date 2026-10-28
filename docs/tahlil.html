@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08090c">
+  <title>Tahlil Takibi · Klinik Atlas</title>
+  <meta name="description" content="Farklı tarihli tahlil PDF'lerini tarayıcıda okuyup değerleri zaman içinde yan yana grafikleyen araç. Veri sunucuya gitmez, kaydedilmez.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="tahlil.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="shell.css">
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="shell.js" defer></script>
+  <script src="ui.js" defer></script>
+</head>
+<body>
+  <header class="topbar ctx">
+    <nav class="crumbs" data-crumbs="Klinik Atlas=index.html|Araçlar=araclar.html|Tahlil Takibi"></nav>
+    <a class="btn" href="araclar.html"><span data-icon="chevron" style="transform:scaleX(-1);display:inline-flex"></span><span class="lbl"> Tüm araçlar</span></a>
+  </header>
+
+  <main class="tahlil">
+    <aside class="yan">
+      <section class="card">
+        <h1 class="page-title">Tahlil Takibi</h1>
+        <p class="gizlilik">🔒 Dosyalar yalnızca bu sekmede, bellekte okunur. Sunucuya gönderilmez, tarayıcıya kaydedilmez; sekme kapanınca silinir.</p>
+
+        <label class="drop" id="drop" tabindex="0">
+          <input type="file" id="dosya" accept="application/pdf" multiple hidden>
+          <b>PDF'leri buraya bırakın</b>
+          <span class="muted">ya da seçmek için tıklayın · birden çok dosya olur</span>
+        </label>
+
+        <div id="durum" class="durum muted" role="status" aria-live="polite"></div>
+        <ul id="dosyalar" class="dosyalar"></ul>
+
+        <div class="satir-btn">
+          <button class="btn" id="ornek" type="button">Örnek veriyle dene</button>
+          <button class="btn" id="csv" type="button" disabled>CSV indir</button>
+          <button class="btn" id="temizle" type="button" disabled>Her şeyi temizle</button>
+        </div>
+      </section>
+    </aside>
+
+    <section class="sag">
+      <section class="card" id="ozet-kutu" hidden>
+        <h2>Dikkat edilecekler</h2>
+        <ul id="ozet" class="ozet"></ul>
+      </section>
+
+      <section class="card" id="grafik-kutu" hidden>
+        <div class="filtre">
+          <label>Yıl <select id="yil"></select></label>
+          <label>Ara <input type="search" id="ara" placeholder="ör. kreatinin" autocomplete="off"></label>
+          <label class="toggle"><input type="checkbox" id="sadeceDikkat"> Yalnızca dikkat gerektirenler</label>
+        </div>
+        <div id="grafikler" class="grafikler"></div>
+      </section>
+
+      <details class="card" id="satir-kutu" hidden>
+        <summary>Okunan satırlar (<span id="satir-say">0</span>) · yanlış okunanı silebilirsiniz</summary>
+        <div class="tablo-kap"><table id="satirlar"></table></div>
+      </details>
+
+      <p class="uyari muted">Eğitim ve çalışma kolaylığı içindir; tanı için kullanılamaz. Değerler otomatik okunur, hata olabilir: kararlardan önce asıl rapora bakın.</p>
+    </section>
+  </main>
+
+  <script type="module" src="tahlil.js"></script>
+</body>
+</html>

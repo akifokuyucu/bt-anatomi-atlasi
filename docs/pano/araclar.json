@@ -2,8 +2,19 @@
   {
     "ad": "Devir Listesi Kâğıdı",
     "aciklama": "Servis devri için A4'ü hasta sayısına göre satır × sütun kutulara böler; önerilen düzenlerden seç, PDF indir.",
-    "branslar": ["Klinik"],
+    "branslar": [
+      "Klinik"
+    ],
     "url": "devir.html",
     "durum": "yayinda"
+  },
+  {
+    "ad": "Tahlil Takibi",
+    "aciklama": "Farklı tarihli tahlil PDF'lerini tarayıcıda okur, değerleri yıl yıl yan yana grafikler; aralık dışı değerleri ve belirgin artış/azalışı öne çıkarır. Veri sunucuya gitmez.",
+    "branslar": [
+      "Klinik"
+    ],
+    "url": "tahlil.html",
+    "durum": "beta"
   }
 ]

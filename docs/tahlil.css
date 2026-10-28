@@ -1,0 +1,64 @@
+/* Tahlil takibi aracı */
+.tahlil { display: grid; grid-template-columns: minmax(280px, 340px) 1fr; gap: 16px; padding: 16px; max-width: 1280px; margin: 0 auto; align-items: start; }
+.tahlil .yan { position: sticky; top: 12px; }
+.tahlil .sag { display: grid; gap: 16px; min-width: 0; }
+.tahlil .card { padding: 16px; display: grid; gap: 12px; }
+.tahlil h2 { margin: 0; font-size: 16px; }
+.tahlil .gizlilik { margin: 0; font-size: 12.5px; color: var(--muted); }
+.tahlil .uyari { font-size: 12px; margin: 0; }
+
+.drop { display: grid; gap: 4px; text-align: center; padding: 22px 12px; border: 1.5px dashed var(--line-hi); border-radius: 12px; cursor: pointer; transition: border-color .15s, background .15s; }
+.drop:hover, .drop:focus-visible, .drop.over { border-color: var(--accent); background: var(--glow); outline: none; }
+.durum:empty { display: none; }
+.durum { font-size: 13px; }
+
+.dosyalar { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.dosyalar li { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; align-items: center; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); }
+.dosyalar .ad { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dosyalar .alt { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.dosyalar .uyarili { color: var(--bad, #e5646f); }
+.dosyalar input[type=date] { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; font: inherit; }
+.dosyalar button { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 2px 6px; }
+.dosyalar button:hover { color: var(--bad, #e5646f); }
+.satir-btn { display: flex; gap: 8px; flex-wrap: wrap; }
+.satir-btn .btn[disabled] { opacity: .45; cursor: not-allowed; }
+
+.ozet { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.ozet a { display: inline-flex; gap: 6px; align-items: center; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line-hi); font-size: 13px; color: var(--text); text-decoration: none; background: var(--panel-2); }
+.ozet a:hover { border-color: var(--accent); }
+.ozet .bad { border-color: var(--bad, #e5646f); }
+.ozet .trend { border-color: var(--accent); }
+.ozet em { font-style: normal; color: var(--muted); }
+
+.filtre { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--muted); }
+.filtre select, .filtre input[type=search] { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font: inherit; }
+.grafikler { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.g-kart { border: 1px solid var(--line); border-radius: 12px; padding: 10px 10px 6px; background: var(--panel-2); scroll-margin-top: 80px; min-width: 0; }
+.g-kart.dikkat { border-color: var(--bad, #e5646f); }
+.g-ust { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.g-ust b { font-size: 14px; }
+.g-ust small { color: var(--muted); font-size: 12px; }
+.g-son { font-size: 12px; color: var(--muted); margin: 2px 0 4px; }
+.g-son .yuksek, .g-son .dusuk { color: var(--bad, #e5646f); font-weight: 600; }
+.g-kart svg { width: 100%; height: auto; display: block; }
+.g-bant { fill: var(--ok, #3ecf7a); opacity: .16; }
+.g-cizgi { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+.g-nokta { stroke: var(--panel-2); stroke-width: 1.5; fill: var(--accent); }
+.g-nokta.yuksek, .g-nokta.dusuk { fill: var(--bad, #e5646f); }
+.g-nokta.normal { fill: var(--ok, #3ecf7a); }
+.g-eksen { stroke: var(--line-hi); stroke-width: 1; }
+.g-yazi { fill: var(--muted); font-size: 10px; font-family: var(--sans); }
+.g-yok { color: var(--muted); font-size: 13px; padding: 12px 0; }
+
+.tablo-kap { overflow-x: auto; }
+#satirlar { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+#satirlar th, #satirlar td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+#satirlar th { color: var(--muted); font-weight: 500; }
+#satirlar button { background: none; border: 0; color: var(--muted); cursor: pointer; }
+#satirlar button:hover { color: var(--bad, #e5646f); }
+.tahlil summary { cursor: pointer; font-size: 14px; }
+
+@media (max-width: 860px) {
+  .tahlil { grid-template-columns: 1fr; padding: 12px; }
+  .tahlil .yan { position: static; }
+}
