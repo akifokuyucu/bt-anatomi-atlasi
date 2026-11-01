@@ -50,6 +50,16 @@ let labelHits = [];
 
 // ---------- Yükleme ----------
 
+// Geçiş perdesi (gecis.js) veri gelene kadar kapalı kalır ve yüzdeyi gösterir; perde yoksa bu çağrılar zararsızdır
+function perdeIlerle(yuzde) {
+  window.btatlasIlerleme = yuzde;
+  dispatchEvent(new CustomEvent('btatlas:ilerleme', { detail: yuzde }));
+}
+function perdeHazir() {
+  document.documentElement.dataset.perdeHazir = '1';
+  dispatchEvent(new Event('btatlas:hazir'));
+}
+
 async function fetchBin(url, onProgress) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
@@ -86,7 +96,10 @@ async function load() {
   text.textContent = 'BT yükleniyor…';
   const [ctBuf, labBuf, ovBuf, lesBuf] = await Promise.all([
     fetchBin(`${dir}/ct.bin.gz${v}`, (got, total) => {
-      if (total) $('loadBar').style.width = `${Math.min(100, (got / total) * 100)}%`;
+      if (total) {
+        $('loadBar').style.width = `${Math.min(100, (got / total) * 100)}%`;
+        perdeIlerle(Math.min(99, Math.round((got / total) * 100)));
+      }
       text.textContent = total
         ? `BT yükleniyor… %${Math.min(100, Math.round((got / total) * 100))}`
         : `BT yükleniyor… ${(got / 1e6).toFixed(1)} MB`;
@@ -145,6 +158,7 @@ async function load() {
   bindEvents();
   setPlane(state.plane, true);
   $('loading').hidden = true;
+  perdeHazir();
 }
 
 // ---------- Dil: yapı adları Türkçe, İngilizce veya Latince ----------
@@ -1257,6 +1271,7 @@ load().catch((err) => {
   retry.textContent = 'Yeniden dene';
   retry.addEventListener('click', () => location.reload());
   $('loading').appendChild(retry);
+  perdeHazir(); // hata iletisi perdenin altında kalmasın
 });
 
 // Servis çalışanı: sürüm parametreli hacimleri önbelleğe alır (tekrar ziyaretlerde ~15 MB yeniden inmez)

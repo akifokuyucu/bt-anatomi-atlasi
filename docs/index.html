@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="premium.css">
   <link rel="stylesheet" href="shell.css">
   <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
   <script src="shell.js" defer></script>
   <script src="ui.js" defer></script>
   <script>
@@ -49,10 +50,12 @@
         <p class="lead">Anatomiyi gerçek BT ve ameliyat görüntülerinde görün, fizyolojiyi simülasyonda deneyin, günlük notlarınızı araçlarla hazırlayın.</p>
         <ul class="hero-stats" id="hero-stats" aria-label="Site özeti"></ul>
       </div>
+      <!-- Süs amaçlı 3B kalp ve noise halkası (home-3d.js); WebGL yoksa boş kalır -->
+      <div class="hero-3d" id="hero-3d" aria-hidden="true"></div>
     </section>
 
     <nav class="kapilar" aria-label="Site bölümleri">
-      <div class="kapi" style="--c: var(--ok)">
+      <div class="kapi">
         <a class="kapi-ana" href="atlaslar.html">
           <b>Atlaslar</b>
           <span class="muted">Gerçek görüntüde Türkçe etiketli anatomi.</span>
@@ -63,7 +66,7 @@
           <li><a href="atlaslar.html#laparoskopi">Laparoskopi</a></li>
         </ul>
       </div>
-      <div class="kapi" style="--c: var(--bad)">
+      <div class="kapi">
         <a class="kapi-ana" href="sim.html">
           <b>Simülasyon</b>
           <span class="muted">Parametreyi değiştirin, sonucu hemen görün.</span>
@@ -74,7 +77,7 @@
           <li><a href="mi.html">EKG: miyokard infarktüsü</a></li>
         </ul>
       </div>
-      <div class="kapi" style="--c: var(--lap)">
+      <div class="kapi">
         <a class="kapi-ana" href="araclar.html">
           <b>Araçlar</b>
           <span class="muted">Günlük klinik iş için küçük yardımcılar.</span>
@@ -86,6 +89,13 @@
         </ul>
       </div>
     </nav>
+
+    <div class="serit" aria-label="Atlasta etiketli yapılardan örnekler">
+      <div class="serit-ray">
+        <div class="serit-set"><span>Aort</span><span>Karaciğer</span><span>Pankreas</span><span>Safra kesesi</span><span>Dalak</span><span>Böbrek</span><span>Portal ven</span><span>Pulmoner arter</span><span>Sağ atriyum</span><span>His demeti</span><span>Purkinje ağı</span><span>Calot üçgeni</span><span>Üreter</span><span>Mesane</span></div>
+        <div class="serit-set" aria-hidden="true"><span>Aort</span><span>Karaciğer</span><span>Pankreas</span><span>Safra kesesi</span><span>Dalak</span><span>Böbrek</span><span>Portal ven</span><span>Pulmoner arter</span><span>Sağ atriyum</span><span>His demeti</span><span>Purkinje ağı</span><span>Calot üçgeni</span><span>Üreter</span><span>Mesane</span></div>
+      </div>
+    </div>
 
     <section id="yenilikler" class="block">
       <h2>Son eklenenler</h2>
@@ -111,5 +121,6 @@
   </footer>
 
   <script type="module" src="home.js"></script>
+  <script type="module" src="home-3d.js"></script>
 </body>
 </html>

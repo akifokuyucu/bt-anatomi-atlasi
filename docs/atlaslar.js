@@ -56,6 +56,31 @@ fill('data/lapa_cases.json',
   (c) => `${c.page || 'lapa.html'}#c=${encodeURIComponent(c.id)}`,
   (c) => (c.dur ? [`${c.dur} sn video`, `${c.n} yapı`] : [`${c.frames} kare`, `${c.n} yapı`]));
 
+// Karşılaştırma sürgüsü: sahnede sürükleme veya klavye için alttaki aralık kutusu
+(() => {
+  const sahne = document.getElementById('kiyas-sahne');
+  const surgu = document.getElementById('kiyas-surgu');
+  if (!sahne || !surgu) return;
+  const ayarla = (y) => {
+    const k = Math.min(100, Math.max(0, y));
+    sahne.style.setProperty('--k', `${k}%`);
+    surgu.value = String(k);
+  };
+  surgu.addEventListener('input', () => ayarla(+surgu.value));
+  const sur = (e) => { const r = sahne.getBoundingClientRect(); ayarla(((e.clientX - r.left) / r.width) * 100); };
+  sahne.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button) return;
+    sahne.setPointerCapture(e.pointerId);
+    sur(e);
+    const git = (ev) => sur(ev);
+    const bit = () => { sahne.removeEventListener('pointermove', git); sahne.removeEventListener('pointerup', bit); sahne.removeEventListener('pointercancel', bit); };
+    sahne.addEventListener('pointermove', git);
+    sahne.addEventListener('pointerup', bit);
+    sahne.addEventListener('pointercancel', bit);
+  });
+  ayarla(50);
+})();
+
 // Normal BT, patoloji ve laparoskopi bölümleri sekme gibi; aynı anda biri görünür.
 // #saglikli, #patoloji, #laparoskopi bağlantıları doğrudan ilgili sekmeyi açar.
 (() => {

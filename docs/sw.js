@@ -14,7 +14,7 @@ const CDN_YOL = [
   'https://cdn.jsdelivr.net/npm/three@',
 ];
 const ONYUKLE = [
-  './', 'index.html', 'atlaslar.html', 'atlaslar.js', 'araclar.html', 'form.html', 'form.js', 'form.css', 'formlar/index.json', 'formlar/vizit.json',
+  './', 'index.html', 'atlaslar.html', 'atlaslar.js', 'gecis.js', 'home-3d.js', 'araclar.html', 'form.html', 'form.js', 'form.css', 'formlar/index.json', 'formlar/vizit.json',
   'formlar/nobet.json', 'formlar/konsultasyon.json', 'tahlil.html', 'tahlil.js', 'tahlil.css', 'tahlil/parse.py',
   'devir.html', 'devir.js', 'devir.css', 'sim.html', 'ekg.html', 'derivasyon.html', 'derivasyon.js', 'mi.html', 'mi.js', 'ekg.js', 'ekg-model.js', 'ekg-heart.js', 'sim.css', 'pano/simulasyon.json', 'data/heart/heart.glb', 'data/heart/heart.json', 'gizlilik.html', 'style.css', 'home.css', 'home.js', 'premium.css', 'shell.css',
   'shell.js', 'ui.js', 'search.js', 'araclar.js', 'manifest.webmanifest', 'pano/araclar.json', 'pano/pano.json',
@@ -70,7 +70,8 @@ self.addEventListener('fetch', (e) => {
     e.respondWith((async () => {
       const cache = await caches.open(SHELL);
       try {
-        const res = await fetch(e.request);
+        // no-cache: tarayıcı kopyası varsa da sunucuya sorar (304 ile hızlı); yayından sonra eski CSS/JS ile yeni sayfa karışmaz
+        const res = await fetch(new Request(e.request, { cache: 'no-cache' }));
         if (res.ok) cache.put(e.request, res.clone());
         return res;
       } catch {

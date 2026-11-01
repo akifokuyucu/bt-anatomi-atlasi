@@ -73,6 +73,32 @@
     if (((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') || (e.key === '/' && !yazi)) { e.preventDefault(); ac(); }
   });
 
+  // Atlas sayfalarına geçişte noise perdesi (gecis.js). Hareket azaltma açıksa, WebGL yoksa veya
+  // yeni sekme/değiştirici tuş varsa hiçbir şey yapılmaz; bağlantı normal çalışır.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const gecis = () => import('./gecis.js');
+    try {
+      if (sessionStorage.getItem('btatlas.gecis')) {
+        sessionStorage.removeItem('btatlas.gecis');
+        gecis().then((m) => m.ac()).catch(() => {});
+      }
+    } catch { /* depolama kapalıysa perde açılışı atlanır */ }
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest?.('a[href]');
+      if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target || a.hasAttribute('download')) return;
+      const u = new URL(a.href, location.href);
+      const dosya = u.pathname.split('/').pop();
+      if (u.origin !== location.origin || !/^(atlas|lapa|lapav)\.html$/.test(dosya) || dosya === sayfa) return;
+      e.preventDefault();
+      const git = () => { location.href = a.href; };
+      gecis().then((m) => m.kapat()).then((perdeVar) => {
+        if (perdeVar) { try { sessionStorage.setItem('btatlas.gecis', '1'); } catch { /* sorun değil */ } }
+        git();
+      }).catch(git);
+      setTimeout(git, 2500); // güvenlik: perde takılırsa yine de git
+    });
+  }
+
   // EKG sekmeleri: bağlam çubuğunun altına eklenir
   document.addEventListener('DOMContentLoaded', () => {
     if (!EKG.some(([href]) => href === sayfa)) return;

@@ -57,6 +57,17 @@
       <div class="cat-head"><span class="badge bad">PATOLOJİ BT</span></div>
       <h2>Patoloji BT: hastalığı tanıyın</h2>
       <p class="sub">Normalden sapmayı öğrenmek için ayrı bir atlas. Hastalıklı alanın üzerine gelince (dokunun) kırmızıyla işaretlenir; tanı, BT bulguları ve ayırıcı tanı kartta görünür. Tanıyı gizleyip kendiniz bulmayı da deneyebileceksiniz.</p>
+      <figure class="kiyas" id="kiyas">
+        <figcaption><b>Normal ile patolojiyi yan yana görün</b><span class="muted">Sürgüyü kaydırın: solda normal toraks BT, sağda pulmoner emboli (BT anjiyo).</span></figcaption>
+        <div class="kiyas-sahne" id="kiyas-sahne">
+          <img class="kiyas-alt" src="img/s0372.jpg" alt="Normal toraks BT kesiti" width="640" height="468" loading="lazy">
+          <img class="kiyas-ust" src="img/pe01.jpg" alt="Pulmoner emboli içeren toraks BT anjiyo kesiti" width="640" height="468" loading="lazy">
+          <span class="kiyas-etiket sol">NORMAL</span><span class="kiyas-etiket sag">PULMONER EMBOLİ</span>
+          <span class="kiyas-cizgi" aria-hidden="true"></span>
+        </div>
+        <input class="kiyas-surgu" id="kiyas-surgu" type="range" min="0" max="100" value="50" aria-label="Normal ve patolojik kesit arasındaki ayırıcının konumu">
+        <p class="muted kiyas-not">Kesitler farklı hastalara ve farklı fazlara aittir; yalnızca toraks düzeyinde görsel karşılaştırma içindir.</p>
+      </figure>
       <div class="cards" id="cases-patoloji"></div>
       <p class="note-box">Patoloji vakalarında lezyon işaretlemeleri yalnızca açık lisanslı, uzman onaylı verilerden alınır. Hazır olmayan vakalar "Hazırlanıyor" olarak gösterilir.</p>
     </section>

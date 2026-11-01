@@ -103,7 +103,7 @@ export async function kalpSahnesi(kutu, etiketKutu) {
     geo.computeBoundingBox();
     const bb = geo.boundingBox;
     const nk = new Float32Array(n * 3);
-    const apeksD = new Float32Array(n), septum = new Float32Array(n), yanal = new Float32Array(n), siraA = new Float32Array(n), faz = new Float32Array(n), taraf = new Uint8Array(n), doku = new Float32Array(n);
+    const apeksD = new Float32Array(n), septum = new Float32Array(n), yanal = new Float32Array(n), siraA = new Float32Array(n), faz = new Float32Array(n), taraf = new Uint8Array(n), doku = new Float32Array(n), gur = new Float32Array(n);
     const p = V(0, 0, 0), q = V(0, 0, 0);
     let maxD = 0;
     for (let i = 0; i < n; i++) { p.fromBufferAttribute(pos, i); maxD = Math.max(maxD, p.distanceTo(tip === 'A' ? (yan === 'R' ? sa : laG) : apeks)); }
@@ -128,9 +128,11 @@ export async function kalpSahnesi(kutu, etiketKutu) {
       nk[i * 3 + 2] = (p.z - (bb.min.z + bb.max.z) / 2) / ((bb.max.z - bb.min.z) / 2);
       faz[i] = Math.random() * 6.28;
       doku[i] = 0.9 + 0.2 * (0.5 + 0.5 * Math.sin(p.x * 23 + p.y * 17) * Math.cos(p.z * 19 + p.x * 11));
+      // İnfarkt sınırını tırtıklı yapan sabit gürültü (0..1); evre ilerledikçe sınır bu gürültü boyunca yayılır
+      gur[i] = 0.5 + 0.25 * Math.sin(p.x * 41 + p.y * 29) * Math.cos(p.z * 37 - p.x * 23) + 0.25 * Math.sin(p.y * 67 + p.z * 53 + p.x * 31);
     }
     const merkez = bb.getCenter(V(0, 0, 0));
-    return { tip, yan, mesh, geo, n, nk, inf: null, apeksD, septum, yanal, siraA, faz, taraf, doku, merkez, rest: renk === 'a' ? RENK.atriyum : (tip === 'A' ? RENK.atriyum : RENK.ventrikul) };
+    return { tip, yan, mesh, geo, n, nk, inf: null, apeksD, septum, yanal, siraA, faz, taraf, doku, gur, merkez, rest: renk === 'a' ? RENK.atriyum : (tip === 'A' ? RENK.atriyum : RENK.ventrikul) };
   }
   const odalar = [
     oda('ra', 'A', 'R', '#c9786d'),
@@ -282,7 +284,8 @@ export async function kalpSahnesi(kutu, etiketKutu) {
 
   // --- Kare güncelleme ----------------------------------------------------------
   const tmp = new THREE.Color();
-  let infSiddet = 0;
+  let infSiddet = 0, infHedef = 0, infT = performance.now();
+  const azHareket = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const infRenk = new THREE.Color('#5a3a5c');
   const tmpV = new THREE.Vector3(), dir = new THREE.Vector3();
 
@@ -308,7 +311,13 @@ export async function kalpSahnesi(kutu, etiketKutu) {
     for (let i = 0; i < o.n; i++) {
       let act = hesapla(a, i);
       if (ö) act = Math.max(act, hesapla(ö, i));
-      const iw = o.inf && infSiddet > 0 ? o.inf[i] * infSiddet : 0;
+      // İnfarkt: bölge ağırlığı gürültüyle bozulur, eşik evre şiddetiyle düşer; sınır tırtıklı yayılır
+      let iw = 0;
+      if (o.inf && infSiddet > 0.002) {
+        const f0 = o.inf[i];
+        const alan = f0 + (o.gur[i] - 0.5) * 3.2 * f0 * (1 - f0);
+        iw = sm((alan - (1 - infSiddet)) / 0.16 + 0.5) * Math.min(1, f0 * 4) * (0.55 + 0.45 * infSiddet);
+      }
       act *= 1 - iw; // ölü doku depolarize olmaz
       tmp.copy(o.rest).multiplyScalar(o.doku[i]).lerp(RENK.aktif, act * 0.85);
       if (iw > 0) tmp.lerp(infRenk, Math.min(1, iw));
@@ -357,6 +366,11 @@ export async function kalpSahnesi(kutu, etiketKutu) {
   }
 
   function guncelle(t, akis, vek) {
+    // Evre değişince infarkt alanı yumuşakça genişler/daralır
+    const simdi = performance.now();
+    const dt = Math.min(0.1, (simdi - infT) / 1000);
+    infT = simdi;
+    infSiddet = azHareket ? infHedef : infSiddet + (infHedef - infSiddet) * (1 - Math.exp(-dt * 4));
     const bi = akis.atimBul(t);
     for (const o of odalar) odaGuncelle(o, akis, t, bi);
     if (iletimAcik) for (const y of yollar) yolGuncelle(y, akis, t, bi);
@@ -397,10 +411,10 @@ export async function kalpSahnesi(kutu, etiketKutu) {
 
   // İnfarkt bölgesi: ventrikül duvarı köşelerine bölgeye göre ağırlık verir (0..1)
   function infarkt(bolge, siddet, renk) {
-    infSiddet = siddet || 0;
+    infHedef = siddet || 0;
     if (renk) infRenk.set(renk);
     const o = odalar.find((x) => x.tip === 'V');
-    if (!bolge || !siddet) { o.inf = null; return; }
+    if (!bolge || !siddet) { o.inf = null; infSiddet = 0; return; }
     const w = new Float32Array(o.n);
     const lc = V(0, 0, 0), rc = V(0, 0, 0), pp = V(0, 0, 0), uu = V(0, 0, 0), q2 = V(0, 0, 0);
     for (let k = 0; k < lvc.count; k++) lc.add(q2.fromBufferAttribute(lvc, k));
