@@ -62,6 +62,30 @@ def kavram_fj(*desenler):
 # --- Parça grupları -----------------------------------------------------------
 koroner_ven = ['FJ2655', 'FJ2656', 'FJ2724', 'FJ2731', 'FJ2725', 'FJ2730']
 koroner_arter = [f for f in kavram_fj(lambda n: 'coronary' in n or 'interventricular' in n) if 2600 <= int(f[2:]) <= 2760 and f not in koroner_ven]
+# Ön interventriküler damarlar ven: arter grubundan çıkar, ven grubuna ekle
+koroner_ven += [f for f in koroner_arter if f in kavram_fj(lambda n: 'vein' in n)]
+koroner_arter = [f for f in koroner_arter if f not in koroner_ven]
+
+# Koroner arterleri adlarına göre grupla (fareyle üzerine gelince adı gösterilir)
+KORONER = [  # (kimlik, Türkçe ad, bölge notu, ad deseni)
+    ('lmca', 'Sol ana koroner arter (LMCA)', 'LAD ve sirkumfleksi verir', lambda n: n.startswith('trunk of left coronary')),
+    ('lad', 'Sol ön inen arter (LAD)', 'Ön duvar ve septum · V1–V4', lambda n: n.startswith('trunk of branch of coronary')),
+    ('diag', 'Diyagonal dallar (LAD)', 'Ön-yan duvar · I, aVL, V4–V6', lambda n: n.startswith('diagonal branch')),
+    ('septal', 'Septal perforan dallar (LAD)', 'İnterventriküler septum', lambda n: n.startswith('septal branch of anterior')),
+    ('ladrv', 'Konus ve sağ ön dallar (LAD)', 'Sağ ventrikül ön yüzü, çıkış yolu', lambda n: n.startswith('conus branch') or n.startswith('right anterior branch')),
+    ('lcx', 'Sirkumfleks arter (LCx)', 'Yan ve arka-yan duvar · I, aVL, V5–V6', lambda n: n.startswith('circumflex')),
+    ('rca', 'Sağ koroner arter (RCA)', 'Sağ ventrikül, alt duvar · II, III, aVF', lambda n: n.startswith('trunk of right coronary') or n == 'right conus artery'),
+    ('rcarv', 'Sağ ventrikül dalları (RCA)', 'Sağ ventrikül serbest duvarı · V4R', lambda n: n.startswith('anterior ventricular branch')),
+    ('rcapl', 'Posterolateral dallar (RCA)', 'Alt-arka duvar', lambda n: n.startswith('posterior ventricular branch')),
+    ('pda', 'Posterior inen arter (PDA)', 'Alt duvar ve arka septum · II, III, aVF', lambda n: n.startswith('posterior interventricular') or n.startswith('septal branch of right posterior')),
+]
+_ad = {}
+for l in open(LISTE, encoding='utf-8').read().splitlines()[1:]:
+    c, n, f = l.split('	')
+    _ad.setdefault(f, n)
+kor_grup = {k[0]: [f for f in koroner_arter if k[3](_ad.get(f, ''))] for k in KORONER}
+_atanan = {f for v in kor_grup.values() for f in v}
+assert _atanan == set(koroner_arter), sorted(set(koroner_arter) - _atanan)
 GRUP = {
     'vent': (['FJ2428'], None),
     'ra': (['FJ2439'], None),
@@ -73,7 +97,16 @@ GRUP = {
     'pv': (['FJ2925', 'FJ2933', 'FJ3020', 'FJ2944', 'FJ2950', 'FJ2955', 'FJ3040', 'FJ3031'], None),
     'svc': (['FJ3645'], None),
     'ivc': (['FJ3441'], 1130),
-    'corA': (koroner_arter, None),
+    'cor_lmca': (kor_grup['lmca'], None),
+    'cor_lad': (kor_grup['lad'], None),
+    'cor_diag': (kor_grup['diag'], None),
+    'cor_septal': (kor_grup['septal'], None),
+    'cor_ladrv': (kor_grup['ladrv'], None),
+    'cor_lcx': (kor_grup['lcx'], None),
+    'cor_rca': (kor_grup['rca'], None),
+    'cor_rcarv': (kor_grup['rcarv'], None),
+    'cor_rcapl': (kor_grup['rcapl'], None),
+    'cor_pda': (kor_grup['pda'], None),
     'corV': (koroner_ven, None),
 }
 parcalar = {}
@@ -175,6 +208,7 @@ meta = {
     'apeks': sv(apeks_epi), 'septum': sv(orta),
     'sa': sv(SA), 'laGiris': sv(la_m + [6, -14, 18]),
     'yollar': yollar, 'etiket': etiket,
+    'koroner': {k[0]: {'ad': k[1], 'bolge': k[2]} for k in KORONER},
 }
 
 # --- GLB yaz --------------------------------------------------------------------
@@ -217,4 +251,4 @@ os.makedirs(CIKTI, exist_ok=True)
 veri = glb(parcalar)
 open(f'{CIKTI}/heart.glb', 'wb').write(veri)
 json.dump(meta, open(f'{CIKTI}/heart.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
-print('heart.glb KB', round(len(veri) / 1024), 'koroner arter parça', len(koroner_arter))
+print('heart.glb KB', round(len(veri) / 1024), 'koroner arter parça', len(koroner_arter), {k: len(v) for k, v in kor_grup.items()})

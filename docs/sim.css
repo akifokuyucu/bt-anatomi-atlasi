@@ -9,6 +9,11 @@
 .ekg .sahne { position: sticky; top: 68px; }
 .sahne-ust, .sahne-alt { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
 .sahne-kutu { position: relative; height: min(58vh, 520px); min-height: 300px; border-radius: 12px; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, var(--panel-2), var(--panel)); border: 1px solid var(--line); touch-action: none; }
+/* Büyütülmüş sahne: ekranın ortasında, arkası karartılmış */
+.sahne-kutu.buyuk { position: fixed; inset: 3vh 3vw; z-index: 200; height: auto; min-height: 0; box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .72); }
+body.sahne-acik { overflow: hidden; }
+.sahne-buyut { position: absolute; top: 10px; right: 10px; z-index: 4; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px; border: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 85%, transparent); color: var(--text, inherit); cursor: pointer; backdrop-filter: blur(6px); }
+.sahne-buyut:hover, .sahne-buyut:focus-visible { border-color: var(--accent, #7aa2ff); }
 .sahne-kutu canvas { display: block; cursor: grab; }
 .sahne-kutu canvas:active { cursor: grabbing; }
 .yukleniyor { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; padding: 20px; color: var(--muted); font-size: 13px; pointer-events: none; }
@@ -16,6 +21,10 @@
 .kalp-etiket { position: absolute; left: 0; top: 0; padding: 2px 7px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; background: rgba(10, 12, 15, .72); color: #f3f4f6; border: 1px solid rgba(255, 255, 255, .22); transition: opacity .2s; will-change: transform; }
 .kalp-etiket.iletim { background: rgba(60, 44, 8, .8); color: #ffe9a8; border-color: rgba(255, 213, 74, .6); }
 .kalp-etiket.arka { opacity: .28; }
+.kalp-ipucu { position: absolute; left: 0; top: 0; max-width: 220px; padding: 6px 10px; border-radius: 10px; font-size: 12px; line-height: 1.35; background: rgba(10, 12, 15, .9); color: #f3f4f6; border: 1px solid rgba(255, 138, 61, .7); pointer-events: none; z-index: 3; display: flex; flex-direction: column; gap: 1px; text-align: center; }
+.kalp-ipucu b { font-weight: 600; color: #ffb27a; }
+.kalp-ipucu span { opacity: .85; font-size: 11px; }
+.kalp-ipucu[hidden] { display: none; }
 .faz { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--panel-2); min-height: 112px; }
 .faz b { display: block; font-size: 15px; margin: 2px 0 4px; color: var(--accent); }
 .faz p { margin: 0; font-size: 13px; line-height: 1.5; }

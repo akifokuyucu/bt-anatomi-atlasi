@@ -80,9 +80,11 @@ export async function kalpSahnesi(kutu, etiketKutu) {
     return m;
   };
   gec('aorta', '#c9483f'); gec('pulm', '#5a80cc'); gec('pv', '#c9524a'); gec('svc', '#4a74c4'); gec('ivc', '#4a74c4');
-  gec('corA', '#e23a2e'); gec('corV', '#33589f');
+  const koroner = Object.keys(meta.koroner);
+  for (const k of koroner) gec('cor_' + k, '#e23a2e', { emissive: new THREE.Color('#000000') });
+  gec('corV', '#33589f');
   for (const ad of ['lvc', 'rvc']) { parca[ad].visible = false; }
-  const damarlar = ['aorta', 'pulm', 'pv', 'svc', 'ivc', 'corA', 'corV'].map((a) => parca[a]);
+  const damarlar = ['aorta', 'pulm', 'pv', 'svc', 'ivc', 'corV', ...koroner.map((k) => 'cor_' + k)].map((a) => parca[a]);
 
   // --- Odalar -------------------------------------------------------------------
   const lvc = parca.lvc.geometry.attributes.position, rvc = parca.rvc.geometry.attributes.position;
@@ -171,6 +173,66 @@ export async function kalpSahnesi(kutu, etiketKutu) {
   });
   let etiketAcik = true, iletimAcik = false, vektorAcik = false;
 
+  // --- Koroner arter ipucu: fareyle üzerine gelince (dokunmada dokununca) adı ve bölgesi ---------
+  const ipucu = document.createElement('div');
+  ipucu.className = 'kalp-ipucu';
+  ipucu.hidden = true;
+  etiketKutu.appendChild(ipucu);
+  const korNokta = koroner.map((k) => {
+    const pos = parca['cor_' + k].geometry.attributes.position, adim = 3, dizi = [];
+    for (let i = 0; i < pos.count; i += adim) dizi.push(V(0, 0, 0).fromBufferAttribute(pos, i));
+    return { k, dizi };
+  });
+  const engeller = ['vent', 'ra', 'la', 'aorta', 'pulm', 'svc', 'ivc', 'pv'].map((a) => parca[a]);
+  const isin = new THREE.Raycaster();
+  let ipucuKor = null;
+  function korVurgula(k) {
+    if (ipucuKor === k) return;
+    if (ipucuKor) parca['cor_' + ipucuKor].material.emissive.set('#000000');
+    ipucuKor = k;
+    if (k) parca['cor_' + k].material.emissive.set('#ff8a3d');
+    renderer.domElement.style.cursor = k ? 'pointer' : '';
+  }
+  function korBul(cx, cy) {
+    const r = renderer.domElement.getBoundingClientRect();
+    const ex = cx - r.left, ey = cy - r.top;
+    let en = 1e9, bul = null;
+    for (const g of korNokta) for (const p of g.dizi) {
+      tmpV.copy(p).applyMatrix4(grup.matrixWorld).project(cam);
+      if (tmpV.z > 1) continue;
+      const d = Math.hypot((tmpV.x + 1) / 2 * r.width - ex, (1 - tmpV.y) / 2 * r.height - ey);
+      if (d < en) { en = d; bul = { k: g.k, p: p }; }
+    }
+    if (!bul || en > 14) return null;
+    // Önünde heykelin kendisi varsa (arka yüzdeki damar) seçme
+    tmpV.copy(bul.p).applyMatrix4(grup.matrixWorld);
+    const yon = tmpV.clone().sub(cam.position), uz = yon.length();
+    isin.set(cam.position, yon.normalize());
+    const vur = isin.intersectObjects(engeller, false)[0];
+    return vur && vur.distance < uz - 0.12 ? null : bul.k;
+  }
+  function korIpucuGoster(cx, cy) {
+    const k = korBul(cx, cy);
+    korVurgula(k);
+    if (!k) { ipucu.hidden = true; return; }
+    const m = meta.koroner[k], r = etiketKutu.getBoundingClientRect();
+    ipucu.innerHTML = '<b></b><span></span>';
+    ipucu.firstChild.textContent = m.ad;
+    ipucu.lastChild.textContent = m.bolge;
+    ipucu.hidden = false;
+    const x = Math.min(Math.max(cx - r.left, 80), r.width - 80);
+    ipucu.style.transform = `translate(-50%,0) translate(${x}px,${Math.max(8, cy - r.top - 58)}px)`;
+  }
+  const kd = renderer.domElement;
+  let basla = null;
+  kd.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse' && e.buttons === 0) korIpucuGoster(e.clientX, e.clientY); });
+  kd.addEventListener('pointerleave', () => { korVurgula(null); ipucu.hidden = true; });
+  kd.addEventListener('pointerdown', (e) => { basla = { x: e.clientX, y: e.clientY }; if (e.pointerType === 'mouse') ipucu.hidden = true; });
+  kd.addEventListener('pointerup', (e) => {
+    if (e.pointerType !== 'mouse' && basla && Math.hypot(e.clientX - basla.x, e.clientY - basla.y) < 8) korIpucuGoster(e.clientX, e.clientY);
+    basla = null;
+  });
+
   function boyutla() {
     const w = kutu.clientWidth || 300, h = kutu.clientHeight || 300;
     renderer.setSize(w, h, false);
@@ -181,6 +243,36 @@ export async function kalpSahnesi(kutu, etiketKutu) {
   }
   new ResizeObserver(boyutla).observe(kutu);
   boyutla();
+
+  // --- Büyüt: sahne ekranın ortasında büyük açılır (Esc veya tekrar basınca kapanır) ---------------
+  const buyutDugme = document.createElement('button');
+  buyutDugme.type = 'button';
+  buyutDugme.className = 'sahne-buyut';
+  const IKON_BUYUT = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>';
+  const IKON_KUCUK = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 10l7-7M3 21l7-7M14 10V4M14 10h6M10 14v6M10 14H4"/></svg>';
+  const yerTutucu = document.createElement('div');
+  let buyuk = false;
+  function buyut(a) {
+    if (a === buyuk) return;
+    buyuk = a;
+    if (a) {
+      yerTutucu.style.height = kutu.offsetHeight + 'px';
+      kutu.parentNode.insertBefore(yerTutucu, kutu);
+    } else yerTutucu.remove();
+    kutu.classList.toggle('buyuk', a);
+    document.body.classList.toggle('sahne-acik', a);
+    buyutDugme.innerHTML = a ? IKON_KUCUK : IKON_BUYUT;
+    buyutDugme.setAttribute('aria-label', a ? 'Küçült' : 'Büyüt');
+    buyutDugme.title = a ? 'Küçült (Esc)' : 'Büyüt';
+    boyutla();
+  }
+  buyutDugme.innerHTML = IKON_BUYUT;
+  buyutDugme.setAttribute('aria-label', 'Büyüt');
+  buyutDugme.title = 'Büyüt';
+  buyutDugme.addEventListener('click', () => buyut(!buyuk));
+  buyutDugme.addEventListener('pointerdown', (e) => e.stopPropagation());
+  kutu.appendChild(buyutDugme);
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && buyuk) buyut(false); });
 
   let hedef = null;
   function gorunum(ad) {
