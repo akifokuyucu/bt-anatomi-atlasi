@@ -59,7 +59,7 @@ def og():
     d.text((64, 250), "Klinik çalışmanın", font=font("georgiab.ttf", 64), fill=TEXT)
     d.text((64, 326), "yanında, tek sayfada", font=font("georgiab.ttf", 64), fill=TEXT)
     d.rectangle([64, 424, 144, 427], fill=GOLD)
-    d.text((64, 452), "Pano  ·  Araçlar  ·  Atlaslar", font=font("arial.ttf", 30), fill=MUTED)
+    d.text((64, 452), "Atlaslar  ·  Simülasyon  ·  Araçlar", font=font("arial.ttf", 30), fill=MUTED)
     d.text((64, 540), "BT ve laparoskopi anatomi atlası · eğitim amaçlıdır", font=font("arial.ttf", 22), fill=GOLD2)
     im.save(DOCS / "og.png", optimize=True)
 

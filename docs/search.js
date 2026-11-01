@@ -1,4 +1,4 @@
-// Site içi arama paneli (Ctrl+K): sayfalar, BT ve laparoskopi vakaları, araçlar, pano kartları.
+// Site içi arama paneli (Ctrl+K): sayfalar, BT ve laparoskopi vakaları, araçlar, son eklenenler.
 // Atlas içi yapı araması atlasın kendi arama kutusundadır.
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 // Türkçe harfleri sadeleştir: "karaciğer" ve "karaciger" aynı eşleşsin
@@ -6,16 +6,16 @@ const duz = (t) => String(t || '').toLocaleLowerCase('tr').replace(/ı/g, 'i').r
 const json = (u) => fetch(u).then((r) => (r.ok ? r.json() : [])).catch(() => []);
 
 const SAYFALAR = [
-  ['Pano', 'Seçilmiş siteler, kılavuzlar ve haberler', 'index.html#pano'],
+  ['Atlaslar', 'Gerçek görüntüde Türkçe etiketli anatomi', 'atlaslar.html'],
   ['Araçlar', 'Klinik çalışmada işe yarayan küçük araçlar', 'araclar.html'],
   ['Simülasyon', 'Etkileşimli fizyoloji simülasyonları', 'sim.html'],
   ['EKG', '3B kalpte uyarı iletimi ve 12 derivasyonlu EKG; ritim, PR, QRS ve eksen ayarı', 'ekg.html'],
   ['EKG derivasyonları', 'Derivasyon bir kameradır: 3B kalpte bakış açısı, kalp vektörü ve sınav', 'derivasyon.html'],
   ['EKG miyokard infarktüsü', 'STEMI bölgeleri: anteroseptal, ön, lateral, inferior, posterior, sağ ventrikül; ST yükselmesi ve evrim', 'mi.html'],
   ['Gizlilik ve Kullanım Koşulları', 'Hangi veri işlenir, kullanım koşulları ve sorumluluk sınırları', 'gizlilik.html'],
-  ['BT atlası', 'Normal toraks, abdomen ve kraniyal BT', 'index.html#saglikli'],
-  ['Patoloji BT atlası', 'Lezyonu işaretli vakalar, tanı kartı', 'index.html#patoloji'],
-  ['Laparoskopi atlası', 'Ameliyat görüntüsünde anatomi', 'index.html#laparoskopi'],
+  ['Normal BT', 'Normal toraks, abdomen ve kraniyal BT', 'atlaslar.html#saglikli'],
+  ['Patoloji BT', 'Lezyonu işaretli vakalar, tanı kartı', 'atlaslar.html#patoloji'],
+  ['Laparoskopi', 'Ameliyat görüntüsünde anatomi', 'atlaslar.html#laparoskopi'],
 ];
 
 async function kayitlariYukle() {
@@ -23,10 +23,10 @@ async function kayitlariYukle() {
     json('data/cases.json'), json('data/lapa_cases.json'), json('pano/araclar.json'), json('pano/pano.json'),
   ]);
   const k = SAYFALAR.map(([ad, alt, href]) => ({ grup: 'Sayfa', ad, alt, href }));
-  bt.filter((c) => c.status === 'ready').forEach((c) => k.push({ grup: c.category === 'patoloji' ? 'Patoloji BT' : 'BT atlası', ad: c.title, alt: `${c.eyebrow} · ${c.n} yapı`, href: `atlas.html#c=${encodeURIComponent(c.id)}` }));
+  bt.filter((c) => c.status === 'ready').forEach((c) => k.push({ grup: c.category === 'patoloji' ? 'Patoloji BT' : 'Normal BT', ad: c.title, alt: `${c.eyebrow} · ${c.n} yapı`, href: `atlas.html#c=${encodeURIComponent(c.id)}` }));
   lap.filter((c) => c.status === 'ready').forEach((c) => k.push({ grup: 'Laparoskopi', ad: c.title, alt: c.text || c.eyebrow, href: `${c.page || 'lapa.html'}#c=${encodeURIComponent(c.id)}` }));
   araclar.forEach((t) => k.push({ grup: 'Araç', ad: t.ad, alt: t.aciklama || '', href: t.url }));
-  pano.forEach((p) => k.push({ grup: 'Pano', ad: p.baslik, alt: p.ozet || '', href: p.url, dis: /^https?:/i.test(p.url) }));
+  pano.forEach((p) => k.push({ grup: 'Yenilik', ad: p.baslik, alt: p.ozet || '', href: p.url, dis: /^https?:/i.test(p.url) }));
   return k.map((x) => ({ ...x, kok: duz(`${x.ad} ${x.alt} ${x.grup}`) }));
 }
 
@@ -37,7 +37,7 @@ export function aramaPaneli() {
   kap.innerHTML =
     '<div class="srch-scrim" data-kapat></div>' +
     '<div class="srch-box" role="dialog" aria-modal="true" aria-label="Site içi arama">' +
-      '<input class="srch-in" type="search" placeholder="Vaka, araç veya pano kartı ara…" aria-label="Ara" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="srch-list">' +
+      '<input class="srch-in" type="search" placeholder="Vaka, simülasyon veya araç ara…" aria-label="Ara" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="srch-list">' +
       '<ul class="srch-list" id="srch-list" role="listbox"></ul>' +
       '<div class="srch-foot"><span><kbd>↑</kbd><kbd>↓</kbd> gez</span><span><kbd>Enter</kbd> aç</span><span><kbd>Esc</kbd> kapat</span></div>' +
     '</div>';

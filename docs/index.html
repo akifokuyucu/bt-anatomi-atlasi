@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#08090c">
   <title>Klinik Atlas</title>
-  <meta name="description" content="Radyoloji ve cerrahi için pano, araçlar ve atlaslar: seçilmiş web siteleri ve haberler, klinik yardımcı araçlar, Türkçe etiketli BT ve laparoskopi anatomi atlasları.">
+  <meta name="description" content="Türkçe etiketli BT ve laparoskopi anatomi atlasları, etkileşimli EKG simülasyonu ve günlük klinik işler için araçlar.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="tr_TR">
   <meta property="og:title" content="Klinik Atlas">
-  <meta property="og:description" content="Radyoloji ve cerrahi için pano, araçlar ve atlaslar.">
+  <meta property="og:description" content="Anatomi atlasları, fizyoloji simülasyonları ve klinik araçlar.">
   <meta property="og:url" content="https://akifokuyucu.github.io/bt-anatomi-atlasi/">
   <meta property="og:image" content="https://akifokuyucu.github.io/bt-anatomi-atlasi/og.png">
   <meta property="og:image:width" content="1200">
@@ -31,128 +31,71 @@
   <script>
     // Eski paylaşım bağlantıları (#p=…&s=…) doğrudan atlasa gitsin
     if (/(^#|&)(c|p|y)=/.test(location.hash)) location.replace('atlas.html' + location.hash);
+    // Bölümler ana sayfadan taşındı; eski bağlantılar yeni yerlerine gitsin
+    const eskiBolum = {
+      '#atlaslar': 'atlaslar.html', '#saglikli': 'atlaslar.html#saglikli', '#patoloji': 'atlaslar.html#patoloji',
+      '#laparoskopi': 'atlaslar.html#laparoskopi', '#ozellikler': 'atlaslar.html#ozellikler',
+      '#araclar': 'araclar.html', '#simulasyon': 'sim.html', '#pano': '#yenilikler',
+    }[location.hash];
+    if (eskiBolum) location.replace(eskiBolum);
   </script>
 </head>
 <body class="home">
   <main>
     <section class="hero portal">
       <div class="hero-text">
-        <p class="caption">RADYOLOJİ · GENEL CERRAHİ</p>
-        <h1>Klinik çalışmanın yanında, tek sayfada</h1>
-        <p class="lead">Seçilmiş siteler ve haberler panoda, günlük işe yarayan araçlar bir tık ötede, anatomi ise gerçek BT ve ameliyat görüntüleriyle atlaslarda.</p>
-        <div class="cta">
-          <a class="btn accent big" href="atlas.html">Atlası aç</a>
-          <a class="btn big" href="araclar.html">Araçlara git</a>
-        </div>
+        <p class="caption">ANATOMİ · FİZYOLOJİ · KLİNİK İŞ</p>
+        <h1>Görüntü, fizyoloji ve günlük klinik işler tek yerde</h1>
+        <p class="lead">Anatomiyi gerçek BT ve ameliyat görüntülerinde görün, fizyolojiyi simülasyonda deneyin, günlük notlarınızı araçlarla hazırlayın.</p>
         <ul class="hero-stats" id="hero-stats" aria-label="Site özeti"></ul>
       </div>
     </section>
 
-    <section id="pano" class="block">
-      <div class="sec-head">
-        <div>
-          <div class="cat-head"><span class="badge pano">PANO</span></div>
-          <h2>Pano</h2>
-          <p class="sub">Beğenilen siteler, kılavuzlar ve gelişmeler. Pano henüz yeni; başa sabitlenen kart BT atlası.</p>
-        </div>
-      </div>
-      <a class="featured" id="pano-oneri" href="atlas.html">
-        <div class="featured-body">
-          <span class="caption">SABİT · ATLAS</span>
-          <h3>BT Anatomi Atlası</h3>
-          <p class="ozet">Gerçek ve anonim BT kesitlerinde Türkçe etiketli anatomi: üç düzlemde gezin, yapıya dokunun, kendinizi test edin.</p>
-          <ul class="featured-pts"><li>Aksiyel · koronal · sagittal</li><li>TR · EN · LA</li><li>Sınav modu</li></ul>
-          <span class="btn accent featured-go">Atlası aç <span data-icon="chevron"></span></span>
-        </div>
-        <div class="featured-media" aria-hidden="true"><img id="pano-oneri-img" alt="" width="640" height="468"><span class="tagpill">BT ATLASI</span></div>
-      </a>
-      <div class="pano-bar" id="pano-bar" hidden>
-        <input id="pano-ara" type="search" placeholder="Panoda ara…" aria-label="Panoda ara">
-        <div class="chips" id="pano-bransler" role="group" aria-label="Branş filtresi"></div>
-        <div class="chips" id="pano-turler" role="group" aria-label="Tür filtresi"></div>
-      </div>
-      <div class="pano" id="pano-liste"><p class="muted">Pano yükleniyor…</p></div>
-    </section>
-
-    <section id="araclar" class="block">
-      <div class="cat-head"><span class="badge tool">ARAÇLAR</span></div>
-      <h2>Araçlar</h2>
-      <p class="sub">Tarayıcıda açılan, kurulum gerektirmeyen küçük yardımcılar; telefonda da çalışır.</p>
-      <div class="cards tools" id="araclar-liste"><p class="muted">Araçlar yükleniyor…</p></div>
-      <p><a class="btn" href="araclar.html">Tüm araçlar →</a></p>
-    </section>
-
-    <section id="simulasyon" class="block">
-      <div class="cat-head"><span class="badge new">SİMÜLASYON</span></div>
-      <h2>Simülasyon</h2>
-      <p class="sub">3B anatomi ile canlı sinyalin birlikte çalıştığı etkileşimli fizyoloji modelleri. Parametreyi değiştirin, sonucu hemen görün.</p>
-      <div class="cards tools" id="sim-liste"><p class="muted">Simülasyonlar yükleniyor…</p></div>
-      <p><a class="btn" href="sim.html">Tüm simülasyonlar →</a></p>
-    </section>
-
-    <section id="atlaslar" class="block atlaslar-head">
-      <div class="cat-head"><span class="badge ok">ATLASLAR</span></div>
-      <h2>Atlaslar</h2>
-      <p class="sub">Gerçek BT kesitlerinde ve ameliyat görüntüsünde Türkçe etiketli anatomi.</p>
-      <nav class="areas" aria-label="Atlas bölümleri">
-        <a class="area" href="#saglikli" style="--c: var(--ok)">
-          <span class="caption">BT</span>
-          <b>BT atlası</b>
-          <span class="muted">Normal toraks ve abdomen-pelvis BT'si</span>
+    <nav class="kapilar" aria-label="Site bölümleri">
+      <div class="kapi" style="--c: var(--ok)">
+        <a class="kapi-ana" href="atlaslar.html">
+          <b>Atlaslar</b>
+          <span class="muted">Gerçek görüntüde Türkçe etiketli anatomi.</span>
         </a>
-        <a class="area" href="#patoloji" style="--c: var(--bad)">
-          <span class="caption">BT</span>
-          <b>Patoloji BT atlası</b>
-          <span class="muted">Lezyonu işaretli vakalar, tanı kartı</span>
-        </a>
-        <a class="area" href="#laparoskopi" style="--c: var(--lap)">
-          <span class="caption">LAPAROSKOPİ · ROBOTİK <span class="badge new">YENİ</span></span>
-          <b>Ameliyat görüntüsünde anatomi</b>
-          <span class="muted">Cerrahın kamerasında organlar, BT'deki karşılığı</span>
-        </a>
-      </nav>
-    </section>
-
-    <section id="saglikli" class="block">
-      <div class="cat-head"><span class="badge ok">BT ATLASI</span></div>
-      <h2>Normal BT: toraks, abdomen ve kraniyal</h2>
-      <p class="sub">Önce normali görün. Her bölge için patolojisiz, gerçek ve anonim bir BT; tüm yapılar Türkçe, İngilizce ve Latince adlarıyla etiketli.</p>
-      <div class="cards" id="cases-saglikli"><p class="muted">Vakalar yükleniyor…</p></div>
-    </section>
-
-    <section id="patoloji" class="block">
-      <div class="cat-head"><span class="badge bad">PATOLOJİ BT ATLASI</span></div>
-      <h2>Hastalıklı BT: patolojiyi tanıyın</h2>
-      <p class="sub">Normalden sapmayı öğrenmek için ayrı bir atlas. Hastalıklı alanın üzerine gelince (dokunun) kırmızıyla işaretlenir; tanı, BT bulguları ve ayırıcı tanı kartta görünür. Tanıyı gizleyip kendiniz bulmayı da deneyebileceksiniz.</p>
-      <div class="cards" id="cases-patoloji"></div>
-      <p class="note-box">Patoloji vakalarında lezyon işaretlemeleri yalnızca açık lisanslı, uzman onaylı verilerden alınır. Hazır olmayan vakalar "Hazırlanıyor" olarak gösterilir.</p>
-    </section>
-
-    <section id="laparoskopi" class="block">
-      <div class="cat-head"><span class="badge lap">LAPAROSKOPİ · ROBOTİK CERRAHİ</span></div>
-      <h2>Ameliyat görüntüsünde anatomi</h2>
-      <p class="sub">Aynı organlar bu kez cerrahın kamerasından. Robotik ameliyat karelerinde organlar renkli ve Türkçe etiketli; bir yapıya dokunun, laparoskopide nasıl tanındığını okuyun ve tek dokunuşla BT atlasındaki karşılığına geçin. Video modunda ameliyat videosu düz akar; filtreye basınca organlar ve aletler videonun üzerine gelir.</p>
-      <div class="cards" id="cases-laparoskopi"><p class="muted">Vakalar yükleniyor…</p></div>
-      <p class="note-box lap">Prototip: görüntüler ve organ maskeleri uzmanlarca gözden geçirilmiş açık bir veri setinden (Dresden Surgical Anatomy Dataset, CC BY 4.0) alınır; laparoskopik tanıma notları taslaktır. Video modundaki maskeler SAM 2 ile yarı otomatik üretilmiştir ve henüz uzman onayından geçmemiştir.</p>
-    </section>
-
-    <section id="ozellikler" class="block">
-      <h2>Atlaslarda neler yapabilirsiniz?</h2>
-      <div class="features">
-        <div class="feat"><b>Üç düzlemde gezin</b><span>Aksiyel, koronal ve sagittal kesitler; kaydırma, yakınlaştırma ve taşıma. Telefonda dokunmatik hareketlerle.</span></div>
-        <div class="feat"><b>Yapıya dokunun</b><span>Dokunduğunuz yapının adı, hacmi ve (notu olanlar için) komşulukları ile BT'deki görünümü bilgi kartında.</span></div>
-        <div class="feat"><b>TR · EN · LA</b><span>Yapı adlarını Türkçe, İngilizce veya Latince görün; arama üç dilde de çalışır.</span></div>
-        <div class="feat"><b>Kendinizi test edin</b><span>Vurgulanan yapıyı bulun. Yanlış yaptıklarınız daha sık sorulur; 20 soruluk sınav modu vardır.</span></div>
-        <div class="feat"><b>Yapı ağacı</b><span>Sistem, alt grup ve yapı düzeyinde göster/gizle: omurlar, kaburgalar, damarlar tek tek açılıp kapanır.</span></div>
-        <div class="feat"><b>Ameliyat görüntüsü ↔ BT</b><span>Laparoskopik karede seçtiğiniz organı BT atlasında aynı yapı seçili olarak açın; iki görünümü birlikte öğrenin.</span></div>
-        <div class="feat"><b>Bağlantıyla paylaşın</b><span>Bulunduğunuz kesit, seçili yapı ve açık sistemler tek bir bağlantıda; derse veya gruba gönderin.</span></div>
+        <ul>
+          <li><a href="atlaslar.html#saglikli">Normal BT</a></li>
+          <li><a href="atlaslar.html#patoloji">Patoloji BT</a></li>
+          <li><a href="atlaslar.html#laparoskopi">Laparoskopi</a></li>
+        </ul>
       </div>
+      <div class="kapi" style="--c: var(--bad)">
+        <a class="kapi-ana" href="sim.html">
+          <b>Simülasyon</b>
+          <span class="muted">Parametreyi değiştirin, sonucu hemen görün.</span>
+        </a>
+        <ul>
+          <li><a href="ekg.html">EKG: ritim ve iletim</a></li>
+          <li><a href="derivasyon.html">EKG: derivasyonlar</a></li>
+          <li><a href="mi.html">EKG: miyokard infarktüsü</a></li>
+        </ul>
+      </div>
+      <div class="kapi" style="--c: var(--lap)">
+        <a class="kapi-ana" href="araclar.html">
+          <b>Araçlar</b>
+          <span class="muted">Günlük klinik iş için küçük yardımcılar.</span>
+        </a>
+        <ul>
+          <li><a href="form.html#f=vizit">Vizit notu</a></li>
+          <li><a href="devir.html">Devir listesi</a></li>
+          <li><a href="tahlil.html">Tahlil takibi</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <section id="yenilikler" class="block">
+      <h2>Son eklenenler</h2>
+      <div class="pano" id="yenilikler-liste"><p class="muted">Yükleniyor…</p></div>
     </section>
 
     <section class="block soon">
       <h2>Yolda olanlar</h2>
       <ul>
-        <li>Kraniyal BT ve BT anjiyo vakaları; patoloji atlasında ilk vakalar</li>
+        <li>Patoloji BT: ileus ve intrakraniyal kanama vakaları</li>
         <li>Adım adım rehberli turlar</li>
         <li>Tüm yapılar için kısa anatomi notları (bir uzman gözden geçirmesiyle)</li>
         <li>Üçlü kesit görünümü ve 3B model</li>

@@ -1,7 +1,7 @@
 {
   "name": "Klinik Atlas",
   "short_name": "Klinik Atlas",
-  "description": "Radyoloji ve cerrahi için pano, araçlar ve atlaslar.",
+  "description": "Anatomi atlasları, fizyoloji simülasyonları ve klinik araçlar.",
   "lang": "tr",
   "start_url": "./index.html",
   "scope": "./",
@@ -14,8 +14,8 @@
     { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Araçlar", "url": "araclar.html" },
-    { "name": "Klinik formlar", "url": "form.html" },
-    { "name": "BT atlası", "url": "atlas.html" }
+    { "name": "Atlaslar", "url": "atlaslar.html" },
+    { "name": "Simülasyon", "url": "sim.html" },
+    { "name": "Araçlar", "url": "araclar.html" }
   ]
 }

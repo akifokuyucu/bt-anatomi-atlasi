@@ -1,24 +1,7 @@
 [
   {
-    "ad": "Devir Listesi Kâğıdı",
-    "aciklama": "Servis devri için A4'ü hasta sayısına göre satır × sütun kutulara böler; önerilen düzenlerden seç, PDF indir.",
-    "branslar": [
-      "Klinik"
-    ],
-    "url": "devir.html",
-    "durum": "yayinda"
-  },
-  {
-    "ad": "Tahlil Takibi",
-    "aciklama": "Farklı tarihli tahlil PDF'lerini tarayıcıda okur, değerleri yıl yıl yan yana grafikler; aralık dışı değerleri ve belirgin artış/azalışı öne çıkarır. Veri sunucuya gitmez.",
-    "branslar": [
-      "Klinik"
-    ],
-    "url": "tahlil.html",
-    "durum": "beta"
-  },
-  {
     "ad": "Vizit / Günlük Hasta Notu",
+    "grup": "Hasta notları",
     "aciklama": "SOAP, sistem sistem ya da kısa not düzeninde vizit notu; yazdır, PDF al ya da panoya kopyala.",
     "branslar": [
       "Klinik"
@@ -27,7 +10,28 @@
     "durum": "beta"
   },
   {
+    "ad": "Konsültasyon İstem Formu",
+    "grup": "Hasta notları",
+    "aciklama": "Tek net soru, kısa öykü ve aciliyet kutularıyla standart ya da acil telefon konsültasyonu.",
+    "branslar": [
+      "Klinik"
+    ],
+    "url": "form.html#f=konsultasyon",
+    "durum": "beta"
+  },
+  {
+    "ad": "Yazdırılabilir Devir Listesi",
+    "grup": "Nöbet ve devir",
+    "aciklama": "Servis devri için A4'ü hasta sayısına göre satır × sütun kutulara böler; önerilen düzenlerden seç, PDF indir.",
+    "branslar": [
+      "Klinik"
+    ],
+    "url": "devir.html",
+    "durum": "yayinda"
+  },
+  {
     "ad": "Nöbet Devir Notu",
+    "grup": "Nöbet ve devir",
     "aciklama": "I-PASS, SBAR ve çok hastalı devir listesi; yatay A4 çıktı seçeneğiyle.",
     "branslar": [
       "Klinik"
@@ -36,12 +40,13 @@
     "durum": "beta"
   },
   {
-    "ad": "Konsültasyon İstem Formu",
-    "aciklama": "Tek net soru, kısa öykü ve aciliyet kutularıyla standart ya da acil telefon konsültasyonu.",
+    "ad": "Tahlil Takibi",
+    "grup": "Takip",
+    "aciklama": "Farklı tarihli tahlil PDF'lerini tarayıcıda okur, değerleri yıl yıl yan yana grafikler; aralık dışı değerleri ve belirgin artış/azalışı öne çıkarır. Veri sunucuya gitmez.",
     "branslar": [
       "Klinik"
     ],
-    "url": "form.html#f=konsultasyon",
+    "url": "tahlil.html",
     "durum": "beta"
   }
 ]

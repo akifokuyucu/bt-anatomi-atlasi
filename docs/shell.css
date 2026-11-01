@@ -1,4 +1,4 @@
-/* Ortak kabuk: sabit üst menü, konum izi, sayfa başlığı, Pano öne çıkan kart. premium.css'ten sonra yüklenir. */
+/* Ortak kabuk: sabit üst menü, konum izi, sayfa başlığı, ana sayfa kapıları. premium.css'ten sonra yüklenir. */
 :root { --nav-h: 56px; }
 
 /* ---------- Sabit üst menü ---------- */
@@ -48,7 +48,7 @@ body.focus .sitenav { display: none; }
 .has-sitenav .topbar.ctx { padding: 10px 16px; border-bottom: 1px solid color-mix(in srgb, var(--text) 7%, transparent); }
 .topbar.ctx .crumbs { flex: 1; min-width: 0; }
 
-/* ---------- Ana sayfa: kahraman ve Pano ---------- */
+/* ---------- Ana sayfa: kahraman ---------- */
 .hero.portal { padding: 56px 0 36px; position: relative; }
 .hero.portal .hero-text { max-width: 760px; }
 .hero.portal h1 { font-size: clamp(34px, 5.6vw, 58px); line-height: 1.06; }
@@ -60,36 +60,35 @@ body.focus .sitenav { display: none; }
 .sec-head .sub { margin: 0; }
 .sec-head .btn { text-decoration: none; }
 
-/* Pano: öne çıkan kart (BT atlası) */
-.featured {
-  display: grid; grid-template-columns: 1.15fr 1fr; gap: 0; overflow: hidden; text-decoration: none; color: inherit;
-  border: 1px solid var(--line); border-radius: 20px; margin-bottom: 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, .03), transparent 45%), var(--panel);
-  box-shadow: var(--shadow);
-  transition: border-color .25s var(--ease), transform .25s var(--ease), box-shadow .25s var(--ease);
-}
-.featured:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 30px 60px -32px rgba(0, 0, 0, .9), 0 0 0 1px var(--accent); }
-.featured-body { padding: clamp(20px, 3.4vw, 36px); display: grid; gap: 12px; align-content: center; }
-.featured-body h3 { margin: 0; font-family: var(--serif); font-size: clamp(24px, 3.2vw, 34px); line-height: 1.15; font-weight: 600; }
-.featured-body p { margin: 0; color: var(--muted); max-width: 46ch; }
-.featured-body .ozet { color: var(--text); opacity: .86; }
-.featured-pts { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 6px; padding: 0; list-style: none; }
-.featured-pts li { font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
-.featured-go { justify-self: start; margin-top: 6px; text-decoration: none; }
-.featured-media { position: relative; min-height: 260px; background: #000; overflow: hidden; }
-.featured-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease); }
-.featured:hover .featured-media img { transform: scale(1.04); }
-.featured-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--panel) 0%, transparent 38%); opacity: .55; pointer-events: none; }
-.featured-media .tagpill { position: absolute; left: 14px; bottom: 14px; z-index: 1; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; padding: 4px 10px; border-radius: 999px; background: rgba(0, 0, 0, .6); color: #fff; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
-@media (max-width: 800px) {
-  .featured { grid-template-columns: 1fr; }
-  .featured-media { order: -1; min-height: 0; aspect-ratio: 16 / 10; }
-  .featured-media::after { background: linear-gradient(0deg, var(--panel), transparent 40%); }
-}
+/* Ana sayfa: üç bölüm kapısı */
+.kapilar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding: 0 0 36px; }
+.kapi { display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--c); border-radius: 16px; padding: 18px 18px 8px; transition: border-color .2s var(--ease); }
+.kapi:hover { border-color: var(--c); }
+.kapi-ana { display: grid; gap: 6px; flex: 1; align-content: start; color: inherit; text-decoration: none; padding-bottom: 14px; }
+.kapi-ana b { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-family: var(--serif); font-size: 24px; font-weight: 600; }
+.kapi-ana b::after { content: "→"; color: var(--c); font-family: var(--sans, inherit); font-size: 20px; }
+.kapi-ana .muted { font-size: 14px; }
+.kapi ul { list-style: none; margin: 0; padding: 0; }
+.kapi li { border-top: 1px solid var(--line); }
+.kapi li a { display: flex; align-items: center; min-height: 42px; color: var(--muted); font-size: 14px; text-decoration: none; }
+.kapi li a:hover { color: var(--text); }
+@media (max-width: 800px) { .kapilar { grid-template-columns: 1fr; padding-bottom: 28px; } }
+@media (pointer: coarse) { .kapi li a { min-height: 44px; } }
+@media (prefers-reduced-motion: reduce) { .kapi { transition: none; } }
 
-/* Pano: filtre çubuğu kart az iken gizlenir (home.js) */
-.pano-bar[hidden] { display: none !important; }
-.pano-bos { border: 1px dashed var(--line); border-radius: 14px; padding: 18px; color: var(--muted); font-size: 14px; }
+/* Araç ve simülasyon listeleri: grup başlıkları */
+.arac-grup + .arac-grup { margin-top: 28px; }
+.arac-grup h2 { font-size: 19px; margin: 0 0 12px; }
+
+/* EKG sayfaları arasında sekme çubuğu */
+.alt-sekme { display: flex; gap: 4px; padding: 6px 16px 0; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }
+.alt-sekme a { flex: none; display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; color: var(--muted); font-size: 14px; text-decoration: none; border-bottom: 2px solid transparent; }
+.alt-sekme a:hover { color: var(--text); }
+.alt-sekme a[aria-current] { color: var(--text); font-weight: 500; border-bottom-color: var(--accent); }
+@media (pointer: coarse) { .alt-sekme a { min-height: 44px; } }
+@media print { .alt-sekme { display: none; } }
+/* Telefonda konum izi tek satırda kalsın; geri bağlantısı zaten izin içinde */
+@media (max-width: 640px) { .topbar.ctx > a.btn { display: none; } }
 
 /* ---------- Alt menü: telefon ---------- */
 @media (max-width: 640px) {
@@ -106,15 +105,11 @@ body.focus .sitenav { display: none; }
 
 /* ---------- Açık tema ---------- */
 [data-theme="light"] .sitenav { background: color-mix(in srgb, var(--bg) 82%, transparent); border-bottom-color: var(--line); }
-[data-theme="light"] .featured { background: var(--panel); }
-[data-theme="light"] .featured-media::after { background: linear-gradient(90deg, var(--panel) 0%, transparent 38%); }
-@media (prefers-reduced-motion: reduce) { .featured, .featured-media img, .sn-link { transition: none; } .featured:hover { transform: none; } .featured:hover .featured-media img { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .sn-link { transition: none; } }
 
 /* Devir: sayfa başlığı */
 .page-title { grid-column: 1 / -1; font-size: clamp(24px, 3.4vw, 32px); margin: 4px 0 14px; letter-spacing: -.01em; }
 
-/* .badge.pano, pano ızgarasının (.pano) kurallarını almasın */
-.badge.pano { display: inline-block; grid-template-columns: none; gap: 0; }
 a.btn { text-decoration: none; }
 
 /* ---------- Atlaslar sekmeleri ---------- */

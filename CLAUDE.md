@@ -6,7 +6,10 @@ Gerçek bir abdomen-pelvis BT'si üzerinde Türkçe etiketli, tarayıcıda çal�
 
 | Yol | İçerik |
 |---|---|
-| `docs/index.html`, `docs/home.js`, `docs/home.css` | Ana sayfa (vaka kartları `data/cases.json`'dan) |
+| `docs/index.html`, `docs/home.js`, `docs/home.css` | Ana sayfa: üç bölüm kapısı (Atlaslar, Simülasyon, Araçlar) ve son eklenenler (`pano/pano.json`) |
+| `docs/atlaslar.html`, `docs/atlaslar.js` | Vaka listeleri: Normal BT, Patoloji BT, Laparoskopi sekmeleri (`data/cases.json`, `data/lapa_cases.json`) |
+| `docs/araclar.html`, `docs/sim.html`, `docs/araclar.js` | Araç ve simülasyon listeleri; `pano/araclar.json`, `pano/simulasyon.json` (`grup` alanı başlığı belirler) |
+| `docs/shell.js`, `docs/shell.css` | Her sayfada üst menü, konum izi, arama düğmesi, EKG sayfaları arası sekmeler |
 | `docs/atlas.html`, `docs/style.css` | Atlas arayüzü; durum `#c=vaka&p=düzlem&…` bağlantısında |
 | `docs/premium.css`, `docs/ui.js`, `docs/atlas-ui.js` | Tüm sayfalarda son yüklenen görünüm katmanı (koyu/açık tema, `data-theme`); `ui.js` SVG ikonlar (`UI.icon`) ve tema anahtarı, `atlas-ui.js` atlasta odak modu, alt gezinme çubuğu ve kaydırıcı balonu |
 | `docs/sw.js` | Servis çalışanı: `?v=` sürümlü `.bin.gz` hacimlerini önbelleğe alır; veri değişince `atlas.json`'daki `v` değişir |

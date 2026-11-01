@@ -9,6 +9,7 @@ export async function araclariKur(boxId = 'araclar-liste', kaynak = 'pano/aracla
     const araclar = await (await fetch(kaynak, { cache: 'no-cache' })).json();
     box.innerHTML = '';
     if (!araclar.length) { box.innerHTML = '<p class="muted">İlk içerik yakında burada olacak.</p>'; return; }
+    const gruplar = new Map(); // grup adı → kartlar; sıra JSON'daki ilk görünüşe göre
     for (const t of araclar) {
       const hazir = t.durum !== 'yakinda';
       const el = document.createElement(hazir ? 'a' : 'div');
@@ -17,8 +18,21 @@ export async function araclariKur(boxId = 'araclar-liste', kaynak = 'pano/aracla
       el.innerHTML =
         `<div class="case-body"><span class="caption">${esc((t.branslar || []).join(' · ') || 'ARAÇ')}</span><b>${esc(t.ad)}</b>` +
         `<span class="muted">${esc(t.aciklama || '')}</span>` +
+        ((t.bolumler || []).length ? `<div class="rozetler">${t.bolumler.map((b) => `<span class="mini">${esc(b)}</span>`).join('')}</div>` : '') +
         `<span class="badge ${hazir ? 'ok' : 'soon'}">${esc({ yayinda: 'Yayında', beta: 'Beta', yakinda: 'Yakında' }[t.durum] || 'Yayında')}</span></div>`;
-      box.appendChild(el);
+      const g = t.grup || '';
+      if (!gruplar.has(g)) gruplar.set(g, []);
+      gruplar.get(g).push(el);
+    }
+    for (const [ad, kartlar] of gruplar) {
+      const kap = document.createElement('div');
+      kap.className = 'arac-grup';
+      if (ad) kap.innerHTML = `<h2>${esc(ad)}</h2>`;
+      const izgara = document.createElement('div');
+      izgara.className = 'cards tools';
+      izgara.append(...kartlar);
+      kap.appendChild(izgara);
+      box.appendChild(kap);
     }
   } catch {
     box.innerHTML = '<p class="muted">Liste yüklenemedi. Sayfayı yenileyin.</p>';
