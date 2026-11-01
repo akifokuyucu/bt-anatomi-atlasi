@@ -3,7 +3,7 @@
 // 2) Sayfa, betik, stil, JSON ve görselleri önce ağdan ister; ağ yoksa son görülen kopyayı verir (çevrimdışı açılış).
 const CACHE = 'btatlas-data-v1';
 const SHELL = 'btatlas-shell-v1';
-const TUR = /\.(html|js|css|json|webmanifest|png|jpg|svg|py)$/;
+const TUR = /\.(html|js|css|json|webmanifest|png|jpg|svg|py|glb)$/;
 // Çevrimdışı çalışma: sık kullanılan sayfalar kurulumda, araç kütüphaneleri (CDN) ilk kullanımda önbelleğe alınır.
 // Önbelleğe yalnızca site dosyaları ve genel kütüphaneler girer; kullanıcının yazdığı/yüklediği hiçbir şey girmez.
 const CDN = 'btatlas-cdn-v1';
@@ -11,11 +11,12 @@ const CDN_YOL = [
   'https://cdn.jsdelivr.net/pyodide/',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/',
+  'https://cdn.jsdelivr.net/npm/three@',
 ];
 const ONYUKLE = [
   './', 'index.html', 'araclar.html', 'form.html', 'form.js', 'form.css', 'formlar/index.json', 'formlar/vizit.json',
   'formlar/nobet.json', 'formlar/konsultasyon.json', 'tahlil.html', 'tahlil.js', 'tahlil.css', 'tahlil/parse.py',
-  'devir.html', 'devir.js', 'devir.css', 'gizlilik.html', 'style.css', 'home.css', 'home.js', 'premium.css', 'shell.css',
+  'devir.html', 'devir.js', 'devir.css', 'sim.html', 'ekg.html', 'derivasyon.html', 'derivasyon.js', 'mi.html', 'mi.js', 'ekg.js', 'ekg-model.js', 'ekg-heart.js', 'sim.css', 'pano/simulasyon.json', 'data/heart/heart.glb', 'data/heart/heart.json', 'gizlilik.html', 'style.css', 'home.css', 'home.js', 'premium.css', 'shell.css',
   'shell.js', 'ui.js', 'search.js', 'araclar.js', 'manifest.webmanifest', 'pano/araclar.json', 'pano/pano.json',
 ];
 

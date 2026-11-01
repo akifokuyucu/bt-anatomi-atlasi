@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08090c">
+  <title>EKG Miyokard İnfarktüsü · Simülasyon · Klinik Atlas</title>
+  <meta name="description" content="Sık görülen MI türlerini (anteroseptal, geniş ön, lateral, inferior, posterior, sağ ventrikül) 12 derivasyonlu EKG'de ve 3B kalpte inceleyin; hiperakut T'den kronik Q dalgasına evrimi izleyin, kendinizi sınayın.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="sim.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="shell.css">
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
+  <script src="shell.js" defer></script>
+  <script src="ui.js" defer></script>
+</head>
+<body>
+  <header class="topbar ctx">
+    <nav class="crumbs" data-crumbs="Klinik Atlas=index.html|Simülasyon=sim.html|EKG Miyokard İnfarktüsü"></nav>
+    <a class="btn" href="sim.html"><span data-icon="chevron" style="transform:scaleX(-1);display:inline-flex"></span><span class="lbl"> Tüm simülasyonlar</span></a>
+  </header>
+
+  <main class="ekg mi">
+    <section class="sahne card" aria-label="3B kalp ve infarkt bölgesi">
+      <div class="sahne-ust">
+        <div class="seg" id="gorunum" role="group" aria-label="Bakış yönü">
+          <button type="button" data-g="on" class="on">Ön</button>
+          <button type="button" data-g="sol">Sol</button>
+          <button type="button" data-g="sag">Sağ</button>
+          <button type="button" data-g="alt">Alt</button>
+          <button type="button" data-g="arka">Arka</button>
+        </div>
+      </div>
+      <div class="sahne-kutu" id="sahne">
+        <div class="kalp-etiketler" id="etiketler"></div>
+        <div class="yukleniyor" id="yukleniyor" role="status">3B kalp yükleniyor…</div>
+      </div>
+      <p class="muted not" id="sahne-not">Koyu bölge infarkt alanıdır: ölü doku depolarize olmaz, bu yüzden uyarı geldiğinde sarı yanmaz.</p>
+      <div class="faz" id="bolge-kart">
+        <span class="caption" id="b-damar">—</span>
+        <b id="b-ad">—</b>
+        <p id="b-metin" class="muted"></p>
+      </div>
+    </section>
+
+    <section class="sag">
+      <section class="card">
+        <div class="mi-ust">
+          <div class="seg" id="mod" role="group" aria-label="Çalışma biçimi">
+            <button type="button" data-m="incele" class="on">İncele</button>
+            <button type="button" data-m="sinav">Sınav</button>
+          </div>
+          <label class="alan">Hasta
+            <select id="hasta" class="select" aria-label="V2–V3 ST eşiği için hasta">
+              <option value="e40">Erkek ≥ 40 yaş</option>
+              <option value="e39">Erkek &lt; 40 yaş</option>
+              <option value="k">Kadın</option>
+            </select>
+          </label>
+        </div>
+        <div class="caption" id="b-etiket">İNFARKT BÖLGESİ</div>
+        <div class="leadler" id="bolgeler" role="group" aria-label="İnfarkt bölgesi"></div>
+        <div class="caption">EVRE</div>
+        <div class="leadler" id="evreler" role="group" aria-label="Evre"></div>
+        <p class="muted not" id="evre-not"></p>
+        <div class="satir-btn mi-secenek">
+          <label class="toggle"><input type="checkbox" id="t-ek"> Ek derivasyonlar (V4R, V7–V9)</label>
+          <label class="toggle"><input type="checkbox" id="t-ipucu" checked> Bölge ipucu (renkli çerçeve)</label>
+        </div>
+        <div class="soru" id="soru" hidden>
+          <p class="soru-metin" id="s-metin">Bu EKG hangi bölgedeki infarkta ait? Yukarıdaki bölge düğmelerinden birini seçin.</p>
+          <p class="sonuc" id="s-sonuc" hidden></p>
+          <div class="satir-btn"><button class="btn accent" type="button" id="s-sonraki">Yeni soru</button><span class="muted" id="s-skor"></span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>12 derivasyonlu EKG</h2>
+        <div class="mi-izgara" id="izgara"></div>
+        <div class="mi-ek" id="ek-izgara" hidden></div>
+        <div class="mi-oz" id="ozet" role="status"></div>
+        <div class="mi-aciklama">
+          <span><i class="k-yuk"></i> ST yükselmesi (ölçüt sağlıyor)</span>
+          <span><i class="k-cok"></i> ST çökmesi (resiprokal olabilir)</span>
+          <span><b>Q</b> patolojik Q dalgası</span>
+          <span class="muted">25 mm/sn · 10 mm/mV · ST: J + 60 ms</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 id="d-baslik">Derivasyon: II</h2>
+        <div class="strip mi-buyuk"><canvas id="buyuk"></canvas></div>
+        <p class="muted not" id="d-metin"></p>
+      </section>
+
+      <section class="card ogren">
+        <h2>Ölçüt ve uyarılar</h2>
+        <ul class="ipuc" id="olcut"></ul>
+      </section>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p><b>Eğitim amaçlıdır, tanı için kullanılamaz.</b> Sentetik, basitleştirilmiş bir modeldir: gerçek hasta kaydı değildir, her hastada ve her damarda tablo değişir. Eşikler Dördüncü Evrensel MI Tanımı (Thygesen ve ark., Eur Heart J 2019;40:237) ve acil göğüs ağrısı yol haritalarının özetidir; gerçek tanıda klinik ve güncel kılavuz esastır.</p>
+    <p>3B kalp modeli: <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html" target="_blank" rel="noopener">BodyParts3D</a>, © The Database Center for Life Science, CC Attribution 4.0 International. 3B görüntüleme: <a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a> (MIT).</p>
+  </footer>
+
+  <script type="module" src="mi.js"></script>
+</body>
+</html>

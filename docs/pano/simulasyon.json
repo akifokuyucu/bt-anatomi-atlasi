@@ -1,0 +1,32 @@
+[
+  {
+    "ad": "EKG: ritim ve iletim",
+    "aciklama": "3B kalpte uyarının sinüs düğümünden ventriküllere yayılışını, aynı anda oluşan 12 derivasyonlu EKG ile izleyin. Ritim, hız, PR, QRS genişliği ve eksen ayarlanabilir.",
+    "branslar": [
+      "Kardiyoloji",
+      "Fizyoloji"
+    ],
+    "url": "ekg.html",
+    "durum": "beta"
+  },
+  {
+    "ad": "EKG: derivasyonlar",
+    "aciklama": "Her derivasyon kalbe farklı bir açıdan bakan bir kameradır. Derivasyonun gözüyle 3B kalbe bakın, kalp vektörünü kendiniz çevirin, çizginin neden yukarı ya da aşağı saptığını sınavla pekiştirin.",
+    "branslar": [
+      "Kardiyoloji",
+      "Fizyoloji"
+    ],
+    "url": "derivasyon.html",
+    "durum": "beta"
+  },
+  {
+    "ad": "EKG: miyokard infarktüsü",
+    "aciklama": "Anteroseptal, geniş ön, lateral, inferior, posterior ve sağ ventrikül infarktını 12 derivasyonlu EKG'de ve 3B kalpte inceleyin; hiperakut T'den kronik Q dalgasına evrimi izleyin, ST ölçümüyle ölçütü sınayın, bölgeyi tahmin edin.",
+    "branslar": [
+      "Kardiyoloji",
+      "Acil"
+    ],
+    "url": "mi.html",
+    "durum": "beta"
+  }
+]

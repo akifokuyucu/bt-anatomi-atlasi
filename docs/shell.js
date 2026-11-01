@@ -6,6 +6,7 @@
     pano: ico('<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'),
     araclar: ico('<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.4 2.4-2.6-.6-.6-2.6z"/>'),
     atlaslar: ico('<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/>'),
+    simulasyon: ico('<path d="M3 12h4l2-6 4 12 2-6h6"/>'),
   };
 
   const sayfa = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
@@ -14,12 +15,14 @@
   const bolum =
     anaSayfa ? '' :
     /^(araclar|devir|tahlil|form)\.html$/.test(sayfa) ? 'araclar' :
-    /^(atlas|lapa|lapav)\.html$/.test(sayfa) ? 'atlaslar' : '';
+    /^(atlas|lapa|lapav)\.html$/.test(sayfa) ? 'atlaslar' :
+    /^(sim|ekg|derivasyon|mi)\.html$/.test(sayfa) ? 'simulasyon' : '';
 
   const OGE = [
     ['pano', 'Pano', 'index.html#pano'],
     ['araclar', 'Araçlar', 'araclar.html'],
     ['atlaslar', 'Atlaslar', 'index.html#atlaslar'],
+    ['simulasyon', 'Simülasyon', 'sim.html'],
   ];
 
   const nav = document.createElement('header');
@@ -74,7 +77,7 @@
     const bag = new Map(OGE.map(([id]) => [id, nav.querySelector(`[data-sn="${id}"]`)]));
     const gor = new Set();
     const guncelle = () => {
-      const ilk = ['pano', 'araclar', 'atlaslar'].find((k) => gor.has(k)) || '';
+      const ilk = ['pano', 'araclar', 'atlaslar', 'simulasyon'].find((k) => gor.has(k)) || '';
       bag.forEach((el, k) => (k === ilk ? el.setAttribute('aria-current', 'location') : el.removeAttribute('aria-current')));
     };
     const io = new IntersectionObserver((es) => {
@@ -83,7 +86,7 @@
     }, { rootMargin: '-30% 0px -55% 0px' });
     document.addEventListener('DOMContentLoaded', () => {
       // atlaslar: BT, patoloji ve laparoskopi bölümleri hep birlikte "Atlaslar" sayılır
-      const harita = { pano: 'pano', araclar: 'araclar', atlaslar: 'atlaslar', saglikli: 'atlaslar', patoloji: 'atlaslar', laparoskopi: 'atlaslar' };
+      const harita = { pano: 'pano', araclar: 'araclar', atlaslar: 'atlaslar', simulasyon: 'simulasyon', saglikli: 'atlaslar', patoloji: 'atlaslar', laparoskopi: 'atlaslar' };
       Object.entries(harita).forEach(([id, sn]) => {
         const s = document.getElementById(id);
         if (s) { s.dataset.sn = sn; io.observe(s); }

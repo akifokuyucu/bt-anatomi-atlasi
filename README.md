@@ -73,6 +73,8 @@ Türkçe adlar, renkler ve sistemler `scripts/build_atlas.py` içindeki `BASE` s
 
 Görüntü ve segmentasyonlar: TotalSegmentator dataset v2.0.1, Wasserthal J. ve ark., *Radiology: Artificial Intelligence* 2023, [CC BY 4.0](https://zenodo.org/records/10047292). Bu atıf arayüzde de gösterilir ve korunmalıdır.
 
+Simülasyon modülündeki 3B kalp: BodyParts3D, © The Database Center for Life Science, [CC Attribution 4.0 International](https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html); Mitsuhashi N. ve ark., *Nucleic Acids Res* 2008. Parçalar `scripts/build_heart.py` ile sadeleştirilip tek `docs/data/heart/heart.glb` dosyasında birleştirilmiştir; iletim sistemi veri setinde yoktur, oda geometrisinden türetilmiş şematik bir çizimdir.
+
 Laparoskopik görüntü ve maskeler: Dresden Surgical Anatomy Dataset, Carstens M. ve ark., *Scientific Data* 2023, [CC BY 4.0](https://doi.org/10.6084/m9.figshare.21702600). Kareler küçültülmüş ve WebP'ye dönüştürülmüştür; maskeler tek bir bit maskesinde birleştirilmiştir. Laparoskopik tanıma notları taslaktır. Laparoskopi videosu: Boer J, Boerma D, de Vries Reilingh T, *J Med Case Rep* 2011;5:588, [CC BY 2.0](https://doi.org/10.1186/1752-1947-5-588) (Wikimedia Commons üzerinden; ilk 30 sn, kırpılmış ve yeniden kodlanmış); maskeleri bu projede SAM 2 ile üretilmiştir. Karaciğer segmentleri TotalSegmentator'ın açık lisanslı (Apache-2.0) `liver_segments` modeliyle üretilmiştir. Kraniyal vakada (`s0103`) beyin yapıları TotalSegmentator'ın `brain_structures` modeliyle üretilmiştir (ücretsiz akademik, ticari olmayan lisans); diğer baş yapıları açık lisanslı modellerle üretilmiştir.
 
 Segmentasyonlar otomatik veya yarı otomatik üretilmiştir; kenarlarda küçük hatalar olabilir. Uygulama eğitim amaçlıdır, tanı için kullanılamaz.

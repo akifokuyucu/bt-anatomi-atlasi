@@ -141,6 +141,7 @@ async function panoyuKur() {
 
 panoyuKur();
 araclariKur();
+araclariKur('sim-liste', 'pano/simulasyon.json');
 
 // Atlaslar: BT, patoloji ve laparoskopi bölümleri sekme gibi; aynı anda biri görünür.
 // #saglikli, #patoloji, #laparoskopi bağlantıları doğrudan ilgili sekmeyi açar.
