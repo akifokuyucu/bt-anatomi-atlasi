@@ -15,6 +15,8 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="premium.css">
   <link rel="stylesheet" href="shell.css">
+  <link rel="stylesheet" href="mpr.css">
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
   <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
   <script src="shell.js" defer></script>
   <script src="ui.js" defer></script>
@@ -51,6 +53,10 @@
     </div>
     <div class="chips" id="systems"></div>
     <div class="row wrap">
+      <div class="seg" id="viewMode" role="group" aria-label="Görünüm">
+        <button type="button" data-mode="tek" class="on" title="Tek kesit penceresi">Tek</button>
+        <button type="button" data-mode="uclu" title="Üç düzlem ve 3B yan yana">Üçlü + 3B</button>
+      </div>
       <div class="seg" id="planes">
         <button data-plane="axial" class="on">Aksiyel</button>
         <button data-plane="coronal">Koronal</button>
@@ -60,7 +66,7 @@
         <button data-tool="scroll" class="on" title="Sürükleyerek kesit değiştir"><span data-icon="scroll"></span> Kesit</button>
         <button data-tool="pan" title="Sürükleyerek görüntüyü taşı"><span data-icon="move"></span> Taşı</button>
       </div>
-      <div class="seg">
+      <div class="seg" id="zoomSeg">
         <button id="zoomOut" aria-label="Uzaklaştır">−</button>
         <button id="zoomLabel" class="ghost" title="Sığdır">100%</button>
         <button id="zoomIn" aria-label="Yakınlaştır">+</button>

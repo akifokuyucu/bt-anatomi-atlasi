@@ -1,0 +1,31 @@
+/* Üçlü kesit (MPR) ve 3B görünüm: mpr.js */
+.mpr-aktif #planes, .mpr-aktif #tools, .mpr-aktif #zoomSeg { display: none; }
+.viewer-wrap.mpr-aktif .viewer, .viewer-wrap.mpr-aktif .slice-bar { display: none; }
+.seg.mini button { padding: 3px 8px; font-size: 11px; }
+
+#mpr[hidden] { display: none; }
+.mpr-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 8px 12px; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+.mpr-izgara { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); }
+.mpr-pane { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--panel); min-width: 0; }
+.mpr-ust { display: flex; align-items: center; gap: 8px; padding: 6px 10px; font-size: 12.5px; }
+.mpr-ust b { color: var(--c, var(--text)); font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+.mpr-sahne { --oran: 1; --maks: 46vh; position: relative; background: #000; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; cursor: crosshair; margin: 0 auto; width: min(100%, calc(var(--maks) * var(--oran))); aspect-ratio: var(--oran); }
+.mpr-sahne canvas { display: block; width: 100%; height: 100%; }
+.mpr-cizgi { position: absolute; background: var(--c); opacity: .75; pointer-events: none; }
+.mpr-cizgi.v { top: 0; bottom: 0; width: 1px; margin-left: -.5px; }
+.mpr-cizgi.h { left: 0; right: 0; height: 1px; margin-top: -.5px; }
+.mpr-surgu { width: calc(100% - 20px); margin: 6px 10px 8px; accent-color: var(--c, var(--accent)); }
+
+.mpr-3b-sahne { cursor: grab; aspect-ratio: auto; width: 100%; height: 100%; min-height: 280px; }
+.mpr-3b-sahne:active { cursor: grabbing; }
+.mpr-durum { position: absolute; inset: 0; display: grid; place-content: center; padding: 16px; text-align: center; color: var(--muted); font-family: var(--mono); font-size: 12px; pointer-events: none; }
+.mpr-durum[hidden] { display: none; }
+.mpr-3b-alt { display: flex; align-items: center; gap: 12px; padding: 8px 12px; flex-wrap: wrap; }
+
+@media (max-width: 899px) {
+  .mpr-izgara { grid-template-columns: minmax(0, 1fr); }
+  .mpr-sahne { --maks: 52vh; }
+  .mpr-3b-sahne { min-height: 320px; width: 100%; }
+  .mpr-3b-alt .btn { min-height: 40px; }
+}
+@media (pointer: coarse) { .seg.mini button { padding: 8px 10px; } }

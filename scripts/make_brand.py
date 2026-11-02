@@ -1,6 +1,8 @@
 """Marka görselleri: og.png (paylaşım önizlemesi) ve PWA simgeleri (docs/icons/).
 Kullanım: .venv/Scripts/python scripts/make_brand.py
 """
+import math
+import random
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
@@ -39,28 +41,42 @@ def og():
     W, H = 1200, 630
     im = Image.new("RGB", (W, H), BG)
     d = ImageDraw.Draw(im)
-    # sağda BT kesiti
-    ct = Image.open(DOCS / "img" / "s0139.jpg").convert("RGB")
-    h = H
-    w = int(ct.width * h / ct.height)
-    ct = ct.resize((w, h), Image.LANCZOS)
-    x0 = W - 640
-    crop = ct.crop(((w - 640) // 2, 0, (w - 640) // 2 + 640, h))
-    im.paste(crop, (x0, 0))
-    # geçiş
-    grad = Image.new("L", (240, H))
-    gd = ImageDraw.Draw(grad)
-    for i in range(240):
-        gd.line([(i, 0), (i, H)], fill=int(255 * (1 - i / 240)))
-    im.paste(Image.new("RGB", (240, H), BG), (x0, 0), grad)
-    # sol: marka
-    logo(d, 108, 140, 34)
-    d.text((160, 112), "Klinik Atlas", font=font("georgiab.ttf", 40), fill=TEXT)
-    d.text((64, 250), "Klinik çalışmanın", font=font("georgiab.ttf", 64), fill=TEXT)
-    d.text((64, 326), "yanında, tek sayfada", font=font("georgiab.ttf", 64), fill=TEXT)
-    d.rectangle([64, 424, 144, 427], fill=GOLD)
-    d.text((64, 452), "Atlaslar  ·  Simülasyon  ·  Araçlar", font=font("arial.ttf", 30), fill=MUTED)
-    d.text((64, 540), "BT ve laparoskopi anatomi atlası · eğitim amaçlıdır", font=font("arial.ttf", 22), fill=GOLD2)
+    # sağda: ana sayfadaki gibi nabız halkası (yarım ton noktalar) ve ortada gerçek BT kesiti
+    cx, cy, halka_r, kesit_r = 925, 315, 235, 168
+    ss = 2  # kenar yumuşatma için 2 kat çiz
+    ov = Image.new("RGBA", (W * ss, H * ss), (0, 0, 0, 0))
+    od = ImageDraw.Draw(ov)
+    rnd = random.Random(7)  # her çalıştırmada aynı görsel
+    adim = 20
+    for gy in range(0, H + adim, adim):
+        for gx in range(W // 2, W + adim, adim):
+            d_ = math.hypot(gx - cx, gy - cy)
+            halka = math.exp(-(((d_ - halka_r) / 46) ** 2))
+            gurultu = rnd.random()
+            r = halka * (3.0 + 4.6 * gurultu) + (1.4 if gurultu > 0.82 and d_ > kesit_r + 20 else 0)
+            if r < 0.9 or d_ < kesit_r + 8:
+                continue
+            a = int(255 * min(1.0, 0.35 + 0.65 * halka))
+            od.ellipse([(gx - r) * ss, (gy - r) * ss, (gx + r) * ss, (gy + r) * ss], fill=GOLD + (a,))
+    ov = ov.resize((W, H), Image.LANCZOS)
+    im.paste(ov, (0, 0), ov)
+    ct = Image.open(DOCS / "img" / "s0372.jpg").convert("RGB")
+    k = kesit_r * 2
+    ct = ct.resize((k, int(ct.height * k / ct.width)), Image.LANCZOS)
+    ct = ct.crop((0, (ct.height - k) // 2, k, (ct.height - k) // 2 + k)) if ct.height >= k else ct.resize((k, k), Image.LANCZOS)
+    mask = Image.new("L", (k * 4, k * 4), 0)
+    ImageDraw.Draw(mask).ellipse([0, 0, k * 4 - 1, k * 4 - 1], fill=255)
+    mask = mask.resize((k, k), Image.LANCZOS)
+    im.paste(ct, (cx - kesit_r, cy - kesit_r), mask)
+    d.ellipse([cx - kesit_r - 3, cy - kesit_r - 3, cx + kesit_r + 3, cy + kesit_r + 3], outline=GOLD, width=3)
+    # sol: marka ve başlık
+    logo(d, 108, 120, 30)
+    d.text((156, 94), "Klinik Atlas", font=font("georgiab.ttf", 38), fill=TEXT)
+    for i, satir in enumerate(["Görüntü, fizyoloji ve", "günlük klinik işler", "tek yerde"]):
+        d.text((64, 200 + i * 74), satir, font=font("georgiab.ttf", 56), fill=TEXT)
+    d.rectangle([64, 438, 144, 441], fill=GOLD)
+    d.text((64, 462), "Atlaslar  ·  Simülasyon  ·  Araçlar", font=font("arial.ttf", 30), fill=MUTED)
+    d.text((64, 552), "Anatomi atlasları ve simülasyonlar · eğitim amaçlıdır", font=font("arial.ttf", 22), fill=GOLD2)
     im.save(DOCS / "og.png", optimize=True)
 
 

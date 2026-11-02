@@ -11,6 +11,8 @@ Gerçek bir abdomen-pelvis BT'si üzerinde Türkçe etiketli, tarayıcıda çal�
 | `docs/araclar.html`, `docs/sim.html`, `docs/araclar.js` | Araç ve simülasyon listeleri; `pano/araclar.json`, `pano/simulasyon.json` (`grup` alanı başlığı belirler) |
 | `docs/shell.js`, `docs/shell.css` | Her sayfada üst menü, konum izi, arama düğmesi, EKG sayfaları arası sekmeler |
 | `docs/atlas.html`, `docs/style.css` | Atlas arayüzü; durum `#c=vaka&p=düzlem&…` bağlantısında |
+| `docs/mpr.js`, `docs/mpr.css`, `docs/mesh-worker.js` | Atlasta "Üçlü + 3B" görünümü: üç senkron kesit, artı imleci, Three.js 3B sahnesi. `mpr.js` hacmi ve durumu `app.js`'ten `mprKur(api)` ile alır; 3B yüzeyler etiket hacminden tarayıcıda üretilir (`mesh-worker.js`, Surface Nets, ek veri yok) |
+| `docs/gecis.js`, `docs/home-3d.js` | `gecis.js`: atlas sayfalarına geçişte saf WebGL noise perdesi; atlasta `<html data-perde-bekle>` ile veri gelene kadar yüzde gösterir. `home-3d.js`: ana sayfa kahramanındaki 3B kalp ve nabız halkası (hareket azalt, ekran dışı ve gizli sekmede durur) |
 | `docs/premium.css`, `docs/ui.js`, `docs/atlas-ui.js` | Tüm sayfalarda son yüklenen görünüm katmanı (koyu/açık tema, `data-theme`); `ui.js` SVG ikonlar (`UI.icon`) ve tema anahtarı, `atlas-ui.js` atlasta odak modu, alt gezinme çubuğu ve kaydırıcı balonu |
 | `docs/sw.js` | Servis çalışanı: `?v=` sürümlü `.bin.gz` hacimlerini önbelleğe alır; veri değişince `atlas.json`'daki `v` değişir |
 | `docs/app.js` | Tüm uygulama: veri yükleme (`load`), kesit çizimi (`renderSlice`, `draw`), etiketler (`drawLabels`), olaylar (`bindEvents`), test modu (`quiz*`) |

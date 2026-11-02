@@ -1,7 +1,10 @@
 // BT Anatomi Atlası — bağımlılıksız 2B görüntüleyici.
 // Hacimler bellekte [z][y][x] sırasıyla tutulur ve RAS yönündedir (build_atlas.py).
 
+import { mprKur } from './mpr.js';
+
 const $ = (id) => document.getElementById(id);
+let mpr = null; // üçlü kesit ve 3B görünüm (mpr.js); load() sonunda kurulur
 
 const PLANE_TR = { axial: 'Aksiyel', coronal: 'Koronal', sagittal: 'Sagittal' };
 const PLANE_LOC = { axial: 'Aksiyelde', coronal: 'Koronalde', sagittal: 'Sagittalde' };
@@ -157,6 +160,12 @@ async function load() {
   buildDx();
   bindEvents();
   setPlane(state.plane, true);
+  mpr = mprKur({
+    state,
+    atlas: () => atlas, ct: () => ct, lab: () => lab, ov: () => ov, les: () => les,
+    dims: () => [nx, ny, nz], rgb: () => rgbById, struct: () => structById,
+    dimsOf, strides, visibleTable, overlayOn, isEnabled, select, render,
+  });
   $('loading').hidden = true;
   perdeHazir();
 }
@@ -648,12 +657,13 @@ function drawLabels(L) {
 
 function render() {
   renderSlice();
-  draw();
+  if (!mpr?.aktif) draw(); // üçlü görünümde tek pencere gizli
   updateSliceInfo();
   updateListPresence();
   updateInfo();
   updateDx();
   writeHash();
+  mpr?.guncelle();
 }
 
 // ---------- Arayüz ----------

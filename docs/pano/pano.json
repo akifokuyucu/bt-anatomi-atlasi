@@ -1,9 +1,19 @@
 [
   {
+    "id": "uclu-kesit-3b",
+    "tur": "duyuru",
+    "baslik": "Üçlü kesit ve 3B görünüm",
+    "ozet": "Atlasta üç düzlemi artı imleciyle bağlı izleyin, aynı yapıyı 3B'de görün. Telefonda 3B isteğe bağlı yüklenir.",
+    "url": "atlas.html#c=s0139",
+    "kaynak": "Klinik Atlas",
+    "tarih": "2026-11-02",
+    "branslar": ["Radyoloji", "Anatomi"]
+  },
+  {
     "id": "site-duzeni",
     "tur": "duyuru",
     "baslik": "Site yeniden düzenlendi",
-    "ozet": "Menü üç başlığa indi: Atlaslar, Simülasyon ve Araçlar. Eski bağlantılar yeni yerlerine yönlenir.",
+    "ozet": "Menü üç başlığa indi: Atlaslar, Simülasyon ve Araçlar. Ana sayfada 3B kalp, normal-patoloji karşılaştırma sürgüsü ve geçiş perdesi eklendi.",
     "url": "atlaslar.html",
     "kaynak": "Klinik Atlas",
     "tarih": "2026-11-01",
