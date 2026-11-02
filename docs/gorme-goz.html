@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08090c">
+  <title>Göz ve Görüntü · Simülasyon · Klinik Atlas</title>
+  <meta name="description" content="Işığın gözde nasıl odaklandığını, kırma kusurlarını, uyumu, pupilla etkisini ve göz hastalıklarında görüntünün nasıl bozulduğunu canlı izleyin.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="sim.css">
+  <link rel="stylesheet" href="gorme.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="shell.css">
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){};document.documentElement.dataset.bolum="simulasyon"</script>
+  <script src="shell.js" defer></script>
+  <script src="ui.js" defer></script>
+</head>
+<body>
+  <header class="topbar ctx">
+    <nav class="crumbs" data-crumbs="Klinik Atlas=index.html|Simülasyon=sim.html|Göz ve Görüntü"></nav>
+    <a class="btn" href="sim.html"><span data-icon="chevron" style="transform:scaleX(-1);display:inline-flex"></span><span class="lbl"> Tüm simülasyonlar</span></a>
+  </header>
+
+  <main class="gy goz">
+    <section class="card goz-tam">
+      <div class="gy-chipler" id="onayar" role="group" aria-label="Durum"></div>
+    </section>
+
+    <section class="card">
+      <h2>Işığın yolu</h2>
+      <canvas class="goz-isin" id="isin" aria-label="Gözün yandan kesitinde ışınlar ve odak noktası"></canvas>
+      <p class="muted not" id="odak-metin"></p>
+      <div class="goz-olcu">
+        <div><span class="caption">KIRMA KUSURU</span><b id="o-rx">0,00</b><small>D (uzak)</small></div>
+        <div><span class="caption">UYUM</span><b id="o-uyum">0,0</b><small id="o-uyum-k">/ 0 D</small></div>
+        <div><span class="caption">ODAK HATASI</span><b id="o-hata">0,00</b><small>D</small></div>
+        <div><span class="caption">KESKİNLİK</span><b id="o-va">1,0</b><small id="o-snellen">20/20</small></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 id="gor-baslik">Hastanın gördüğü</h2>
+      <div class="goz-ikili">
+        <figure>
+          <div class="goz-gor"><canvas id="gor" aria-label="Hastanın gördüğü sahne"></canvas><span class="goz-rozet" id="gor-rozet"></span></div>
+          <figcaption>Hastanın gördüğü</figcaption>
+        </figure>
+        <figure>
+          <canvas class="goz-ters" id="ters" aria-label="Retinadaki ters görüntü"></canvas>
+          <figcaption>Retinadaki görüntü: ters ve aynalı. Bu yüzden üst retina alt alanı görür.</figcaption>
+        </figure>
+      </div>
+      <p class="muted not">Sahne yaklaşık 16° genişliğindedir, bulanıklık bu ölçeğe göre hesaplanır. Ekran çözünürlüğü sınırlı olduğundan alt satırlar temsilidir.</p>
+    </section>
+
+    <section class="card goz-tam">
+      <div class="goz-ayar">
+        <label>Göz uzunluğu <output id="v-al"></output><input type="range" id="a-al" min="21" max="28" step="0.1"></label>
+        <label>Bakılan uzaklık <output id="v-uzak"></output><input type="range" id="a-uzak" min="0" max="4" step="0.05"></label>
+        <label>Yaş <output id="v-yas"></output><input type="range" id="a-yas" min="8" max="80" step="1"></label>
+        <label>Pupilla çapı <output id="v-pup"></output><input type="range" id="a-pup" min="2" max="8" step="0.1"></label>
+        <label>Silindir (astigmatizma) <output id="v-sil"></output><input type="range" id="a-sil" min="0" max="5" step="0.25"></label>
+        <label>Silindir ekseni <output id="v-eks"></output><input type="range" id="a-eks" min="0" max="175" step="5"></label>
+        <label>Düzeltme camı <output id="v-cam"></output><input type="range" id="a-cam" min="-10" max="10" step="0.25"></label>
+        <label>Lens opaklığı (katarakt) <output id="v-kat"></output><input type="range" id="a-kat" min="0" max="1" step="0.02"></label>
+      </div>
+      <div class="satir-btn" style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn accent" id="duzelt" type="button">Doğru camı tak</button>
+        <button class="btn" id="cam-cikar" type="button">Camı çıkar</button>
+      </div>
+    </section>
+
+    <section class="card goz-tam gy-bilgi">
+      <span class="caption" id="b-tur"></span>
+      <h2 id="b-ad"></h2>
+      <p id="b-ozet"></p>
+      <dl class="gy-dl">
+        <div id="b-neden-k"><dt>Sık nedenler</dt><dd id="b-neden"></dd></div>
+        <div id="b-yon-k"><dt>Klinik yaklaşım</dt><dd id="b-yon"></dd></div>
+      </dl>
+      <p class="muted not">Görme alanı kayıplarının yola göre dağılımı için <a href="gorme.html">Yollar ve görme alanı</a> sekmesine geçin.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p><b>Eğitim amaçlıdır, tanı için kullanılamaz.</b> İndirgenmiş göz modeli (n = 1,336, 60 D) ve yaklaşık bulanıklık hesabı kullanılır; keskinlik değerleri kaba tahmindir. Renk görme benzetimi: Machado, Oliveira ve Fernandes 2009. Uyum genliği: Hofstetter ortalama denklemi. Sahne sentetiktir.</p>
+  </footer>
+
+  <script type="module" src="gorme-goz.js"></script>
+</body>
+</html>

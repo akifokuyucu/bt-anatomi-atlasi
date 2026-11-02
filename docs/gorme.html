@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08090c">
+  <title>Görme Yolları · Simülasyon · Klinik Atlas</title>
+  <meta name="description" content="3B görme yollarında lezyonu yerleştirin, iki gözün görme alanını, hastanın gördüğünü, V1 haritasını ve pupilla yanıtını birlikte izleyin. Retinadan kortekse patolojiler.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="sim.css">
+  <link rel="stylesheet" href="gorme.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="shell.css">
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){};document.documentElement.dataset.bolum="simulasyon"</script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
+  <script src="shell.js" defer></script>
+  <script src="ui.js" defer></script>
+</head>
+<body>
+  <header class="topbar ctx">
+    <nav class="crumbs" data-crumbs="Klinik Atlas=index.html|Simülasyon=sim.html|Görme Yolları"></nav>
+    <a class="btn" href="sim.html"><span data-icon="chevron" style="transform:scaleX(-1);display:inline-flex"></span><span class="lbl"> Tüm simülasyonlar</span></a>
+  </header>
+
+  <main class="gy">
+    <section class="card gy-secim" aria-label="Lezyon seçimi">
+      <div class="gy-ust">
+        <div class="seg" id="mod" role="group" aria-label="Çalışma biçimi">
+          <button type="button" data-m="kesfet" class="on">Keşfet</button>
+          <button type="button" data-m="sinav">Sınav</button>
+        </div>
+        <div class="seg" id="taraf" role="group" aria-label="Lezyon tarafı">
+          <button type="button" data-t="1" class="on">Sol lezyon</button>
+          <button type="button" data-t="-1">Sağ lezyon</button>
+        </div>
+        <label class="gy-boyut">Lezyon boyutu <output id="v-boyut"></output>
+          <input type="range" id="boyut" min="0.5" max="1.6" step="0.02" value="1">
+        </label>
+        <button class="btn" id="serbest" type="button" aria-pressed="false" title="3B sahnede dokunduğunuz yere lezyon koyar">Serbest lezyon</button>
+      </div>
+      <ol class="gy-duraklar" id="duraklar" aria-label="Görme yolu durakları"></ol>
+      <div class="gy-chipler" id="chipler" role="group" aria-label="Patoloji"></div>
+    </section>
+
+    <section class="sahne card gy-sahne" aria-label="3B görme yolları">
+      <div class="sahne-ust">
+        <div class="seg" id="gorunum" role="group" aria-label="Bakış yönü">
+          <button type="button" data-g="ust" class="on">Üst</button>
+          <button type="button" data-g="alt">Alt</button>
+          <button type="button" data-g="yan">Yan</button>
+          <button type="button" data-g="on">Ön</button>
+          <button type="button" data-g="arka">Arka</button>
+        </div>
+      </div>
+      <div class="sahne-kutu gy-kutu" id="sahne">
+        <div class="kalp-etiketler" id="etiketler"></div>
+        <div class="yukleniyor" id="yukleniyor" role="status">3B görme yolları yükleniyor…</div>
+        <div class="gy-ipucu" id="ipucu" hidden>Lif üzerinde bir noktaya dokunun; lezyon oraya yerleşir.</div>
+      </div>
+      <div class="sahne-alt">
+        <label class="toggle"><input type="checkbox" id="t-etiket" checked> Etiketler</label>
+        <label class="toggle"><input type="checkbox" id="t-kabuk" checked> Beyin</label>
+        <label class="toggle"><input type="checkbox" id="t-lif" checked> Lifler</label>
+        <label class="toggle"><input type="checkbox" id="t-sinyal" checked> Sinyal</label>
+      </div>
+      <div class="gy-anahtar" id="anahtar" aria-label="Lif renkleri"></div>
+    </section>
+
+    <section class="gy-sag">
+      <section class="card gy-alanlar" aria-label="Görme alanları">
+        <div class="gy-ust">
+          <h2 id="alan-baslik">Normal görme alanı</h2>
+          <div class="seg" id="sahne-sec" role="group" aria-label="Görülen sahne">
+            <button type="button" data-s="yol" class="on">Yol</button>
+            <button type="button" data-s="okuma">Okuma</button>
+            <button type="button" data-s="amsler">Amsler</button>
+            <button type="button" data-s="perimetri">Perimetri</button>
+          </div>
+          <div class="seg" id="kapsam" role="group" aria-label="Alan kapsamı">
+            <button type="button" data-k="90" class="on">90°</button>
+            <button type="button" data-k="30">30°</button>
+          </div>
+        </div>
+        <div class="gy-gozler">
+          <figure><canvas id="alan-sol" aria-label="Sol göz görme alanı"></canvas><figcaption><b>Sol göz</b> · OS</figcaption></figure>
+          <figure><canvas id="alan-sag" aria-label="Sağ göz görme alanı"></canvas><figcaption><b>Sağ göz</b> · OD</figcaption></figure>
+        </div>
+        <p class="muted not" id="alan-bilgi">Alanda bir noktaya dokunun: o noktayı taşıyan lifler 3B sahnede parlar.</p>
+        <figure class="gy-birlesik">
+          <canvas id="alan-iki" aria-label="İki gözle birleşik görüş"></canvas>
+          <figcaption><b>Hastanın iki gözle gördüğü</b> · Bir nokta ancak iki gözde de kayıpsa kaybolur</figcaption>
+        </figure>
+      </section>
+
+      <section class="card gy-sinav" id="sinav" hidden>
+        <h2>Bu alan defekti nereyi gösteriyor?</h2>
+        <p class="muted not" id="s-durum"></p>
+        <div class="gy-chipler" id="s-yer" role="group" aria-label="Lezyon yeri"></div>
+        <div class="seg" id="s-taraf" role="group" aria-label="Lezyon tarafı">
+          <button type="button" data-t="1">Sol</button>
+          <button type="button" data-t="0">Orta hat / iki taraf</button>
+          <button type="button" data-t="-1">Sağ</button>
+        </div>
+        <div class="satir-btn">
+          <button class="btn accent" id="s-cevap" type="button" disabled>Cevapla</button>
+          <button class="btn" id="s-sonraki" type="button" hidden>Sonraki soru</button>
+        </div>
+        <p class="gy-sonuc" id="s-sonuc" hidden></p>
+      </section>
+
+      <section class="card gy-bilgi" id="bilgi">
+        <span class="caption" id="b-yer"></span>
+        <h2 id="b-ad"></h2>
+        <p id="b-ozet"></p>
+        <dl class="gy-dl">
+          <div id="b-neden-k"><dt>Sık nedenler</dt><dd><ul id="b-neden"></ul></dd></div>
+          <div id="b-eslik-k"><dt>Eşlik eden bulgular</dt><dd id="b-eslik"></dd></div>
+          <div id="b-goruntu-k"><dt>Görüntüleme ve inceleme</dt><dd id="b-goruntu"></dd></div>
+        </dl>
+      </section>
+
+      <section class="gy-ikili">
+        <div class="card gy-pupil">
+          <h2>Pupilla: sallanan ışık testi</h2>
+          <canvas id="pupil" aria-label="Sallanan ışık testinde iki pupilla"></canvas>
+          <div class="seg" id="isik" role="group" aria-label="Işık">
+            <button type="button" data-i="sallan" class="on">Sallanan</button>
+            <button type="button" data-i="sol">Sol göz</button>
+            <button type="button" data-i="sag">Sağ göz</button>
+            <button type="button" data-i="yok">Kapalı</button>
+          </div>
+          <p class="gy-rapd" id="rapd"></p>
+        </div>
+        <div class="card gy-v1">
+          <h2>V1 haritası</h2>
+          <canvas id="v1" aria-label="Görme korteksi düz haritası"></canvas>
+          <p class="muted not">Kortikal büyütme: merkez 10° V1'in yarısından fazlasını kaplar (Horton ve Hoyt 1991). Sağdaki alan sol V1'e, üst alan alt kıyıya düşer.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p><b>Eğitim amaçlıdır, tanı için kullanılamaz.</b> Basitleştirilmiş bir modeldir: lif yerleşimi yayımlanmış retinotopi haritalarına dayanır, optik radyasyon rotaları ve V1 yüzeyi şematiktir; gerçek hastada defekt farklı olabilir. Görüntüler sentetiktir, hasta verisi içermez.</p>
+    <p>3B anatomi: <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html" target="_blank" rel="noopener">BodyParts3D</a>, © The Database Center for Life Science, CC Attribution 4.0 International (parçalar sadeleştirilip birleştirildi). 3B görüntüleme: <a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a> (MIT). Kaynaklar: Horton ve Hoyt 1991; Horton 1997; Frisén 1978-79; Trobe, Visual Fields.</p>
+  </footer>
+
+  <script type="module" src="gorme.js"></script>
+</body>
+</html>

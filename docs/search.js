@@ -12,6 +12,8 @@ const SAYFALAR = [
   ['EKG', '3B kalpte uyarı iletimi ve 12 derivasyonlu EKG; ritim, PR, QRS ve eksen ayarı', 'ekg.html'],
   ['EKG derivasyonları', 'Derivasyon bir kameradır: 3B kalpte bakış açısı, kalp vektörü ve sınav', 'derivasyon.html'],
   ['EKG miyokard infarktüsü', 'STEMI bölgeleri: anteroseptal, ön, lateral, inferior, posterior, sağ ventrikül; ST yükselmesi ve evrim', 'mi.html'],
+  ['Görme yolları', '3B görme yollarında lezyon: bitemporal, homonim hemianopi, kadranopi, makula korunması, RAPD ve V1 haritası', 'gorme.html'],
+  ['Göz ve görüntü', 'Miyopi, hipermetropi, astigmatizma, presbiyopi, katarakt, makula, diyabetik retinopati ve renk körlüğünde görüntü', 'gorme-goz.html'],
   ['Yararlanılan kaynaklar', 'Veri setleri, 3B model ve yazılımlar; sahipleri ve lisanslarıyla', 'kaynaklar.html'],
   ['Gizlilik ve Kullanım Koşulları', 'Hangi veri işlenir, kullanım koşulları ve sorumluluk sınırları', 'gizlilik.html'],
   ['Normal BT', 'Normal toraks, abdomen ve kraniyal BT', 'atlaslar.html#saglikli'],

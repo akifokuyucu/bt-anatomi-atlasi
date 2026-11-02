@@ -15,5 +15,21 @@
     ],
     "url": "ekg.html",
     "durum": "beta"
+  },
+  {
+    "ad": "Görme Yolları ve Görüntü",
+    "grup": "Nöro-oftalmoloji",
+    "aciklama": "3B görme yollarında lezyonu yerleştirin; iki gözün görme alanı, hastanın gördüğü sahne, V1 haritası ve pupilla yanıtı kesilen liflerden hesaplanır. Kırma kusurları ve göz hastalıklarında görüntü de ayrı sekmede.",
+    "bolumler": [
+      "Yollar ve görme alanı",
+      "Göz ve görüntü"
+    ],
+    "branslar": [
+      "Nöroloji",
+      "Göz",
+      "Nöroşirürji"
+    ],
+    "url": "gorme.html",
+    "durum": "beta"
   }
 ]

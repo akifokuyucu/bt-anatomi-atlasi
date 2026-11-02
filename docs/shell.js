@@ -15,7 +15,7 @@
     anaSayfa ? '' :
     /^(araclar|devir|tahlil|form)\.html$/.test(sayfa) ? 'araclar' :
     /^(atlaslar|atlas|lapa|lapav)\.html$/.test(sayfa) ? 'atlaslar' :
-    /^(sim|ekg|derivasyon|mi)\.html$/.test(sayfa) ? 'simulasyon' : '';
+    /^(sim|ekg|derivasyon|mi|gorme|gorme-goz)\.html$/.test(sayfa) ? 'simulasyon' : '';
 
   if (bolum) document.documentElement.dataset.bolum = bolum; // renk teması (shell.css); sayfa başındaki satır içi betik aynısını ilk boyamadan önce yapar
 
@@ -25,8 +25,11 @@
     ['araclar', 'Araçlar', 'araclar.html'],
   ];
 
-  // Tek konunun bölümleri: EKG sayfaları arasında sekme çubuğu
-  const EKG = [['ekg.html', 'Ritim ve iletim'], ['derivasyon.html', 'Derivasyonlar'], ['mi.html', 'Miyokard infarktüsü']];
+  // Tek konunun bölümleri: aynı konunun sayfaları arasında sekme çubuğu
+  const KONULAR = [
+    ['EKG bölümleri', [['ekg.html', 'Ritim ve iletim'], ['derivasyon.html', 'Derivasyonlar'], ['mi.html', 'Miyokard infarktüsü']]],
+    ['Görme bölümleri', [['gorme.html', 'Yollar ve görme alanı'], ['gorme-goz.html', 'Göz ve görüntü']]],
+  ];
 
   const nav = document.createElement('header');
   nav.className = 'sitenav';
@@ -101,13 +104,14 @@
     });
   }
 
-  // EKG sekmeleri: bağlam çubuğunun altına eklenir
+  // Konu sekmeleri: bağlam çubuğunun altına eklenir
   document.addEventListener('DOMContentLoaded', () => {
-    if (!EKG.some(([href]) => href === sayfa)) return;
+    const konu = KONULAR.find(([, liste]) => liste.some(([href]) => href === sayfa));
+    if (!konu) return;
     const sekme = document.createElement('nav');
     sekme.className = 'alt-sekme';
-    sekme.setAttribute('aria-label', 'EKG bölümleri');
-    sekme.innerHTML = EKG.map(([href, ad]) => `<a href="${href}"${href === sayfa ? ' aria-current="page"' : ''}>${ad}</a>`).join('');
+    sekme.setAttribute('aria-label', konu[0]);
+    sekme.innerHTML = konu[1].map(([href, ad]) => `<a href="${href}"${href === sayfa ? ' aria-current="page"' : ''}>${ad}</a>`).join('');
     document.querySelector('.topbar.ctx')?.after(sekme);
   });
 
