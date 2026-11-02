@@ -28,7 +28,7 @@
     .yasal th { color: var(--muted); font-weight: 500; }
     .yasal .tarih { color: var(--muted); font-size: 13px; }
   </style>
-  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){};(function(){var p=location.pathname.split("/").pop(),b=/^(atlaslar|atlas|lapa|lapav)\.html$/.test(p)?"atlaslar":/^(sim|ekg|derivasyon|mi)\.html$/.test(p)?"simulasyon":/^(araclar|devir|tahlil|form)\.html$/.test(p)?"araclar":"";if(b)document.documentElement.dataset.bolum=b})()</script>
   <script src="shell.js" defer></script>
   <script src="ui.js" defer></script>
 </head>
@@ -38,7 +38,7 @@
       <nav class="crumbs" data-crumbs="Klinik Atlas=index.html|Gizlilik ve Kullanım Koşulları"></nav>
       <h1>Gizlilik ve Kullanım Koşulları</h1>
       <p class="lead">Klinik Atlas'ta kişisel veri toplamıyoruz. Araçlara yazdığınız ve yüklediğiniz hiçbir şey cihazınızdan dışarı çıkmaz.</p>
-      <p class="tarih">Son güncelleme: 28 Ekim 2026</p>
+      <p class="tarih">Son güncelleme: 2 Kasım 2026</p>
     </div>
 
     <section class="ozet" aria-label="Kısaca">
@@ -79,9 +79,9 @@
     </ul>
 
     <h2>5. Veri kaynakları ve lisanslar</h2>
-    <p>Yalnızca anonim, açık lisanslı veri setleri kullanılır: TotalSegmentator veri seti (CC BY 4.0), READ PE CT (CC0 1.0), Dresden Surgical Anatomy Dataset (CC BY 4.0) ve Boer ve ark. laparoskopi videosu (CC BY 2.0). Ayrıntılı atıflar <a href="index.html#hakkinda">ana sayfanın alt bilgisinde</a> yer alır. Sitenin kaynak kodu <a href="https://github.com/akifokuyucu/bt-anatomi-atlasi" target="_blank" rel="noopener">GitHub'da</a> herkese açıktır.</p>
+    <p>Yalnızca anonim, açık lisanslı veri setleri kullanılır. Veri setleri, 3B model ve yazılımların hepsi sahipleri ve lisanslarıyla <a href="kaynaklar.html">Yararlanılan kaynaklar</a> sayfasında listelenir. Sitenin kaynak kodu <a href="https://github.com/akifokuyucu/bt-anatomi-atlasi" target="_blank" rel="noopener">GitHub'da</a> herkese açıktır.</p>
 
-    <h2>6. İletişim ve bildirim</h2>
+    <h2 id="iletisim">6. İletişim ve bildirim</h2>
     <p>Hata, güvenlik sorunu ya da öneri için <a href="https://github.com/akifokuyucu/bt-anatomi-atlasi/issues" target="_blank" rel="noopener">GitHub'da bir kayıt açın</a>. Bu kayıtlar herkese açıktır; bu yüzden içine hasta bilgisi, belge ya da kişisel veri yazmayın.</p>
 
     <h2>7. Erişilebilirlik</h2>
@@ -95,9 +95,5 @@
     </ul>
     <p>Bilinen sınırlar: BT kesitleri, laparoskopi görüntüleri ve 3B sahneler tuval üzerinde çizilir; bu nedenle ekran okuyucular görüntünün içeriğini aktaramaz. Yapı adları ve notları metin olarak da listelenir, ancak her etkileşim için tam bir metin eşdeğeri henüz yoktur. Bir engelle karşılaşırsanız <a href="https://github.com/akifokuyucu/bt-anatomi-atlasi/issues" target="_blank" rel="noopener">GitHub'da kayıt açın</a>; hangi sayfa ve hangi araçla denediğinizi yazmanız işimizi kolaylaştırır.</p>
   </main>
-
-  <footer class="foot">
-    <p><b>Eğitim ve çalışma kolaylığı içindir; tanı için kullanılamaz.</b></p>
-  </footer>
 </body>
 </html>

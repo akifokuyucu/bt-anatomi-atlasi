@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="premium.css">
   <link rel="stylesheet" href="shell.css">
-  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){};(function(){var p=location.pathname.split("/").pop(),b=/^(atlaslar|atlas|lapa|lapav)\.html$/.test(p)?"atlaslar":/^(sim|ekg|derivasyon|mi)\.html$/.test(p)?"simulasyon":/^(araclar|devir|tahlil|form)\.html$/.test(p)?"araclar":"";if(b)document.documentElement.dataset.bolum=b})()</script>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
   <script src="shell.js" defer></script>
   <script src="ui.js" defer></script>
@@ -60,7 +60,7 @@
     </section>
 
     <nav class="kapilar" aria-label="Site bölümleri">
-      <div class="kapi">
+      <div class="kapi k-atlas">
         <a class="kapi-ana" href="atlaslar.html">
           <b>Atlaslar</b>
           <span class="muted">Gerçek görüntüde Türkçe etiketli anatomi.</span>
@@ -71,7 +71,7 @@
           <li><a href="atlaslar.html#laparoskopi">Laparoskopi</a></li>
         </ul>
       </div>
-      <div class="kapi">
+      <div class="kapi k-sim">
         <a class="kapi-ana" href="sim.html">
           <b>Simülasyon</b>
           <span class="muted">Parametreyi değiştirin, sonucu hemen görün.</span>
@@ -82,7 +82,7 @@
           <li><a href="mi.html">EKG: miyokard infarktüsü</a></li>
         </ul>
       </div>
-      <div class="kapi">
+      <div class="kapi k-arac">
         <a class="kapi-ana" href="araclar.html">
           <b>Araçlar</b>
           <span class="muted">Günlük klinik iş için küçük yardımcılar.</span>
@@ -95,36 +95,11 @@
       </div>
     </nav>
 
-    <div class="serit" aria-label="Atlasta etiketli yapılardan örnekler">
-      <div class="serit-ray">
-        <div class="serit-set"><span>Aort</span><span>Karaciğer</span><span>Pankreas</span><span>Safra kesesi</span><span>Dalak</span><span>Böbrek</span><span>Portal ven</span><span>Pulmoner arter</span><span>Sağ atriyum</span><span>His demeti</span><span>Purkinje ağı</span><span>Calot üçgeni</span><span>Üreter</span><span>Mesane</span></div>
-        <div class="serit-set" aria-hidden="true"><span>Aort</span><span>Karaciğer</span><span>Pankreas</span><span>Safra kesesi</span><span>Dalak</span><span>Böbrek</span><span>Portal ven</span><span>Pulmoner arter</span><span>Sağ atriyum</span><span>His demeti</span><span>Purkinje ağı</span><span>Calot üçgeni</span><span>Üreter</span><span>Mesane</span></div>
-      </div>
-    </div>
-
     <section id="yenilikler" class="block">
       <h2>Son eklenenler</h2>
       <div class="pano" id="yenilikler-liste"><p class="muted">Yükleniyor…</p></div>
     </section>
-
-    <section class="block soon">
-      <h2>Yolda olanlar</h2>
-      <ul>
-        <li>Patoloji BT: ileus ve intrakraniyal kanama vakaları</li>
-        <li>Adım adım rehberli turlar</li>
-        <li>Tüm yapılar için kısa anatomi notları (bir uzman gözden geçirmesiyle)</li>
-        <li>3B: lezyonlar ve karaciğer segmentlerinin patlatılmış görünümü</li>
-        <li>Laparoskopi: pelvik diseksiyon (üreter, veziküler bezler) ve kolesistektomi vakaları</li>
-        <li>Simülasyon: BT kontrast fazı (HU eğrileri)</li>
-      </ul>
-    </section>
   </main>
-
-  <footer id="hakkinda" class="foot">
-    <p><b>Eğitim amaçlıdır, tanı için kullanılamaz.</b> Yapı notları taslak niteliğindedir ve bir radyolog ya da anatomist tarafından gözden geçirilmemiştir.</p>
-    <p>Veri: <a href="https://zenodo.org/records/10047292" target="_blank" rel="noopener">TotalSegmentator veri seti v2.0.1</a> (Wasserthal ve ark., Radiology: AI 2023), CC BY 4.0. Patoloji vakası: <a href="https://doi.org/10.1038/s41597-023-02374-x" target="_blank" rel="noopener">READ PE CT</a> (Andrade ve ark., Sci Data 2023), CC0 1.0. Laparoskopik görüntüler: <a href="https://doi.org/10.1038/s41597-022-01719-2" target="_blank" rel="noopener">Dresden Surgical Anatomy Dataset</a> (Carstens ve ark., Sci Data 2023), CC BY 4.0. Laparoskopi videosu: <a href="https://doi.org/10.1186/1752-1947-5-588" target="_blank" rel="noopener">Boer ve ark., J Med Case Rep 2011</a>, CC BY 2.0 (Wikimedia Commons). Yalnızca anonim, açık lisanslı veriler kullanılır.</p>
-    <p><a href="https://github.com/akifokuyucu/bt-anatomi-atlasi/issues" target="_blank" rel="noopener">Hata bildir / öneri gönder</a> · <a href="https://github.com/akifokuyucu/bt-anatomi-atlasi" target="_blank" rel="noopener">Kaynak kod</a></p>
-  </footer>
 
   <script type="module" src="home.js"></script>
   <script type="module" src="home-3d.js"></script>

@@ -150,9 +150,7 @@ async function load() {
   state.slices.sagittal = (byKey('aorta') || anchor).focus.sagittal;
 
   $('title').textContent = atlas.title;
-  $('credit').innerHTML =
-    `Veri: <a href="${atlas.sourceUrl || 'https://zenodo.org/records/10047292'}" target="_blank" rel="noopener">${atlas.source}</a>. ` +
-    'Segmentasyonlar otomatik/yarı otomatiktir. Eğitim amaçlıdır, tanı için kullanılamaz.';
+  $('credit').textContent = 'Segmentasyonlar otomatik/yarı otomatiktir. Eğitim amaçlıdır, tanı için kullanılamaz.';
 
   readHash();
   buildSystems();

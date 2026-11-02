@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="premium.css">
   <link rel="stylesheet" href="shell.css">
-  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){};(function(){var p=location.pathname.split("/").pop(),b=/^(atlaslar|atlas|lapa|lapav)\.html$/.test(p)?"atlaslar":/^(sim|ekg|derivasyon|mi)\.html$/.test(p)?"simulasyon":/^(araclar|devir|tahlil|form)\.html$/.test(p)?"araclar":"";if(b)document.documentElement.dataset.bolum=b})()</script>
   <script src="shell.js" defer></script>
   <script src="ui.js" defer></script>
 </head>
@@ -77,7 +77,7 @@
       <h2>Laparoskopi: ameliyat görüntüsünde anatomi</h2>
       <p class="sub">Aynı organlar bu kez cerrahın kamerasından. Robotik ameliyat karelerinde organlar renkli ve Türkçe etiketli; bir yapıya dokunun, laparoskopide nasıl tanındığını okuyun ve tek dokunuşla BT atlasındaki karşılığına geçin. Video modunda ameliyat videosu düz akar; filtreye basınca organlar ve aletler videonun üzerine gelir.</p>
       <div class="cards" id="cases-laparoskopi"><p class="muted">Vakalar yükleniyor…</p></div>
-      <p class="note-box lap">Prototip: görüntüler ve organ maskeleri uzmanlarca gözden geçirilmiş açık bir veri setinden (Dresden Surgical Anatomy Dataset, CC BY 4.0) alınır; laparoskopik tanıma notları taslaktır. Video modundaki maskeler SAM 2 ile yarı otomatik üretilmiştir ve henüz uzman onayından geçmemiştir.</p>
+      <p class="note-box lap">Prototip: görüntüler ve organ maskeleri uzmanlarca gözden geçirilmiş açık bir veri setinden alınır; laparoskopik tanıma notları taslaktır. Video modundaki maskeler SAM 2 ile yarı otomatik üretilmiştir ve henüz uzman onayından geçmemiştir.</p>
     </section>
 
     <section id="ozellikler" class="block">
@@ -95,8 +95,7 @@
   </main>
 
   <footer class="foot">
-    <p><b>Eğitim amaçlıdır, tanı için kullanılamaz.</b> Yapı notları taslak niteliğindedir ve bir radyolog ya da anatomist tarafından gözden geçirilmemiştir.</p>
-    <p>Veri: <a href="https://zenodo.org/records/10047292" target="_blank" rel="noopener">TotalSegmentator veri seti v2.0.1</a> (Wasserthal ve ark., Radiology: AI 2023), CC BY 4.0. Patoloji vakası: <a href="https://doi.org/10.1038/s41597-023-02374-x" target="_blank" rel="noopener">READ PE CT</a> (Andrade ve ark., Sci Data 2023), CC0 1.0. Laparoskopik görüntüler: <a href="https://doi.org/10.1038/s41597-022-01719-2" target="_blank" rel="noopener">Dresden Surgical Anatomy Dataset</a> (Carstens ve ark., Sci Data 2023), CC BY 4.0. Laparoskopi videosu: <a href="https://doi.org/10.1186/1752-1947-5-588" target="_blank" rel="noopener">Boer ve ark., J Med Case Rep 2011</a>, CC BY 2.0 (Wikimedia Commons). Yalnızca anonim, açık lisanslı veriler kullanılır.</p>
+    <p>Yapı notları taslak niteliğindedir ve bir radyolog ya da anatomist tarafından gözden geçirilmemiştir.</p>
   </footer>
 
   <script type="module" src="atlaslar.js"></script>

@@ -5,11 +5,18 @@ const json = (u) => fetch(u, { cache: 'no-cache' }).then((r) => r.json());
 async function ozetiCiz() {
   const ul = document.getElementById('hero-stats');
   try {
-    const [bt, lap, araclar] = await Promise.all([json('data/cases.json'), json('data/lapa_cases.json'), json('pano/araclar.json')]);
+    const [bt, lap, araclar, sim] = await Promise.all([json('data/cases.json'), json('data/lapa_cases.json'), json('pano/araclar.json'), json('pano/simulasyon.json')]);
     const hazir = (l) => l.filter((c) => c.status === 'ready').length;
-    const yapi = Math.max(0, ...bt.map((c) => c.n || 0));
-    ul.innerHTML = [[hazir(bt), 'BT vakası'], [yapi, 'etiketli yapı'], [hazir(lap), 'laparoskopi vakası'], [araclar.length, 'klinik araç']]
-      .map(([n, t]) => `<li><b>${n}</b>${esc(t)}</li>`).join('');
+    const btN = hazir(bt), lapN = hazir(lap);
+    // Simülasyon modülü: bir kartın bölümleri ayrı modül sayılır (EKG: ritim, derivasyonlar, infarkt = 3)
+    const simN = sim.reduce((t, s) => t + ((s.bolumler || []).length || 1), 0);
+    const ogeler = [
+      { n: btN + lapN, t: 'atlas vakası', alt: `${btN} BT · ${lapN} laparoskopi`, renk: '--c-atlas', href: 'atlaslar.html' },
+      { n: simN, t: 'simülasyon modülü', renk: '--c-sim', href: 'sim.html' },
+      { n: araclar.length, t: 'klinik araç', renk: '--c-arac', href: 'araclar.html' },
+    ];
+    ul.innerHTML = ogeler.map((o) =>
+      `<li><a href="${o.href}" style="--c: var(${o.renk})"><b>${o.n}</b>${esc(o.t)}${o.alt ? `<small>${esc(o.alt)}</small>` : ''}</a></li>`).join('');
   } catch { ul.hidden = true; }
 }
 

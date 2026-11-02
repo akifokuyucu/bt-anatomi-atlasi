@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="premium.css">
   <link rel="stylesheet" href="shell.css">
-  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){};(function(){var p=location.pathname.split("/").pop(),b=/^(atlaslar|atlas|lapa|lapav)\.html$/.test(p)?"atlaslar":/^(sim|ekg|derivasyon|mi)\.html$/.test(p)?"simulasyon":/^(araclar|devir|tahlil|form)\.html$/.test(p)?"araclar":"";if(b)document.documentElement.dataset.bolum=b})()</script>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
   <script src="shell.js" defer></script>
   <script src="ui.js" defer></script>
@@ -135,7 +135,6 @@
 
   <footer class="foot">
     <p><b>Eğitim amaçlıdır, tanı için kullanılamaz.</b> Basitleştirilmiş bir modeldir: kalp tek bir elektrik vektörü olarak ele alınır; elektrot yerleşimleri şematiktir.</p>
-    <p>3B kalp modeli: <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html" target="_blank" rel="noopener">BodyParts3D</a>, © The Database Center for Life Science, CC Attribution 4.0 International. 3B görüntüleme: <a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a> (MIT).</p>
   </footer>
 
   <script type="module" src="derivasyon.js"></script>

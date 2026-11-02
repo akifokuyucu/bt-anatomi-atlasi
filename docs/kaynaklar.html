@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08090c">
+  <title>Yararlanılan kaynaklar · Klinik Atlas</title>
+  <meta name="description" content="Klinik Atlas'ta kullanılan veri setleri, 3B model, yazılım ve kaynaklar; sahipleri, lisansları ve bağlantılarıyla.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="home.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="shell.css">
+  <style>
+    .kaynak { max-width: 860px; }
+    .kaynak h2 { font-size: 22px; margin: 34px 0 6px; }
+    .kaynak .alt { color: var(--muted); margin: 0 0 14px; }
+    .kaynak-liste { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+    .kaynak-liste li { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 4px; }
+    .kaynak-liste h3 { margin: 0; font-size: 16px; }
+    .kaynak-liste p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .kaynak-liste .kullanim { color: var(--text); }
+    .kaynak-liste .alt-satir { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin-top: 4px; font-size: 13px; }
+    .kaynak-liste .lisans { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; padding: 2px 9px; border: 1px solid var(--line-hi); border-radius: 999px; color: var(--muted); }
+    .kaynak-liste a { color: var(--accent-2); text-underline-offset: 3px; }
+    .kaynak .not { border: 1px solid var(--line-hi); border-left: 3px solid var(--accent); border-radius: 10px; padding: 12px 14px; background: var(--panel); color: var(--text); line-height: 1.6; margin-top: 28px; }
+  </style>
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="shell.js" defer></script>
+  <script src="ui.js" defer></script>
+</head>
+<body class="home">
+  <main class="kaynak">
+    <div class="page-head">
+      <nav class="crumbs" data-crumbs="Klinik Atlas=index.html|Yararlanılan kaynaklar"></nav>
+      <h1>Yararlanılan kaynaklar</h1>
+      <p class="lead">Sitedeki görüntüler, modeller ve yazılımlar başkalarının emeğine dayanıyor. Hepsi bu sayfada, sahipleri ve lisanslarıyla listelenir; diğer sayfalarda atıf satırı tekrarlanmaz.</p>
+    </div>
+
+    <h2>Veri setleri</h2>
+    <p class="alt">Yalnızca anonim, açık lisanslı veri kullanılır. Hasta ya da hastane verisi içermez.</p>
+    <ul class="kaynak-liste">
+      <li>
+        <h3>TotalSegmentator veri seti v2.0.1</h3>
+        <p>Wasserthal ve ark., <i>Radiology: Artificial Intelligence</i>, 2023.</p>
+        <p class="kullanim">Normal BT atlasları (abdomen-pelvis, toraks, kraniyal) ve laparoskopi atlasındaki "BT'de göster" bağlantıları: BT görüntüleri ve yapı segmentasyonları.</p>
+        <div class="alt-satir"><span class="lisans">CC BY 4.0</span><a href="https://zenodo.org/records/10047292" target="_blank" rel="noopener">zenodo.org/records/10047292 ↗</a></div>
+      </li>
+      <li>
+        <h3>READ PE CT</h3>
+        <p>Andrade ve ark., <i>Scientific Data</i>, 2023.</p>
+        <p class="kullanim">Patoloji BT atlasındaki pulmoner emboli vakası (BT anjiyo) ve lezyon işaretlemeleri.</p>
+        <div class="alt-satir"><span class="lisans">CC0 1.0</span><a href="https://doi.org/10.1038/s41597-023-02374-x" target="_blank" rel="noopener">doi.org/10.1038/s41597-023-02374-x ↗</a></div>
+      </li>
+      <li>
+        <h3>Dresden Surgical Anatomy Dataset</h3>
+        <p>Carstens ve ark., <i>Scientific Data</i>, 2023.</p>
+        <p class="kullanim">Laparoskopi atlasındaki robotik cerrahi kareleri ve organ maskeleri.</p>
+        <div class="alt-satir"><span class="lisans">CC BY 4.0</span><a href="https://doi.org/10.1038/s41597-022-01719-2" target="_blank" rel="noopener">doi.org/10.1038/s41597-022-01719-2 ↗</a></div>
+      </li>
+      <li>
+        <h3>Laparoskopik kolesistektomi videosu</h3>
+        <p>Boer ve ark., <i>Journal of Medical Case Reports</i>, 2011 (Wikimedia Commons).</p>
+        <p class="kullanim">Laparoskopi video modundaki ameliyat videosu. Üzerindeki organ ve alet maskeleri SAM 2 ile yarı otomatik üretilmiştir ve henüz uzman onayından geçmemiştir.</p>
+        <div class="alt-satir"><span class="lisans">CC BY 2.0</span><a href="https://doi.org/10.1186/1752-1947-5-588" target="_blank" rel="noopener">doi.org/10.1186/1752-1947-5-588 ↗</a></div>
+      </li>
+      <li>
+        <h3>BodyParts3D</h3>
+        <p>© The Database Center for Life Science.</p>
+        <p class="kullanim">Ana sayfadaki ve EKG simülasyonlarındaki 3B kalp modeli. Parçalar sadeleştirilip birleştirilmiştir. İletim sistemi bu veri setinde yoktur; oda geometrisinden türetilmiş şematik bir çizimdir.</p>
+        <div class="alt-satir"><span class="lisans">CC BY 4.0</span><a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html" target="_blank" rel="noopener">dbarchive.biosciencedbc.jp ↗</a></div>
+      </li>
+    </ul>
+
+    <h2>Klinik içerik</h2>
+    <p class="alt">Simülasyonlardaki eşikler ve ölçütler şu kaynakların özetidir. Gerçek tanıda klinik ve güncel kılavuz esastır.</p>
+    <ul class="kaynak-liste">
+      <li>
+        <h3>Dördüncü Evrensel Miyokard İnfarktüsü Tanımı</h3>
+        <p>Thygesen ve ark., <i>European Heart Journal</i>, 2019;40:237.</p>
+        <p class="kullanim">EKG: miyokard infarktüsü simülasyonundaki ST yükselmesi eşikleri ve bölge ölçütleri (acil göğüs ağrısı yol haritalarının özetiyle birlikte).</p>
+      </li>
+    </ul>
+
+    <h2>Yazılım ve kütüphaneler</h2>
+    <p class="alt">Tarayıcıda çalışan açık kaynak bileşenler; çoğu cdnjs ve jsDelivr üzerinden, sabit sürümle yüklenir.</p>
+    <ul class="kaynak-liste">
+      <li>
+        <h3>three.js</h3>
+        <p class="kullanim">Ana sayfadaki 3B kalp, EKG simülasyonları ve atlastaki 3B görünüm.</p>
+        <div class="alt-satir"><span class="lisans">MIT</span><a href="https://threejs.org/" target="_blank" rel="noopener">threejs.org ↗</a></div>
+      </li>
+      <li>
+        <h3>PDF.js</h3>
+        <p>Mozilla.</p>
+        <p class="kullanim">Tahlil Takibi: PDF'ten metin okuma (tarayıcıda; dosya sunucuya gitmez).</p>
+        <div class="alt-satir"><span class="lisans">Apache 2.0</span><a href="https://mozilla.github.io/pdf.js/" target="_blank" rel="noopener">mozilla.github.io/pdf.js ↗</a></div>
+      </li>
+      <li>
+        <h3>Pyodide</h3>
+        <p class="kullanim">Tahlil Takibi: tarayıcıda çalışan Python ile tahlil değerlerini ayrıştırma.</p>
+        <div class="alt-satir"><span class="lisans">MPL 2.0</span><a href="https://pyodide.org/" target="_blank" rel="noopener">pyodide.org ↗</a></div>
+      </li>
+      <li>
+        <h3>jsPDF</h3>
+        <p class="kullanim">PDF çıktısı alan araçlar (devir listesi, klinik formlar).</p>
+        <div class="alt-satir"><span class="lisans">MIT</span><a href="https://github.com/parallax/jsPDF" target="_blank" rel="noopener">github.com/parallax/jsPDF ↗</a></div>
+      </li>
+      <li>
+        <h3>Segment Anything Model 2 (SAM 2)</h3>
+        <p>Meta AI.</p>
+        <p class="kullanim">Laparoskopi video modundaki maskelerin kare kare yarı otomatik izlenmesi.</p>
+        <div class="alt-satir"><span class="lisans">Apache 2.0</span><a href="https://ai.meta.com/sam2/" target="_blank" rel="noopener">ai.meta.com/sam2 ↗</a></div>
+      </li>
+    </ul>
+
+    <h2>Yazı tipleri ve tasarım</h2>
+    <ul class="kaynak-liste">
+      <li>
+        <h3>Inter ve Playfair Display</h3>
+        <p class="kullanim">Site yazı tipleri, Google Fonts üzerinden.</p>
+        <div class="alt-satir"><span class="lisans">SIL OFL 1.1</span><a href="https://fonts.google.com/" target="_blank" rel="noopener">fonts.google.com ↗</a></div>
+      </li>
+      <li>
+        <h3>Noise transition (Codrops)</h3>
+        <p>mohAmineBrs.</p>
+        <p class="kullanim">Atlas sayfalarına geçiş perdesi ve ana sayfadaki nabız halkası bu deneyden esinlenmiştir; kod bu sitede sıfırdan yazılmıştır.</p>
+        <div class="alt-satir"><span class="lisans">MIT</span><a href="https://github.com/mohAmineBrs/codrops-noise-transition" target="_blank" rel="noopener">github.com/mohAmineBrs/codrops-noise-transition ↗</a></div>
+      </li>
+    </ul>
+
+    <p class="not"><b>Bu sitede yapılan değişiklikler.</b> Görüntüler web için dönüştürülmüştür (yeniden örnekleme, sıkıştırma, gürültü azaltma); segmentasyonlar renklendirilmiş, yapı adları Türkçeleştirilmiş ve notlar eklenmiştir. Bu değişiklikler veri sahiplerine ait değildir ve onlar tarafından onaylanmamıştır. Yapı notları taslak niteliğindedir ve bir radyolog ya da anatomist tarafından gözden geçirilmemiştir. Eğitim amaçlıdır, tanı için kullanılamaz.</p>
+  </main>
+</body>
+</html>

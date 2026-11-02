@@ -17,6 +17,8 @@
     /^(atlaslar|atlas|lapa|lapav)\.html$/.test(sayfa) ? 'atlaslar' :
     /^(sim|ekg|derivasyon|mi)\.html$/.test(sayfa) ? 'simulasyon' : '';
 
+  if (bolum) document.documentElement.dataset.bolum = bolum; // renk teması (shell.css); sayfa başındaki satır içi betik aynısını ilk boyamadan önce yapar
+
   const OGE = [
     ['atlaslar', 'Atlaslar', 'atlaslar.html'],
     ['simulasyon', 'Simülasyon', 'sim.html'],
@@ -109,21 +111,33 @@
     document.querySelector('.topbar.ctx')?.after(sekme);
   });
 
-  // Gizlilik bağlantısı: her alt sayfanın altında; alt bilgi yoksa (atlas ekranları hariç) oluşturulur
+  // Kalıcı site alt bilgisi: her sayfada aynı. Sayfaya özgü notlar (footer.foot) bu alt bilgiye taşınır;
+  // veri ve yazılım atıfları sayfalarda değil, tek yerde (kaynaklar.html) durur.
   document.addEventListener('DOMContentLoaded', () => {
-    if (sayfa === 'gizlilik.html' || /^(atlas|lapa|lapav)\.html$/.test(sayfa)) return;
-    let foot = document.querySelector('footer.foot');
-    if (!foot) {
-      if (anaSayfa) return;
-      foot = document.createElement('footer');
-      foot.className = 'foot';
-      document.body.appendChild(foot);
-    }
-    if (!foot.querySelector('a[href="gizlilik.html"]')) {
-      const p = document.createElement('p');
-      p.innerHTML = '<a href="gizlilik.html">Gizlilik ve Kullanım Koşulları</a>';
-      foot.appendChild(p);
-    }
+    const sayfaNotlari = [...document.querySelectorAll('footer.foot')];
+    // Evrensel uyarı zaten alt bilgide: notların başındaki aynı kalın cümle tekrarlanmasın
+    const tekrar = /<b>Eğitim (?:amaçlıdır, tanı için kullanılamaz|ve çalışma kolaylığı içindir)\.?<\/b>\s*/g;
+    const notlar = sayfaNotlari.map((f) => f.innerHTML.replace(tekrar, '').replace(/<p>\s*<\/p>/g, '').trim()).filter(Boolean);
+    sayfaNotlari.forEach((f) => f.remove());
+    const GH = 'https://github.com/akifokuyucu/bt-anatomi-atlasi';
+    const baglantilar = [
+      ['kaynaklar.html', 'Yararlanılan kaynaklar'],
+      ['gizlilik.html', 'Gizlilik ve Kullanım Koşulları'],
+      ['gizlilik.html#iletisim', 'İletişim'],
+      [`${GH}/issues`, 'Hata bildir / öneri', true],
+      [GH, 'Kaynak kod', true],
+    ];
+    const foot = document.createElement('footer');
+    foot.className = 'site-foot';
+    foot.innerHTML =
+      (notlar.length ? `<div class="sf-not">${notlar.join('')}</div>` : '') +
+      '<div class="sf-alt">' +
+        '<p class="sf-uyari"><b>Eğitim ve çalışma kolaylığı içindir; tanı için kullanılamaz.</b></p>' +
+        '<nav class="sf-links" aria-label="Site bilgileri">' +
+          baglantilar.map(([href, ad, dis]) => `<a href="${href}"${dis ? ' target="_blank" rel="noopener"' : ''}>${ad}${dis ? ' ↗' : ''}</a>`).join('') +
+        '</nav>' +
+      '</div>';
+    document.body.appendChild(foot);
   });
 
   // Alt sayfalarda konum izi: Klinik Atlas › Araçlar › Devir Listesi gibi; ".crumbs" yer tutucusu doldurulur

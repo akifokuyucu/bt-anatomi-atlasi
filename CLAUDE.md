@@ -9,7 +9,8 @@ Gerçek bir abdomen-pelvis BT'si üzerinde Türkçe etiketli, tarayıcıda çal�
 | `docs/index.html`, `docs/home.js`, `docs/home.css` | Ana sayfa: üç bölüm kapısı (Atlaslar, Simülasyon, Araçlar) ve son eklenenler (`pano/pano.json`) |
 | `docs/atlaslar.html`, `docs/atlaslar.js` | Vaka listeleri: Normal BT, Patoloji BT, Laparoskopi sekmeleri (`data/cases.json`, `data/lapa_cases.json`) |
 | `docs/araclar.html`, `docs/sim.html`, `docs/araclar.js` | Araç ve simülasyon listeleri; `pano/araclar.json`, `pano/simulasyon.json` (`grup` alanı başlığı belirler) |
-| `docs/shell.js`, `docs/shell.css` | Her sayfada üst menü, konum izi, arama düğmesi, EKG sayfaları arası sekmeler |
+| `docs/shell.js`, `docs/shell.css` | Her sayfada üst menü, konum izi, arama düğmesi, EKG sayfaları arası sekmeler, kalıcı site alt bilgisi (sayfadaki `footer.foot` notları oraya taşınır) ve bölüm renkleri (`<html data-bolum>`: Atlaslar mavi, Simülasyon sarı, Araçlar kırmızı) |
+| `docs/kaynaklar.html` | Yararlanılan kaynaklar: veri seti, model ve yazılım atıflarının tek yeri. Yeni veri/kütüphane eklenince buraya yaz; sayfalara ayrıca atıf satırı koyma |
 | `docs/atlas.html`, `docs/style.css` | Atlas arayüzü; durum `#c=vaka&p=düzlem&…` bağlantısında |
 | `docs/mpr.js`, `docs/mpr.css`, `docs/mesh-worker.js` | Atlasta "Üçlü + 3B" görünümü: üç senkron kesit, artı imleci, Three.js 3B sahnesi. `mpr.js` hacmi ve durumu `app.js`'ten `mprKur(api)` ile alır; 3B yüzeyler etiket hacminden tarayıcıda üretilir (`mesh-worker.js`, Surface Nets, ek veri yok) |
 | `docs/gecis.js`, `docs/home-3d.js` | `gecis.js`: atlas sayfalarına geçişte saf WebGL noise perdesi; atlasta `<html data-perde-bekle>` ile veri gelene kadar yüzde gösterir. `home-3d.js`: ana sayfa kahramanındaki 3B kalp ve nabız halkası (hareket azalt, ekran dışı ve gizli sekmede durur) |

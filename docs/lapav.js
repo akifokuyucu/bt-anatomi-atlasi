@@ -59,11 +59,7 @@ async function load() {
 
   $('title').textContent = data.title;
   $('eyebrow').textContent = data.eyebrow;
-  const src = data.source;
-  $('credit').innerHTML =
-    `${src.text} <a href="${src.url}" target="_blank" rel="noopener">Wikimedia Commons</a> · ` +
-    `<a href="https://doi.org/${src.doi}" target="_blank" rel="noopener">makale</a>. ` +
-    `${data.note} BT bağlantıları: TotalSegmentator (CC BY 4.0). Eğitim amaçlıdır, tanı için kullanılamaz.`;
+  $('credit').textContent = `${data.note} Eğitim amaçlıdır, tanı için kullanılamaz.`;
 
   readHash();
   buildFilters();

@@ -79,10 +79,7 @@ async function load() {
 
   $('title').textContent = atlas.title;
   $('eyebrow').textContent = atlas.eyebrow;
-  $('credit').innerHTML =
-    `Görüntü ve maskeler: <a href="${atlas.sourceUrl}" target="_blank" rel="noopener">${atlas.source}</a>. ` +
-    'BT bağlantıları: TotalSegmentator (CC BY 4.0). Yapı notları taslaktır, uzman onayı bekler. ' +
-    'Eğitim amaçlıdır, tanı için kullanılamaz.';
+  $('credit').textContent = 'Yapı notları taslaktır, uzman onayı bekler. Eğitim amaçlıdır, tanı için kullanılamaz.';
 
   readHash();
   buildThumbs();
