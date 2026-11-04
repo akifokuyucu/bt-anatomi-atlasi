@@ -62,14 +62,8 @@
       </section>
 
       <section class="card">
-        <div class="seg" id="mod" role="group" aria-label="Çalışma biçimi">
-          <button type="button" data-m="canli" class="on">Canlı atım</button>
-          <button type="button" data-m="serbest">Vektörü ben çevireyim</button>
-          <button type="button" data-m="sinav">Sınav</button>
-        </div>
-
         <div class="strip-kap" id="iz-kap">
-          <div class="strip tek"><span class="strip-ad" id="iz-ad">II</span><canvas id="iz"></canvas><div class="strip-gizli" id="iz-gizli" hidden>Cevabı verince çizgi burada görünür</div></div>
+          <div class="strip tek"><span class="strip-ad" id="iz-ad">II</span><canvas id="iz"></canvas></div>
         </div>
 
         <div data-panel="canli">
@@ -87,55 +81,10 @@
           </div>
           <p class="muted not">Ekseni değiştirin: ana vektör dönünce hangi derivasyonlar yükselir, hangileri düşer, çizgisi hiç sapmayanı bulun.</p>
         </div>
-
-        <div data-panel="serbest" hidden>
-          <div class="ayarlar">
-            <label>Frontal yön (sağ-sol / yukarı-aşağı) <output id="s-aci"></output><input type="range" id="a-aci" min="-180" max="180" step="5" value="55"></label>
-            <label>Öne – arkaya <output id="s-on"></output><input type="range" id="a-on" min="-90" max="90" step="5" value="-25"></label>
-            <label>Büyüklük <output id="s-buy"></output><input type="range" id="a-buy" min="0" max="150" step="5" value="100"></label>
-          </div>
-          <div class="satir-btn">
-            <button class="btn" type="button" data-on="55,-25">Normal QRS</button>
-            <button class="btn" type="button" data-on="-30,-25">Sola yatık</button>
-            <button class="btn" type="button" data-on="110,-25">Sağa yatık</button>
-            <button class="btn" type="button" data-on="55,60">Öne bakan</button>
-            <button class="btn" type="button" data-on="55,-70">Arkaya bakan</button>
-          </div>
-          <p class="muted not">Vektörü istediğiniz yöne çevirin. Alttaki çubuklar her derivasyonun o anda çizeceği değeri gösterir: yeşil = yukarı, kırmızı = aşağı.</p>
-        </div>
-
-        <div data-panel="sinav" hidden>
-          <div class="soru" id="soru">
-            <p class="soru-metin" id="s-metin"></p>
-            <div class="satir-btn" id="s-sec">
-              <button class="btn" type="button" data-c="poz">Yukarı sapar</button>
-              <button class="btn" type="button" data-c="neg">Aşağı sapar</button>
-              <button class="btn" type="button" data-c="duz">Düz / iki fazlı</button>
-            </div>
-            <p class="sonuc" id="s-sonuc" hidden></p>
-            <div class="satir-btn"><button class="btn accent" type="button" id="s-sonraki">Yeni soru</button><span class="muted" id="s-skor"></span></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="alt-ikili">
-        <div class="card eksen-kart">
-          <h2 id="d-baslik">Frontal düzlem</h2>
-          <canvas id="eksen" width="320" height="320" aria-label="Derivasyon eksenleri ve kalp vektörü"></canvas>
-          <p class="muted not" id="d-not"></p>
-        </div>
-        <div class="card">
-          <h2>12 derivasyon şu an</h2>
-          <canvas id="cubuk" width="360" height="360" aria-label="Derivasyon değerleri"></canvas>
-          <p class="muted not">Aynı vektör, 12 farklı bakış açısı. Çubuk: o derivasyonun çizeceği değer (mV).</p>
-        </div>
       </section>
     </section>
   </main>
 
-  <footer class="foot">
-    <p><b>Eğitim amaçlıdır, tanı için kullanılamaz.</b> Basitleştirilmiş bir modeldir: kalp tek bir elektrik vektörü olarak ele alınır; elektrot yerleşimleri şematiktir.</p>
-  </footer>
 
   <script type="module" src="derivasyon.js"></script>
 </body>

@@ -34,8 +34,8 @@
   // Tek kaynak: ana sayfa kartları, menü ve arama bu listeyi kullanır
   const KONU_LISTESI = [
     { id: 'bt', ad: 'BT', href: 'bt.html', ozet: 'Toraks, abdomen-pelvis ve kraniyal BT; normal ve patolojik vakalar, Türkçe etiketli yapılar, sınav modu.' },
-    { id: 'lapa', ad: 'Laparoskopi', href: 'laparoskopi.html', ozet: 'Ameliyat adıyla kayıtlı laparoskopik ve robotik görüntülerde anatomi; video ve kare modu.' },
-    { id: 'ekg', ad: 'EKG', href: 'ekg.html', ozet: '3B kalpte uyarı iletimi, 12 derivasyon ve miyokard infarktüsü; parametreyi değiştirin, sınanın.' },
+    { id: 'lapa', ad: 'Laparoskopi', href: 'laparoskopi.html', ozet: 'Ameliyat adıyla kayıtlı laparoskopik ve robotik görüntülerde anatomi; video modu.' },
+    { id: 'ekg', ad: 'EKG', href: 'ekg.html', ozet: '3B kalpte uyarı iletimi, 12 derivasyon ve miyokard infarktüsü; parametreyi değiştirin.' },
     { id: 'gorme', ad: 'Görme', href: 'gorme.html', ozet: 'Lezyonu yerleştirin; görme alanı, V1 haritası ve pupilla yanıtı hesaplanır. Göz hastalıklarında görüntü.' },
     { id: 'araclar', ad: 'Araçlar', href: 'araclar.html', ozet: 'Vizit notu, devir listesi, tahlil takibi: günlük klinik iş için küçük yardımcılar.' },
   ];

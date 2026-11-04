@@ -8,7 +8,7 @@ Gerçek bir abdomen-pelvis BT'si üzerinde Türkçe etiketli, tarayıcıda çal�
 |---|---|
 | `docs/index.html`, `docs/home.js`, `docs/home.css` | Ana sayfa: konu kartları (BT, Laparoskopi, EKG, Görme yolları, Araçlar; kullanıcı "ne çalışacağını" seçer) ve son eklenenler (`pano/pano.json`). Konu listesi `shell.js` içindeki `KONU_LISTESI`'nde |
 | `docs/bt.html`, `docs/bt.js` | BT listesi: tek vaka listesi, bölge (abdomen/toraks/kraniyal) ve tür (normal/patoloji) filtreleri; durum `#b=…&t=…` (`data/cases.json`) |
-| `docs/laparoskopi.html`, `docs/laparoskopi.js`, `docs/vaka-kart.js` | Ameliyat listesi (`data/lapa_cases.json`); video varsa `lapav.html`, yoksa `lapa.html`. `vaka-kart.js` BT ve laparoskopi kartının ortak modülü |
+| `docs/laparoskopi.html`, `docs/laparoskopi.js`, `docs/vaka-kart.js` | Ameliyat listesi (`data/lapa_cases.json`); hazır ameliyatlar `lapav.html`'de (video modu) açılır. `vaka-kart.js` BT ve laparoskopi kartının ortak modülü |
 | `docs/atlaslar.html`, `docs/sim.html` | Yalnızca eski bağlantıları yeni yerlerine yönlendiren saplamalar |
 | `docs/araclar.html`, `docs/sim.html`, `docs/araclar.js` | Araç ve simülasyon listeleri; `pano/araclar.json`, `pano/simulasyon.json` (`grup` alanı başlığı belirler) |
 | `docs/shell.js`, `docs/shell.css` | Her sayfada üst menü, konum izi, arama düğmesi, EKG sayfaları arası sekmeler, kalıcı site alt bilgisi (sayfadaki `footer.foot` notları oraya taşınır) ve bölüm renkleri (`<html data-bolum>`: Atlaslar mavi, Simülasyon sarı, Araçlar kırmızı) |
@@ -20,11 +20,11 @@ Gerçek bir abdomen-pelvis BT'si üzerinde Türkçe etiketli, tarayıcıda çal�
 | `docs/premium.css`, `docs/ui.js`, `docs/atlas-ui.js` | Tüm sayfalarda son yüklenen görünüm katmanı (koyu/açık tema, `data-theme`); `ui.js` SVG ikonlar (`UI.icon`) ve tema anahtarı, `atlas-ui.js` atlasta odak modu, alt gezinme çubuğu ve kaydırıcı balonu |
 | `docs/sw.js` | Servis çalışanı: `?v=` sürümlü `.bin.gz` hacimlerini önbelleğe alır; veri değişince `atlas.json`'daki `v` değişir |
 | `docs/app.js` | Tüm uygulama: veri yükleme (`load`), kesit çizimi (`renderSlice`, `draw`), etiketler (`drawLabels`), olaylar (`bindEvents`), test modu (`quiz*`) |
-| `docs/lapa.html`, `docs/lapa.js`, `docs/lapa.css` | Laparoskopik atlas (prototip); durum `#c=vaka&f=kare&y=yapı`, "BT'de göster" → `atlas.html#c=s0139&y=…` |
+| `docs/lapa.css` | Laparoskopi video sayfasının (`lapav.html`) stili; kare atlası (`lapa.html`) kaldırıldı |
 | `docs/lapav.html`, `docs/lapav.js` | Laparoskopik video modu; video + üstte çokgen katmanı (`video.json`), durum `#c=vaka&t=sn&k=filtreler&y=yapı` |
 | `docs/data/<vaka>/`, `docs/data/cases.json` | Vaka başına üretilmiş web verisi (vakalar `CASES` sözlüğünde, `build_atlas.py`): `ct.bin.gz` (int16 HU), `labels.bin.gz` ve `overlay.bin.gz` (uint8), `atlas.json` |
 | `scripts/build_atlas.py` | Atlas üretimi; Türkçe adlar, renkler ve sistemler `BASE` sözlüğünde, segment notları `LIVER_SEGMENTS`'te |
-| `scripts/fetch_dsad.py`, `scripts/build_lapa.py` | DSAD karelerini indirir / laparoskopi web verisini üretir (`docs/data/lapa01/`, `docs/data/lapa_cases.json`, `docs/img/lapa01.jpg`); maskeler uint8 bit maskesi |
+| `scripts/fetch_dsad.py`, `scripts/build_lapa.py` | Kullanımda değil: kaldırılan DSAD kare atlasını üretirdi; çalıştırılırsa `lapa_cases.json`a rektum kaydını geri yazar |
 | `scripts/build_lapa_video.py` | Açık lisanslı videodan klip + SAM 2 kare kare izleme → `docs/data/lapav01/` (`video.mp4`, `video.json`, `poster.jpg`); istem noktaları `CASES[...]["prompts"]` |
 | `scripts/fetch_case.py` | TotalSegmentator veri setinden tek vaka indirir |
 | `data/segments/` | Karaciğer segment maskeleri (NIfTI) |

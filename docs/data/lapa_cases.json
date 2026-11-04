@@ -1,15 +1,5 @@
 [
  {
-  "id": "lapa01",
-  "title": "Robotik rektum cerrahisi · üst batın görüntüleri",
-  "eyebrow": "LAPAROSKOPİ · ROBOTİK",
-  "text": "Mide, karaciğer, kolon, pankreas ve ince bağırsak; splenik fleksura mobilizasyonu sırasında üst batın.",
-  "img": "img/lapa01.jpg",
-  "frames": 17,
-  "n": 7,
-  "status": "ready"
- },
- {
   "id": "lapav01",
   "title": "Safra kesesi torsiyonu · laparoskopik kolesistektomi",
   "eyebrow": "LAPAROSKOPİ · VİDEO",

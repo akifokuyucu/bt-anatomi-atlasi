@@ -3,7 +3,6 @@
 import { vakaKarti, iskelet } from './vaka-kart.js';
 
 const kutu = document.getElementById('cases-bt');
-const not = document.getElementById('bt-not');
 kutu.innerHTML = iskelet(3);
 
 const duz = (t) => String(t || '').toLocaleLowerCase('tr');
@@ -41,13 +40,16 @@ function ciz() {
   const liste = vakalar.filter((c) => (!durum.b || bolgeDe(c) === durum.b) && (!durum.t || turDe(c) === durum.t));
   kutu.innerHTML = '';
   if (!liste.length) kutu.innerHTML = '<p class="muted">Bu filtreyle vaka yok. Filtreyi gevşetin.</p>';
-  liste.forEach((c) => kutu.appendChild(vakaKarti(
-    c,
-    (v) => `atlas.html#c=${encodeURIComponent(v.id)}`,
-    (v) => [`${v.n} yapı`, `${v.mm} mm kesit`],
-    turDe(c) === 'patoloji' ? ['Patoloji', 'bad'] : ['Normal', 'ok'],
-  )));
-  if (not) not.hidden = !liste.some((c) => turDe(c) === 'patoloji');
+  liste.forEach((c) => {
+    const kart = vakaKarti(
+      c,
+      (v) => `atlas.html#c=${encodeURIComponent(v.id)}`,
+      (v) => [`${v.n} yapı`, `${v.mm} mm kesit`],
+      turDe(c) === 'patoloji' ? ['Patoloji', 'bad'] : ['Normal', 'ok'],
+    );
+    kart.classList.add(`tur-${turDe(c)}`); // çerçeve rengi: normal yeşil, patoloji kırmızı (shell.css)
+    kutu.appendChild(kart);
+  });
 }
 
 document.querySelectorAll('.filtre').forEach((g) => {
@@ -70,29 +72,4 @@ addEventListener('hashchange', () => { hashOku(); ciz(); });
   } catch {
     kutu.innerHTML = '<p class="muted">Vakalar yüklenemedi. Sayfayı yenileyin.</p>';
   }
-})();
-
-// Karşılaştırma sürgüsü: sahnede sürükleme veya klavye için alttaki aralık kutusu
-(() => {
-  const sahne = document.getElementById('kiyas-sahne');
-  const surgu = document.getElementById('kiyas-surgu');
-  if (!sahne || !surgu) return;
-  const ayarla = (y) => {
-    const k = Math.min(100, Math.max(0, y));
-    sahne.style.setProperty('--k', `${k}%`);
-    surgu.value = String(k);
-  };
-  surgu.addEventListener('input', () => ayarla(+surgu.value));
-  const sur = (e) => { const r = sahne.getBoundingClientRect(); ayarla(((e.clientX - r.left) / r.width) * 100); };
-  sahne.addEventListener('pointerdown', (e) => {
-    if (e.pointerType === 'mouse' && e.button) return;
-    sahne.setPointerCapture(e.pointerId);
-    sur(e);
-    const git = (ev) => sur(ev);
-    const bit = () => { sahne.removeEventListener('pointermove', git); sahne.removeEventListener('pointerup', bit); sahne.removeEventListener('pointercancel', bit); };
-    sahne.addEventListener('pointermove', git);
-    sahne.addEventListener('pointerup', bit);
-    sahne.addEventListener('pointercancel', bit);
-  });
-  ayarla(50);
 })();

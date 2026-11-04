@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#08090c">
   <title>EKG Miyokard İnfarktüsü · Simülasyon · Klinik Atlas</title>
-  <meta name="description" content="Sık görülen MI türlerini (anteroseptal, geniş ön, lateral, inferior, posterior, sağ ventrikül) 12 derivasyonlu EKG'de ve 3B kalpte inceleyin; hiperakut T'den kronik Q dalgasına evrimi izleyin, kendinizi sınayın.">
+  <meta name="description" content="Sık görülen MI türlerini (anteroseptal, geniş ön, lateral, inferior, posterior, sağ ventrikül) 12 derivasyonlu EKG'de ve 3B kalpte inceleyin; hiperakut T'den kronik Q dalgasına evrimi izleyin.">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -52,19 +52,6 @@
 
     <section class="sag">
       <section class="card">
-        <div class="mi-ust">
-          <div class="seg" id="mod" role="group" aria-label="Çalışma biçimi">
-            <button type="button" data-m="incele" class="on">İncele</button>
-            <button type="button" data-m="sinav">Sınav</button>
-          </div>
-          <label class="alan">Hasta
-            <select id="hasta" class="select" aria-label="V2–V3 ST eşiği için hasta">
-              <option value="e40">Erkek ≥ 40 yaş</option>
-              <option value="e39">Erkek &lt; 40 yaş</option>
-              <option value="k">Kadın</option>
-            </select>
-          </label>
-        </div>
         <div class="caption" id="b-etiket">İNFARKT BÖLGESİ</div>
         <div class="leadler" id="bolgeler" role="group" aria-label="İnfarkt bölgesi"></div>
         <div class="caption">EVRE</div>
@@ -73,11 +60,6 @@
         <div class="satir-btn mi-secenek">
           <label class="toggle"><input type="checkbox" id="t-ek"> Ek derivasyonlar (V4R, V7–V9)</label>
           <label class="toggle"><input type="checkbox" id="t-ipucu" checked> Bölge ipucu (renkli çerçeve)</label>
-        </div>
-        <div class="soru" id="soru" hidden>
-          <p class="soru-metin" id="s-metin">Bu EKG hangi bölgedeki infarkta ait? Yukarıdaki bölge düğmelerinden birini seçin.</p>
-          <p class="sonuc" id="s-sonuc" hidden></p>
-          <div class="satir-btn"><button class="btn accent" type="button" id="s-sonraki">Yeni soru</button><span class="muted" id="s-skor"></span></div>
         </div>
       </section>
 

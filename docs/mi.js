@@ -1,5 +1,5 @@
 // EKG: miyokard infarktüsü. Bölge ve evre seçilince 12 derivasyonlu sentetik EKG (ekg-model.js'te infarkt vektörleri),
-// ST ölçümü, ölçüt denetimi ve 3B kalpte infarkt alanı gösterilir. Sınav kipinde bölgeyi tahmin edersiniz.
+// ST ölçümü, ölçüt denetimi ve 3B kalpte infarkt alanı gösterilir.
 import { DERIVASYONLAR, RITIMLER, AtimAkisi, vektor, nokta } from './ekg-model.js';
 
 const $ = (id) => document.getElementById(id);
@@ -34,7 +34,7 @@ const EK = [
 ];
 const KOMSU = [['II', 'III'], ['II', 'aVF'], ['aVF', 'III'], ['I', 'aVL'], ['V1', 'V2'], ['V2', 'V3'], ['V3', 'V4'], ['V4', 'V5'], ['V5', 'V6'], ['V7', 'V8'], ['V8', 'V9']];
 
-const durum = { bolge: 'inf', evre: 2, mod: 'incele', hasta: 'e40', ek: false, ipucu: true, lead: 'III', gizli: false, cevaplandi: true, skor: [0, 0], hedef: null };
+const durum = { bolge: 'inf', evre: 2, hasta: 'e40', ek: false, ipucu: true, lead: 'III' };
 let statik, canli, kalp = null, T = 0, olc = {};
 
 // --- Bağlantıdan durum ----------------------------------------------------------
@@ -84,7 +84,6 @@ $('bolgeler').innerHTML = Object.entries(BOLGELER).map(([k, v]) => `<button type
 $('evreler').innerHTML = EVRELER.map((v, i) => `<button type="button" class="lchip" data-e="${i}">${v.ad}</button>`).join('');
 $('bolgeler').addEventListener('click', (e) => { const b = e.target.closest('[data-b]'); if (b) bolgeSec(b.dataset.b); });
 $('evreler').addEventListener('click', (e) => { const b = e.target.closest('[data-e]'); if (b) { durum.evre = +b.dataset.e; guncelle(); } });
-$('hasta').addEventListener('change', (e) => { durum.hasta = e.target.value; ciz(); });
 $('t-ek').addEventListener('change', (e) => { durum.ek = e.target.checked; ekGoster(); ciz(); });
 $('t-ipucu').addEventListener('change', (e) => { durum.ipucu = e.target.checked; ciz(); });
 $('gorunum').addEventListener('click', (e) => {
@@ -92,47 +91,13 @@ $('gorunum').addEventListener('click', (e) => {
   $('gorunum').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
   kalp && kalp.gorunum(b.dataset.g);
 });
-$('mod').addEventListener('click', (e) => {
-  const b = e.target.closest('button'); if (!b) return;
-  $('mod').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
-  durum.mod = b.dataset.m;
-  if (durum.mod === 'sinav') yeniSoru(); else { durum.gizli = false; durum.cevaplandi = true; $('soru').hidden = true; guncelle(); }
-});
-
 function bolgeSec(k) {
-  if (durum.mod === 'sinav' && durum.gizli) { cevapla(k); return; }
-  durum.bolge = k; durum.hedef = null;
+  durum.bolge = k;
   durum.lead = BOLGELER[k].ilk;
   kalp && kalp.gorunum(BOLGELER[k].bak);
   $('gorunum').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x.dataset.g === BOLGELER[k].bak));
   guncelle();
 }
-
-// --- Sınav ---------------------------------------------------------------------
-function yeniSoru() {
-  const k = Object.keys(BOLGELER);
-  durum.bolge = k[Math.floor(Math.random() * k.length)];
-  durum.evre = [2, 2, 2, 3][Math.floor(Math.random() * 4)];
-  durum.lead = BOLGELER[durum.bolge].ilk;
-  durum.gizli = true; durum.cevaplandi = false;
-  $('soru').hidden = false; $('s-sonuc').hidden = true;
-  $('s-skor').textContent = `Doğru: ${durum.skor[0]} / ${durum.skor[1]}`;
-  $('bolgeler').querySelectorAll('button').forEach((b) => b.classList.remove('dogru', 'yanlis'));
-  guncelle();
-}
-function cevapla(k) {
-  if (durum.cevaplandi) return;
-  durum.cevaplandi = true; durum.gizli = false;
-  const dogru = k === durum.bolge;
-  durum.skor[1]++; if (dogru) durum.skor[0]++;
-  $('bolgeler').querySelectorAll('button').forEach((b) => { if (b.dataset.b === durum.bolge) b.classList.add('dogru'); else if (b.dataset.b === k) b.classList.add('yanlis'); });
-  $('s-sonuc').hidden = false;
-  const b = BOLGELER[durum.bolge];
-  $('s-sonuc').innerHTML = `${dogru ? '✓ Doğru.' : '✗ Yanlış.'} Bu EKG <b>${b.ad}</b> infarkta ait (${EVRELER[durum.evre].ad}): ${b.gor}. ${b.resip}`;
-  $('s-skor').textContent = `Doğru: ${durum.skor[0]} / ${durum.skor[1]}`;
-  guncelle();
-}
-$('s-sonraki').addEventListener('click', yeniSoru);
 
 // --- Çizim ---------------------------------------------------------------------
 let renk = {};
@@ -199,7 +164,6 @@ function ekGoster() { $('ek-izgara').hidden = !durum.ek; }
 
 function ciz() {
   hashYaz();
-  const gizli = durum.gizli;
   const tum = [...DERIVASYONLAR, ...EK];
   document.querySelectorAll('.mi-strip').forEach((el) => {
     const d = tum.find((x) => x.id === el.dataset.l);
@@ -207,8 +171,8 @@ function ciz() {
     serit(el.querySelector('canvas'), d, false);
     const s = leadDurum(d), rz = el.querySelector('.rozet');
     rz.textContent = `ST ${fmt(s.o.st)}${s.o.q ? ' · Q' : ''}${s.o.rs ? ' · R>S' : ''}`;
-    el.classList.toggle('yuk', durum.ipucu && !gizli && s.yuk);
-    el.classList.toggle('cok', durum.ipucu && !gizli && s.cok && !s.yuk);
+    el.classList.toggle('yuk', durum.ipucu && s.yuk);
+    el.classList.toggle('cok', durum.ipucu && s.cok && !s.yuk);
     el.classList.toggle('sec', d.id === durum.lead);
   });
   const d = tum.find((x) => x.id === durum.lead), s = leadDurum(d);
@@ -220,7 +184,6 @@ function ciz() {
 
 function ozetle() {
   const el = $('ozet'), olcut = $('olcut');
-  if (durum.gizli) { el.innerHTML = '<span class="muted">Ölçüt özeti, cevaptan sonra görünür.</span>'; olcut.innerHTML = '<li class="muted">Sınav sürüyor.</li>'; return; }
   const yuk = new Set(), tum = [...DERIVASYONLAR, ...(durum.ek ? EK : [])];
   tum.forEach((d) => { if (leadDurum(d).yuk) yuk.add(d.id); });
   const cift = KOMSU.filter(([a, b]) => yuk.has(a) && yuk.has(b));
@@ -244,19 +207,18 @@ function ozetle() {
 }
 function bilgi() {
   const k = $('bolge-kart');
-  k.hidden = durum.gizli;
   const b = BOLGELER[durum.bolge], E = EVRELER[durum.evre];
   $('b-damar').textContent = ('Suçlu damar: ' + b.damar).toUpperCase();
   $('b-ad').textContent = `${b.ad} · ${E.ad}`;
   $('b-metin').textContent = `${b.metin} Yükselme: ${b.gor}. ${b.resip}`;
-  document.querySelectorAll('#bolgeler .lchip').forEach((x) => x.classList.toggle('on', !durum.gizli && x.dataset.b === durum.bolge));
-  document.querySelectorAll('#evreler .lchip').forEach((x) => { x.classList.toggle('on', +x.dataset.e === durum.evre); x.disabled = durum.gizli; });
-  $('evre-not').textContent = durum.gizli ? '' : `${E.ad}${E.zaman ? ' · ' + E.zaman : ''}: ${E.metin}`;
-  $('sahne-not').textContent = durum.gizli ? 'Bölge sınav bitince 3B kalpte görünür.' : 'Koyu bölge infarkt alanıdır: ölü doku depolarize olmaz, bu yüzden uyarı geldiğinde sarı yanmaz.';
+  document.querySelectorAll('#bolgeler .lchip').forEach((x) => x.classList.toggle('on', x.dataset.b === durum.bolge));
+  document.querySelectorAll('#evreler .lchip').forEach((x) => x.classList.toggle('on', +x.dataset.e === durum.evre));
+  $('evre-not').textContent = `${E.ad}${E.zaman ? ' · ' + E.zaman : ''}: ${E.metin}`;
+  $('sahne-not').textContent = 'Koyu bölge infarkt alanıdır: ölü doku depolarize olmaz, bu yüzden uyarı geldiğinde sarı yanmaz.';
 }
 function sahneGuncelle() {
   if (!kalp) return;
-  const sid = durum.gizli ? 0 : SIDDET[durum.evre];
+  const sid = SIDDET[durum.evre];
   kalp.infarkt(durum.bolge, sid, durum.evre === 4 ? '#e2dac8' : '#9577cc');
 }
 function guncelle() { kur(); ciz(); }

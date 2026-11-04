@@ -64,19 +64,6 @@ body.focus .sitenav { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .hero-3d { transition: none; } }
 
-/* Normal ↔ patoloji karşılaştırma sürgüsü (atlaslar.html) */
-.kiyas { margin: 0 0 22px; display: grid; gap: 10px; max-width: 760px; }
-.kiyas figcaption { display: grid; gap: 2px; }
-.kiyas-sahne { --k: 50%; position: relative; aspect-ratio: 640 / 468; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: #000; touch-action: pan-y; cursor: ew-resize; user-select: none; -webkit-user-select: none; }
-.kiyas-sahne img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-.kiyas-ust { clip-path: inset(0 0 0 var(--k)); }
-.kiyas-cizgi { position: absolute; top: 0; bottom: 0; left: var(--k); width: 2px; margin-left: -1px; background: var(--accent); box-shadow: 0 0 0 1px rgba(0, 0, 0, .35); pointer-events: none; }
-.kiyas-cizgi::after { content: "◂ ▸"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); min-width: 44px; height: 30px; border-radius: 15px; display: grid; place-items: center; background: var(--accent); color: #1b1304; font-size: 11px; white-space: nowrap; }
-.kiyas-etiket { position: absolute; top: 12px; font: 11px var(--mono); letter-spacing: .08em; padding: 3px 10px; border-radius: 999px; background: rgba(0, 0, 0, .66); color: #fff; pointer-events: none; }
-.kiyas-etiket.sol { left: 12px; }
-.kiyas-etiket.sag { right: 12px; }
-.kiyas-surgu { width: 100%; accent-color: var(--accent); min-height: 32px; }
-.kiyas-not { margin: 0; font-size: 12.5px; }
 .hero.portal .cta { margin-top: 4px; }
 .hero.portal .ipucu { margin: 14px 0 0; max-width: 52ch; color: var(--muted); font-size: 13.5px; }
 .hero-stats { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 30px 0 0; padding: 0; list-style: none; color: var(--muted); font-size: 13px; }
@@ -353,3 +340,9 @@ body.focus .site-foot { display: none; }
   .hero.portal h1 { font-size: 28px; }
   .hero.portal .lead { font-size: 15px; }
 }
+
+/* BT listesi: normal vakaların çerçevesi yeşil, patolojilerin kırmızı */
+.case.tur-normal { border-color: color-mix(in srgb, var(--ok) 65%, var(--line)); }
+.case.tur-patoloji { border-color: color-mix(in srgb, var(--bad) 65%, var(--line)); }
+.case.tur-normal:not(.planned):hover { border-color: var(--ok); }
+.case.tur-patoloji:not(.planned):hover { border-color: var(--bad); }

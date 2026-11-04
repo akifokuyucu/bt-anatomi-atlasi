@@ -9,7 +9,7 @@ const SAYFALAR = [
   ['BT atlası', 'Toraks, abdomen-pelvis ve kraniyal BT; normal ve patolojik vakalar', 'bt.html'],
   ['Araçlar', 'Klinik çalışmada işe yarayan küçük araçlar', 'araclar.html'],
   ['EKG', '3B kalpte uyarı iletimi ve 12 derivasyonlu EKG; ritim, PR, QRS ve eksen ayarı', 'ekg.html'],
-  ['EKG derivasyonları', 'Derivasyon bir kameradır: 3B kalpte bakış açısı, kalp vektörü ve sınav', 'derivasyon.html'],
+  ['EKG derivasyonları', 'Derivasyon bir kameradır: 3B kalpte bakış açısı, kalp vektörü', 'derivasyon.html'],
   ['EKG miyokard infarktüsü', 'STEMI bölgeleri: anteroseptal, ön, lateral, inferior, posterior, sağ ventrikül; ST yükselmesi ve evrim', 'mi.html'],
   ['Görme yolları', '3B görme yollarında lezyon: bitemporal, homonim hemianopi, kadranopi, makula korunması, RAPD ve V1 haritası', 'gorme.html'],
   ['Göz ve görüntü', 'Miyopi, hipermetropi, astigmatizma, presbiyopi, katarakt, makula, diyabetik retinopati ve renk körlüğünde görüntü', 'gorme-goz.html'],
@@ -26,7 +26,7 @@ async function kayitlariYukle() {
   ]);
   const k = SAYFALAR.map(([ad, alt, href]) => ({ grup: 'Sayfa', ad, alt, href }));
   bt.filter((c) => c.status === 'ready').forEach((c) => k.push({ grup: c.category === 'patoloji' ? 'Patoloji BT' : 'Normal BT', ad: c.title, alt: `${c.eyebrow} · ${c.n} yapı`, href: `atlas.html#c=${encodeURIComponent(c.id)}` }));
-  lap.filter((c) => c.status === 'ready').forEach((c) => k.push({ grup: 'Laparoskopi', ad: c.title, alt: c.text || c.eyebrow, href: `${c.page || 'lapa.html'}#c=${encodeURIComponent(c.id)}` }));
+  lap.filter((c) => c.status === 'ready').forEach((c) => k.push({ grup: 'Laparoskopi', ad: c.title, alt: c.text || c.eyebrow, href: `${c.page || 'lapav.html'}#c=${encodeURIComponent(c.id)}` }));
   araclar.forEach((t) => k.push({ grup: 'Araç', ad: t.ad, alt: t.aciklama || '', href: t.url }));
   pano.forEach((p) => k.push({ grup: 'Yenilik', ad: p.baslik, alt: p.ozet || '', href: p.url, dis: /^https?:/i.test(p.url) }));
   return k.map((x) => ({ ...x, kok: duz(`${x.ad} ${x.alt} ${x.grup}`) }));

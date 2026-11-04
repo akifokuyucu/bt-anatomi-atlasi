@@ -2,7 +2,7 @@
   {
     "ad": "EKG",
     "grup": "Kardiyoloji",
-    "aciklama": "3B kalpte uyarının yayılışını, 12 derivasyonlu EKG'yi ve miyokard infarktüsünün bölge bölge bulgularını birlikte izleyin; parametreleri değiştirin, sınavla pekiştirin.",
+    "aciklama": "3B kalpte uyarının yayılışını, 12 derivasyonlu EKG'yi ve miyokard infarktüsünün bölge bölge bulgularını birlikte izleyin; parametreleri değiştirin.",
     "bolumler": [
       "Ritim ve iletim",
       "Derivasyonlar",

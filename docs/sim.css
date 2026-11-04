@@ -80,29 +80,15 @@ body.sahne-acik { overflow: hidden; }
 .drv .grup-baslik { margin-top: 2px; }
 .drv .leadler { display: flex; gap: 6px; flex-wrap: wrap; }
 .drv .strip { height: 200px; }
-.drv .strip-gizli { position: absolute; inset: 0; display: grid; place-content: center; color: var(--muted); font-size: 13px; background: var(--panel-2); }
-.drv .strip-gizli[hidden] { display: none; }
 .drv .satir-btn { display: flex; gap: 8px; flex-wrap: wrap; }
 .drv [data-panel] { display: grid; gap: 10px; }
 .drv [data-panel][hidden] { display: none; }
-.drv .soru { display: grid; gap: 10px; }
-.drv .soru-metin { margin: 0; font-size: 14.5px; }
-.drv .sonuc { margin: 0; padding: 10px 12px; border: 1px solid var(--line-hi); border-radius: 10px; background: var(--panel-2); font-size: 13.5px; line-height: 1.5; }
-.drv .btn.dogru { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 25%, transparent); }
-.drv .btn.yanlis { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 25%, transparent); }
-.drv .btn[disabled] { opacity: .8; cursor: default; }
-.drv .eksen-kart canvas, .drv #cubuk { width: 100%; height: auto; aspect-ratio: 1; display: block; max-width: 380px; margin: 0 auto; cursor: default; }
-.drv #cubuk { cursor: pointer; }
 .drv-etiket { background: rgba(10, 12, 15, .8); }
 .drv-etiket.sec { background: var(--accent); color: #1a1405; border-color: var(--accent); }
-.drv .strip-kap[hidden] { display: none; }
 
 /* MI sayfası */
 .mi .leadler { display: flex; gap: 6px; flex-wrap: wrap; }
 .mi .lchip[disabled] { opacity: .5; cursor: default; }
-.mi .lchip.dogru { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 28%, transparent); color: var(--text); }
-.mi .lchip.yanlis { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 28%, transparent); color: var(--text); }
-.mi-ust { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
 .mi-secenek { display: flex; gap: 14px; flex-wrap: wrap; }
 .mi-izgara { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, auto); grid-auto-flow: column; gap: 6px; }
 .mi-ek { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
@@ -124,11 +110,6 @@ body.sahne-acik { overflow: hidden; }
 .mi-aciklama .k-cok { border-color: #5b9bff; }
 .mi-buyuk { position: relative; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); overflow: hidden; }
 .mi-buyuk canvas { display: block; width: 100%; }
-.mi .soru { display: grid; gap: 10px; }
-.mi .soru[hidden] { display: none; }
-.mi .soru-metin { margin: 0; font-size: 14.5px; }
-.mi .sonuc { margin: 0; padding: 10px 12px; border: 1px solid var(--line-hi); border-radius: 10px; background: var(--panel-2); font-size: 13.5px; line-height: 1.5; }
-.mi .sonuc[hidden] { display: none; }
 @media (max-width: 700px) {
   .mi-izgara { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-auto-flow: row; }
   .mi-ek { grid-template-columns: repeat(2, minmax(0, 1fr)); }

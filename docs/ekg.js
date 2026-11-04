@@ -305,6 +305,37 @@ function eksenSinifi(a) {
   return 'normal';
 }
 
+// "Şimdi" kutusu: faz metinleri farklı uzunlukta olduğundan kutu her fazda büyüyüp küçülür ve altındaki her şeyi
+// oynatır (telefonda belirgin). Tüm metinler (sinüs ve AF) bir ölçüm kopyasında denenir, kutu en uzununa sabitlenir.
+function fazYuksekligiSabitle() {
+  const kutu = $('faz');
+  const metinler = new Map();
+  for (const ritim of ['sinus', 'af']) {
+    if (!RITIMLER[ritim]) continue;
+    const ak = new AtimAkisi({ ritim, ...RITIMLER[ritim] }, 0);
+    const b = ak.atimlar[Math.min(2, ak.atimlar.length - 1)];
+    for (let t = b.t0 - 100; t < b.t0 + 2500; t += 5) { const f = faz(b, t); metinler.set(f.ad + f.metin, f); }
+  }
+  const olc = kutu.cloneNode(true);
+  olc.removeAttribute('id'); olc.querySelectorAll('[id]').forEach((e) => e.removeAttribute('id'));
+  olc.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;min-height:0;width:${kutu.offsetWidth}px`;
+  kutu.parentNode.appendChild(olc);
+  let en = 0;
+  for (const f of metinler.values()) {
+    olc.querySelector('b').textContent = f.ad;
+    olc.querySelector('p').textContent = f.metin;
+    en = Math.max(en, olc.offsetHeight);
+  }
+  olc.remove();
+  if (en) kutu.style.minHeight = en + 'px';
+}
+let fazGenislik = 0;
+new ResizeObserver(() => {
+  const w = $('faz').offsetWidth;
+  if (w && w !== fazGenislik) { fazGenislik = w; fazYuksekligiSabitle(); }
+}).observe($('faz'));
+document.fonts?.ready.then(() => fazYuksekligiSabitle());
+
 let son = performance.now(), sayac = 0;
 function kare(now) {
   const dt = Math.min(100, now - son); son = now;

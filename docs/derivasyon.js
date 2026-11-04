@@ -1,5 +1,5 @@
 // EKG derivasyonları: her derivasyon kalbe farklı bir açıdan bakan bir kameradır.
-// 3B sahne (ekg-heart.js) + kalp vektörü modeli (ekg-model.js); canlı atım, serbest vektör ve sınav kipleri.
+// 3B sahne (ekg-heart.js) + kalp vektörü modeli (ekg-model.js); canlı atım.
 import { DERIVASYONLAR, RITIMLER, AtimAkisi, vektor, nokta } from './ekg-model.js';
 
 const $ = (id) => document.getElementById(id);
@@ -21,12 +21,10 @@ const BILGI = {
   V6: { kutup: 'V4 düzeyinde, orta aksiller hat', bolge: 'Lateral duvar', metin: 'Kalbe soldan, yatay düzlemde bakar. Septal depolarizasyon ondan uzaklaştığı için küçük septal q görülebilir.' },
 };
 
-const durum = { lead: 'II', mod: 'canli', kamera: 'serbest', hiz: 1, calisiyor: true, isin: true, iz: true, p: { ritim: 'sinus', ...RITIMLER.sinus }, soru: null, skor: [0, 0] };
+const durum = { lead: 'II', kamera: 'serbest', hiz: 1, calisiyor: true, isin: true, iz: true, p: { ritim: 'sinus', ...RITIMLER.sinus } };
 let T = 0;
 let akis = new AtimAkisi(durum.p, T);
 let kalp = null;
-let manuel = [0, 0, 0];
-let cevaplandi = false;
 
 const lead = (id) => DERIVASYONLAR.find((d) => d.id === id);
 const gogus = (id) => id.startsWith('V');
@@ -45,7 +43,6 @@ function seg(id, attr, fn) {
 }
 seg('hiz', 'h', (v) => { durum.hiz = +v; });
 seg('kamera', 'k', (v) => { durum.kamera = v; sahneGuncelle(); kameraUygula(); });
-seg('mod', 'm', (v) => modUygula(v));
 $('t-isin').addEventListener('change', (e) => { durum.isin = e.target.checked; sahneGuncelle(); });
 $('t-vektor').addEventListener('change', (e) => kalp && kalp.vektoruAyarla(e.target.checked));
 $('t-iz').addEventListener('change', (e) => { durum.iz = e.target.checked; sahneGuncelle(); });
@@ -62,81 +59,11 @@ $('gez').addEventListener('input', (e) => {
   const a = b.t0 - 60, z = b.q0 + b.qt + 160;
   T = a + (e.target.value / 1000) * (z - a);
 });
-function manuelGuncelle() {
-  const th = (+$('a-aci').value * Math.PI) / 180, ph = (+$('a-on').value * Math.PI) / 180, M = (1.2 * +$('a-buy').value) / 100;
-  manuel = [M * Math.cos(ph) * Math.cos(th), M * Math.cos(ph) * Math.sin(th), M * Math.sin(ph)];
-  $('s-aci').textContent = $('a-aci').value + '°';
-  $('s-on').textContent = ($('a-on').value > 0 ? 'öne ' : $('a-on').value < 0 ? 'arkaya ' : '') + Math.abs($('a-on').value) + '°';
-  $('s-buy').textContent = (M).toFixed(2) + ' mV';
+function sifirla() {
+  durum.p = { ritim: 'sinus', ...RITIMLER.sinus, eksen: +$('a-eksen').value };
+  akis.kur(durum.p, T);
+  durum.calisiyor = true; oynatDugme();
 }
-for (const id of ['a-aci', 'a-on', 'a-buy']) $(id).addEventListener('input', manuelGuncelle);
-document.querySelectorAll('[data-on]').forEach((b) => b.addEventListener('click', () => {
-  const [a, o] = b.dataset.on.split(',');
-  $('a-aci').value = a; $('a-on').value = o; $('a-buy').value = 100; manuelGuncelle();
-}));
-
-function modUygula(m) {
-  durum.mod = m;
-  $('mod').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x.dataset.m === m));
-  document.querySelectorAll('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== m; });
-  $('iz-kap').hidden = m === 'serbest';
-  if (m === 'sinav') { yeniSoru(); }
-  else if (m === 'canli') { durum.p = { ritim: 'sinus', ...RITIMLER.sinus, eksen: +$('a-eksen').value }; akis.kur(durum.p, T); durum.calisiyor = true; oynatDugme(); $('iz-gizli').hidden = true; cevaplandi = true; }
-  if (m === 'serbest') manuelGuncelle();
-}
-
-// --- Sınav ----------------------------------------------------------------------
-const FAZLAR = [
-  { id: 'P', ad: 'P dalgasının tepesinde (atriyal depolarizasyon)', zaman: (b) => b.t0 + b.pw * 0.52 },
-  { id: 'QRS', ad: 'QRS\'in ortasında (ventriküler depolarizasyon)', zaman: (b) => b.q0 + 0.42 * b.W },
-  { id: 'T', ad: 'T dalgasının tepesinde (ventriküler repolarizasyon)', zaman: (b) => b.tc },
-];
-function siniflandir(v, d) {
-  const n = Math.hypot(...v) || 1;
-  const u = (v[0] * d.yon[0] + v[1] * d.yon[1] + v[2] * d.yon[2]) / n;
-  return { u, sinif: u > 0.25 ? 'poz' : u < -0.25 ? 'neg' : 'duz' };
-}
-function yeniSoru() {
-  const eksenler = [-30, 0, 30, 55, 75, 100];
-  for (let deneme = 0; deneme < 30; deneme++) {
-    const d = DERIVASYONLAR[Math.floor(Math.random() * 12)];
-    const f = FAZLAR[Math.floor(Math.random() * 3)];
-    durum.p = { ritim: 'sinus', ...RITIMLER.sinus, eksen: eksenler[Math.floor(Math.random() * eksenler.length)] };
-    akis.kur(durum.p, T);
-    const b = akis.atimlar[akis.atimBul(T) + 1];
-    const t = f.zaman(b);
-    const v = vektor(akis, t);
-    const s = siniflandir(v, d);
-    if (Math.abs(s.u) < 0.12 || Math.abs(s.u) > 0.4) { durum.soru = { d, f, t, v, ...s }; break; }
-  }
-  const q = durum.soru;
-  leadSec(q.d.id);
-  T = q.t; durum.calisiyor = false; oynatDugme();
-  cevaplandi = false;
-  $('iz-gizli').hidden = false;
-  $('s-metin').innerHTML = `Kalp vektörü şu anda <b>${q.f.ad}</b>. <b>${q.d.id}</b> derivasyonunda çizgi nasıl sapar? <span class="muted">(QRS ekseni ${durum.p.eksen}°)</span>`;
-  $('s-sonuc').hidden = true;
-  $('s-sec').querySelectorAll('button').forEach((b) => { b.disabled = false; b.classList.remove('dogru', 'yanlis'); });
-  $('s-skor').textContent = `Doğru: ${durum.skor[0]} / ${durum.skor[1]}`;
-}
-$('s-sec').addEventListener('click', (e) => {
-  const b = e.target.closest('button'); if (!b || cevaplandi) return;
-  cevaplandi = true;
-  const q = durum.soru, dogru = b.dataset.c === q.sinif;
-  durum.skor[1]++; if (dogru) durum.skor[0]++;
-  $('s-sec').querySelectorAll('button').forEach((x) => { x.disabled = true; if (x.dataset.c === q.sinif) x.classList.add('dogru'); });
-  if (!dogru) b.classList.add('yanlis');
-  const aci = Math.round((Math.acos(Math.max(-1, Math.min(1, q.u))) * 180) / Math.PI);
-  const ad = { poz: 'yukarı', neg: 'aşağı', duz: 'düz ya da iki fazlı' }[q.sinif];
-  const neden = q.sinif === 'poz' ? 'Vektör derivasyonun kamerasına doğru gidiyor (açı 90°\'den küçük).' : q.sinif === 'neg' ? 'Vektör kameradan uzaklaşıyor (açı 90°\'den büyük).' : 'Vektör kameranın bakışına neredeyse dik; çizgi çok az sapar.';
-  $('s-sonuc').hidden = false;
-  $('s-sonuc').innerHTML = `${dogru ? '✓ Doğru.' : '✗ Yanlış.'} Çizgi <b>${ad}</b> sapar. Vektör ile ${q.d.id} ekseni arasındaki açı yaklaşık <b>${aci}°</b>. ${neden}`;
-  $('s-skor').textContent = `Doğru: ${durum.skor[0]} / ${durum.skor[1]}`;
-  $('iz-gizli').hidden = true;
-  T = q.t - 500; durum.hiz = 0.5; durum.calisiyor = true; oynatDugme();
-  $('hiz').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x.dataset.h === '0.5'));
-});
-$('s-sonraki').addEventListener('click', yeniSoru);
 
 // --- 3B nesneler: elektrotlar, ışınlar, koni, gölge -------------------------------
 let nesne = null;
@@ -258,7 +185,6 @@ function izCiz(vs) {
   }
   c.globalAlpha = 1;
   c.strokeStyle = renk.sus; c.setLineDash([3, 4]); c.beginPath(); c.moveTo(0, taban); c.lineTo(w, taban); c.stroke(); c.setLineDash([]);
-  if (durum.mod === 'sinav' && !cevaplandi) return;
   const simdi = w * IZ_ORAN, ni = Math.round(IZ_ORAN * (N - 1));
   const ciz = (a, z, al) => {
     c.globalAlpha = al; c.strokeStyle = renk.iz; c.lineWidth = 2.2; c.lineJoin = 'round'; c.beginPath();
@@ -276,57 +202,6 @@ function izCiz(vs) {
   c.fillText(`${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)} mV`, w - 10, 18);
 }
 
-function diyagramCiz(vek) {
-  const [c, w] = tuval($('eksen'), true);
-  const d = lead(durum.lead), yatay = gogus(d.id);
-  const cx = w / 2, R = w * 0.38, olcek = R / 1.4;
-  const P = (v) => (yatay ? [v[0], -v[2]] : [v[0], v[1]]);
-  c.lineWidth = 1; c.strokeStyle = renk.cizgi; c.beginPath(); c.arc(cx, cx, R, 0, 7); c.stroke();
-  c.font = '600 12px Inter, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
-  for (const l of DERIVASYONLAR.filter((x) => gogus(x.id) === yatay)) {
-    const [dx, dy] = P(l.yon), n = Math.hypot(dx, dy) || 1, ux = dx / n, uy = dy / n, s = l.id === d.id;
-    c.strokeStyle = s ? renk.vurgu : renk.sus; c.globalAlpha = s ? 1 : 0.5; c.lineWidth = s ? 2 : 1;
-    c.beginPath(); c.moveTo(cx - ux * R, cx - uy * R); c.lineTo(cx + ux * R, cx + uy * R); c.stroke();
-    c.fillStyle = s ? renk.vurgu : renk.sus; c.globalAlpha = s ? 1 : 0.85; c.fillText(l.id, cx + ux * (R + 17), cx + uy * (R + 17));
-  }
-  c.globalAlpha = 1;
-  const [vx, vy] = P(vek), tx = cx + vx * olcek, ty = cx + vy * olcek;
-  const [dx, dy] = P(d.yon), dn = Math.hypot(dx, dy) || 1, ux = dx / dn, uy = dy / dn, iz = vx * ux + vy * uy;
-  c.strokeStyle = iz >= 0 ? renk.iz : renk.kotu; c.lineWidth = 4; c.beginPath(); c.moveTo(cx, cx); c.lineTo(cx + ux * iz * olcek, cx + uy * iz * olcek); c.stroke();
-  c.setLineDash([4, 4]); c.lineWidth = 1; c.strokeStyle = renk.sus; c.beginPath(); c.moveTo(tx, ty); c.lineTo(cx + ux * iz * olcek, cx + uy * iz * olcek); c.stroke(); c.setLineDash([]);
-  const L = Math.hypot(vx, vy);
-  if (L > 0.02) {
-    c.strokeStyle = c.fillStyle = '#2fe0c8'; c.lineWidth = 2.5; c.beginPath(); c.moveTo(cx, cx); c.lineTo(tx, ty); c.stroke();
-    const a = Math.atan2(ty - cx, tx - cx);
-    c.beginPath(); c.moveTo(tx, ty); c.lineTo(tx - 9 * Math.cos(a - 0.4), ty - 9 * Math.sin(a - 0.4)); c.lineTo(tx - 9 * Math.cos(a + 0.4), ty - 9 * Math.sin(a + 0.4)); c.closePath(); c.fill();
-  }
-  c.fillStyle = renk.sus; c.font = '500 11px Inter, sans-serif'; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-  c.fillText(yatay ? 'Yatay düzlem (üstten bakış)' : 'Frontal düzlem', 8, 14);
-  if (yatay) { c.textAlign = 'center'; c.fillText('ön', cx, w - 4); }
-  $('d-baslik').textContent = yatay ? 'Yatay düzlem' : 'Frontal düzlem';
-  const va = (Math.atan2(vy, vx) * 180) / Math.PI, la = (Math.atan2(dy, dx) * 180) / Math.PI;
-  const fark = Math.round(Math.abs(((va - la + 540) % 360) - 180));
-  $('d-not').textContent = L > 0.06 ? `Vektör ${Math.round(va)}°, ${d.id} ekseni ${Math.round(la)}°: aradaki açı ${fark}° → ${fark < 80 ? 'kameraya doğru, yukarı' : fark > 100 ? 'kameradan uzağa, aşağı' : 'yaklaşık dik, düz'}.` : 'Vektör şu anda çok küçük (izoelektrik).';
-}
-
-function cubukCiz(vek) {
-  const [c, w, h] = tuval($('cubuk'), true);
-  const sat = h / 12, orta = w * 0.55, olcek = (w * 0.38) / 1.8;
-  c.font = '600 12px Inter, sans-serif'; c.textBaseline = 'middle';
-  DERIVASYONLAR.forEach((d, i) => {
-    const y = i * sat + sat / 2, v = nokta(vek, d), sec = d.id === durum.lead;
-    if (sec) { c.fillStyle = renk.vurgu; c.globalAlpha = 0.12; c.fillRect(0, i * sat, w, sat); c.globalAlpha = 1; }
-    c.fillStyle = sec ? renk.vurgu : renk.sus; c.textAlign = 'left'; c.fillText(d.id, 8, y);
-    c.fillStyle = v >= 0 ? renk.iz : renk.kotu; c.fillRect(Math.min(orta, orta + v * olcek), y - sat * 0.28, Math.abs(v * olcek), sat * 0.56);
-    c.fillStyle = renk.sus; c.textAlign = 'right'; c.font = '500 11px "JetBrains Mono", ui-monospace, monospace'; c.fillText(`${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}`, w - 6, y); c.font = '600 12px Inter, sans-serif';
-  });
-  c.strokeStyle = renk.sus; c.globalAlpha = 0.6; c.beginPath(); c.moveTo(orta, 0); c.lineTo(orta, h); c.stroke(); c.globalAlpha = 1;
-}
-$('cubuk').addEventListener('click', (e) => {
-  const r = e.currentTarget.getBoundingClientRect();
-  leadSec(DERIVASYONLAR[Math.max(0, Math.min(11, Math.floor(((e.clientY - r.top) / r.height) * 12)))].id);
-});
-
 function etiketleriKonumla() {
   if (!nesne) return;
   const { cam, THREE } = kalp, k = $('sahne'), w = k.clientWidth, h = k.clientHeight, v = new THREE.Vector3();
@@ -343,19 +218,16 @@ function etiketleriKonumla() {
 let son = performance.now(), sayac = 0;
 function kare(now) {
   const dt = Math.min(100, now - son); son = now;
-  if (durum.mod !== 'serbest' && durum.calisiyor) T += dt * durum.hiz;
+  if (durum.calisiyor) T += dt * durum.hiz;
   akis.uret(T);
   if (sayac++ % 20 === 0) renkleriOku();
   const d = lead(durum.lead);
-  const vek = durum.mod === 'serbest' ? manuel : vektor(akis, T);
+  const vek = vektor(akis, T);
   const vs = new Float32Array(N * 3);
-  if (durum.mod !== 'serbest') for (let i = 0; i < N; i++) { const v = vektor(akis, T - IZ_PENCERE * IZ_ORAN + (i / (N - 1)) * IZ_PENCERE); vs[i * 3] = v[0]; vs[i * 3 + 1] = v[1]; vs[i * 3 + 2] = v[2]; }
-  if (durum.mod !== 'serbest') izCiz(vs);
-  diyagramCiz(vek); cubukCiz(vek);
+  for (let i = 0; i < N; i++) { const v = vektor(akis, T - IZ_PENCERE * IZ_ORAN + (i / (N - 1)) * IZ_PENCERE); vs[i * 3] = v[0]; vs[i * 3 + 1] = v[1]; vs[i * 3 + 2] = v[2]; }
+  izCiz(vs);
   if (kalp) {
-    const b = akis.atimlar[akis.atimBul(T)];
-    const bosT = b.tc + 3.2 * b.tsig + 60;
-    kalp.guncelle(durum.mod === 'serbest' ? bosT : T, akis, vek);
+    kalp.guncelle(T, akis, vek);
     if (nesne) {
       const u = nokta(vek, { yon: d.yon, kaz: 1 });
       const dir = nesne.girdiler.find((x) => x.d.id === d.id).dir;
@@ -367,19 +239,18 @@ function kare(now) {
       etiketleriKonumla();
     }
   }
-  if (durum.mod === 'canli') {
+  if (durum.calisiyor) {
     const b = akis.atimlar[akis.atimBul(T)], a = b.t0 - 60, z = b.q0 + b.qt + 160;
-    if (durum.calisiyor) $('gez').value = Math.max(0, Math.min(1000, ((T - a) / (z - a)) * 1000));
+    $('gez').value = Math.max(0, Math.min(1000, ((T - a) / (z - a)) * 1000));
   }
   requestAnimationFrame(kare);
 }
 
 // --- Başlat ---------------------------------------------------------------------
 $('v-eksen').textContent = durum.p.eksen + '°';
-manuelGuncelle();
 renkleriOku();
 leadSec('II');
-modUygula('canli');
+sifirla();
 oynatDugme();
 requestAnimationFrame(kare);
 
