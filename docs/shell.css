@@ -346,3 +346,7 @@ body.focus .site-foot { display: none; }
 .case.tur-patoloji { border-color: color-mix(in srgb, var(--bad) 65%, var(--line)); }
 .case.tur-normal:not(.planned):hover { border-color: var(--ok); }
 .case.tur-patoloji:not(.planned):hover { border-color: var(--bad); }
+
+/* Hazırlanıyor kartları: kapak siyah beyaz ve soluk, henüz oluşmadığı belli olsun */
+.case.planned img { filter: grayscale(1) contrast(.92) brightness(.9); opacity: .8; }
+.case.planned img.yuklendi { opacity: .8; }
