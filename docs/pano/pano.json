@@ -14,7 +14,7 @@
     "tur": "duyuru",
     "baslik": "Site yeniden düzenlendi",
     "ozet": "Menü üç başlığa indi: Atlaslar, Simülasyon ve Araçlar. Ana sayfada 3B kalp, normal-patoloji karşılaştırma sürgüsü ve geçiş perdesi eklendi.",
-    "url": "atlaslar.html",
+    "url": "bt.html",
     "kaynak": "Klinik Atlas",
     "tarih": "2026-11-01",
     "branslar": ["Radyoloji", "Genel cerrahi", "Kardiyoloji"]
@@ -44,7 +44,7 @@
     "tur": "duyuru",
     "baslik": "Laparoskopi video modu yayında",
     "ozet": "Ameliyat videosu düz akar; filtreye basınca organlar ve aletler videonun üzerine gelir.",
-    "url": "atlaslar.html#laparoskopi",
+    "url": "laparoskopi.html",
     "kaynak": "Klinik Atlas",
     "tarih": "2026-10-20",
     "branslar": ["Genel cerrahi"]

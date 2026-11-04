@@ -11,19 +11,37 @@
   const sayfa = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   const anaSayfa = sayfa === 'index.html';
   // Hangi menü öğesi bu sayfaya ait
-  const bolum =
+  // Menü konuya göre: kullanıcı "ne çalışacağını" seçer (BT, EKG…); içerik türü (atlas/simülasyon/araç) sorulmaz.
+  const konu =
     anaSayfa ? '' :
     /^(araclar|devir|tahlil|form)\.html$/.test(sayfa) ? 'araclar' :
-    /^(atlaslar|atlas|lapa|lapav)\.html$/.test(sayfa) ? 'atlaslar' :
-    /^(sim|ekg|derivasyon|mi|gorme|gorme-goz)\.html$/.test(sayfa) ? 'simulasyon' : '';
+    /^(bt|atlas|atlaslar)\.html$/.test(sayfa) ? 'bt' :
+    /^(laparoskopi|lapa|lapav)\.html$/.test(sayfa) ? 'lapa' :
+    /^(ekg|derivasyon|mi|sim)\.html$/.test(sayfa) ? 'ekg' :
+    /^(gorme|gorme-goz)\.html$/.test(sayfa) ? 'gorme' : '';
+  // Renk ailesi (shell.css): görüntü atlasları mavi, simülasyonlar sarı, araçlar kırmızı
+  const bolum = { bt: 'atlaslar', lapa: 'atlaslar', ekg: 'simulasyon', gorme: 'simulasyon', araclar: 'araclar' }[konu] || '';
 
   if (bolum) document.documentElement.dataset.bolum = bolum; // renk teması (shell.css); sayfa başındaki satır içi betik aynısını ilk boyamadan önce yapar
 
-  const OGE = [
-    ['atlaslar', 'Atlaslar', 'atlaslar.html'],
-    ['simulasyon', 'Simülasyon', 'sim.html'],
-    ['araclar', 'Araçlar', 'araclar.html'],
+  const IC_KONU = {
+    bt: IC.atlaslar,
+    lapa: ico('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/>'),
+    ekg: IC.simulasyon,
+    gorme: ico('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+    araclar: IC.araclar,
+  };
+  // Tek kaynak: ana sayfa kartları, menü ve arama bu listeyi kullanır
+  const KONU_LISTESI = [
+    { id: 'bt', ad: 'BT', href: 'bt.html', ozet: 'Toraks, abdomen-pelvis ve kraniyal BT; normal ve patolojik vakalar, Türkçe etiketli yapılar, sınav modu.' },
+    { id: 'lapa', ad: 'Laparoskopi', href: 'laparoskopi.html', ozet: 'Ameliyat adıyla kayıtlı laparoskopik ve robotik görüntülerde anatomi; video ve kare modu.' },
+    { id: 'ekg', ad: 'EKG', href: 'ekg.html', ozet: '3B kalpte uyarı iletimi, 12 derivasyon ve miyokard infarktüsü; parametreyi değiştirin, sınanın.' },
+    { id: 'gorme', ad: 'Görme', href: 'gorme.html', ozet: 'Lezyonu yerleştirin; görme alanı, V1 haritası ve pupilla yanıtı hesaplanır. Göz hastalıklarında görüntü.' },
+    { id: 'araclar', ad: 'Araçlar', href: 'araclar.html', ozet: 'Vizit notu, devir listesi, tahlil takibi: günlük klinik iş için küçük yardımcılar.' },
   ];
+  window.KONU_LISTESI = KONU_LISTESI;
+  const OGE = KONU_LISTESI.map((k) => [k.id, k.ad, k.href]);
+  const IC_OGE = IC_KONU;
 
   // Tek konunun bölümleri: aynı konunun sayfaları arasında sekme çubuğu
   const KONULAR = [
@@ -39,11 +57,13 @@
         '<span class="logo" aria-hidden="true">◐</span><span class="sn-ad">Klinik Atlas</span></a>' +
       '<nav class="sn-links" aria-label="Ana menü">' +
         OGE.map(([id, ad, href]) =>
-          `<a class="sn-link" href="${href}" data-sn="${id}"${bolum === id ? ' aria-current="page"' : ''}>${IC[id]}<span>${ad}</span></a>`).join('') +
+          `<a class="sn-link" href="${href}" data-sn="${id}"${konu === id ? ' aria-current="page"' : ''}>${IC_OGE[id]}<span>${ad}</span></a>`).join('') +
       '</nav>' +
       '<div class="top-actions sn-actions"></div>' +
     '</div>';
   document.body.prepend(nav);
+  // Telefonda menü yana kayar: etkin konu görünür alana getirilir
+  nav.querySelector('.sn-link[aria-current]')?.scrollIntoView({ inline: 'center', block: 'nearest' });
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').catch(() => { /* önbelleksiz de çalışır */ });
   }

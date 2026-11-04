@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="premium.css">
   <link rel="stylesheet" href="shell.css">
-  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){};(function(){var p=location.pathname.split("/").pop(),b=/^(atlaslar|atlas|lapa|lapav)\.html$/.test(p)?"atlaslar":/^(sim|ekg|derivasyon|mi)\.html$/.test(p)?"simulasyon":/^(araclar|devir|tahlil|form)\.html$/.test(p)?"araclar":"";if(b)document.documentElement.dataset.bolum=b})()</script>
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){};(function(){var p=location.pathname.split("/").pop(),b=/^(atlaslar|atlas|bt|laparoskopi|lapa|lapav)\.html$/.test(p)?"atlaslar":/^(sim|ekg|derivasyon|mi)\.html$/.test(p)?"simulasyon":/^(araclar|devir|tahlil|form)\.html$/.test(p)?"araclar":"";if(b)document.documentElement.dataset.bolum=b})()</script>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
   <script src="shell.js" defer></script>
   <script src="ui.js" defer></script>
@@ -34,9 +34,9 @@
     if (/(^#|&)(c|p|y)=/.test(location.hash)) location.replace('atlas.html' + location.hash);
     // Bölümler ana sayfadan taşındı; eski bağlantılar yeni yerlerine gitsin
     const eskiBolum = {
-      '#atlaslar': 'atlaslar.html', '#saglikli': 'atlaslar.html#saglikli', '#patoloji': 'atlaslar.html#patoloji',
-      '#laparoskopi': 'atlaslar.html#laparoskopi', '#ozellikler': 'atlaslar.html#ozellikler',
-      '#araclar': 'araclar.html', '#simulasyon': 'sim.html', '#pano': '#yenilikler',
+      '#atlaslar': 'bt.html', '#saglikli': 'bt.html#t=normal', '#patoloji': 'bt.html#t=patoloji',
+      '#laparoskopi': 'laparoskopi.html', '#ozellikler': 'bt.html',
+      '#araclar': 'araclar.html', '#simulasyon': 'ekg.html', '#pano': '#yenilikler',
     }[location.hash];
     if (eskiBolum) location.replace(eskiBolum);
   </script>
@@ -49,49 +49,43 @@
         <h1>Görüntü, fizyoloji ve günlük klinik işler tek yerde</h1>
         <p class="lead">Anatomiyi gerçek BT ve ameliyat görüntülerinde görün, fizyolojiyi simülasyonda deneyin, günlük notlarınızı araçlarla hazırlayın.</p>
         <div class="cta">
-          <a class="btn accent big" href="atlas.html#c=s0372">Bir BT vakasını aç</a>
+          <a class="btn accent big" href="bt.html">BT atlasını aç</a>
           <a class="btn big" href="ekg.html">EKG'yi dene</a>
         </div>
-        <p class="ipucu">Vakada bir yapıya dokunun: adı, hacmi ve komşulukları görünür. Kendinizi test etmek için sınav modu da var.</p>
-        <ul class="hero-stats" id="hero-stats" aria-label="Site özeti"></ul>
+        <p class="ipucu">Çalışmak istediğiniz konuyu seçin: BT, EKG, laparoskopi, görme yolları. Her konuda yapıya dokunup öğrenir, sınav modunda kendinizi test edersiniz.</p>
       </div>
       <!-- Süs amaçlı 3B kalp ve noise halkası (home-3d.js); WebGL yoksa boş kalır -->
       <div class="hero-3d" id="hero-3d" aria-hidden="true"></div>
     </section>
 
-    <nav class="kapilar" aria-label="Site bölümleri">
-      <div class="kapi k-atlas">
-        <a class="kapi-ana" href="atlaslar.html">
-          <b>Atlaslar</b>
-          <span class="muted">Gerçek görüntüde Türkçe etiketli anatomi.</span>
+    <nav class="konular" aria-label="Konular">
+      <h2 class="konular-bas">Ne çalışmak istiyorsunuz?</h2>
+      <div class="konu-izgara">
+        <a class="konu k-atlas" href="bt.html" data-konu="bt">
+          <b>BT</b>
+          <span class="muted">Toraks, abdomen-pelvis ve kraniyal BT; normal ve patolojik vakalar, Türkçe etiketli yapılar, sınav modu.</span>
+          <small class="konu-say"></small>
         </a>
-        <ul>
-          <li><a href="atlaslar.html#saglikli">Normal BT</a></li>
-          <li><a href="atlaslar.html#patoloji">Patoloji BT</a></li>
-          <li><a href="atlaslar.html#laparoskopi">Laparoskopi</a></li>
-        </ul>
-      </div>
-      <div class="kapi k-sim">
-        <a class="kapi-ana" href="sim.html">
-          <b>Simülasyon</b>
-          <span class="muted">Parametreyi değiştirin, sonucu hemen görün.</span>
+        <a class="konu k-atlas" href="laparoskopi.html" data-konu="lapa">
+          <b>Laparoskopi</b>
+          <span class="muted">Ameliyat adıyla kayıtlı laparoskopik ve robotik görüntülerde anatomi.</span>
+          <small class="konu-say"></small>
         </a>
-        <ul>
-          <li><a href="ekg.html">EKG: ritim ve iletim</a></li>
-          <li><a href="derivasyon.html">EKG: derivasyonlar</a></li>
-          <li><a href="mi.html">EKG: miyokard infarktüsü</a></li>
-        </ul>
-      </div>
-      <div class="kapi k-arac">
-        <a class="kapi-ana" href="araclar.html">
+        <a class="konu k-sim" href="ekg.html" data-konu="ekg">
+          <b>EKG</b>
+          <span class="muted">3B kalpte uyarı iletimi, 12 derivasyon ve miyokard infarktüsü; parametreyi değiştirin.</span>
+          <small class="konu-say"></small>
+        </a>
+        <a class="konu k-sim" href="gorme.html" data-konu="gorme">
+          <b>Görme yolları</b>
+          <span class="muted">Lezyonu yerleştirin; görme alanı, V1 haritası ve pupilla yanıtı hesaplanır.</span>
+          <small class="konu-say"></small>
+        </a>
+        <a class="konu k-arac" href="araclar.html" data-konu="araclar">
           <b>Araçlar</b>
-          <span class="muted">Günlük klinik iş için küçük yardımcılar.</span>
+          <span class="muted">Vizit notu, devir listesi, tahlil takibi: günlük klinik iş için küçük yardımcılar.</span>
+          <small class="konu-say"></small>
         </a>
-        <ul>
-          <li><a href="form.html#f=vizit">Vizit notu</a></li>
-          <li><a href="devir.html">Devir listesi</a></li>
-          <li><a href="tahlil.html">Tahlil takibi</a></li>
-        </ul>
       </div>
     </nav>
 

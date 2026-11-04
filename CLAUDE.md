@@ -6,8 +6,10 @@ Gerçek bir abdomen-pelvis BT'si üzerinde Türkçe etiketli, tarayıcıda çal�
 
 | Yol | İçerik |
 |---|---|
-| `docs/index.html`, `docs/home.js`, `docs/home.css` | Ana sayfa: üç bölüm kapısı (Atlaslar, Simülasyon, Araçlar) ve son eklenenler (`pano/pano.json`) |
-| `docs/atlaslar.html`, `docs/atlaslar.js` | Vaka listeleri: Normal BT, Patoloji BT, Laparoskopi sekmeleri (`data/cases.json`, `data/lapa_cases.json`) |
+| `docs/index.html`, `docs/home.js`, `docs/home.css` | Ana sayfa: konu kartları (BT, Laparoskopi, EKG, Görme yolları, Araçlar; kullanıcı "ne çalışacağını" seçer) ve son eklenenler (`pano/pano.json`). Konu listesi `shell.js` içindeki `KONU_LISTESI`'nde |
+| `docs/bt.html`, `docs/bt.js` | BT listesi: tek vaka listesi, bölge (abdomen/toraks/kraniyal) ve tür (normal/patoloji) filtreleri; durum `#b=…&t=…` (`data/cases.json`) |
+| `docs/laparoskopi.html`, `docs/laparoskopi.js`, `docs/vaka-kart.js` | Ameliyat listesi (`data/lapa_cases.json`); video varsa `lapav.html`, yoksa `lapa.html`. `vaka-kart.js` BT ve laparoskopi kartının ortak modülü |
+| `docs/atlaslar.html`, `docs/sim.html` | Yalnızca eski bağlantıları yeni yerlerine yönlendiren saplamalar |
 | `docs/araclar.html`, `docs/sim.html`, `docs/araclar.js` | Araç ve simülasyon listeleri; `pano/araclar.json`, `pano/simulasyon.json` (`grup` alanı başlığı belirler) |
 | `docs/shell.js`, `docs/shell.css` | Her sayfada üst menü, konum izi, arama düğmesi, EKG sayfaları arası sekmeler, kalıcı site alt bilgisi (sayfadaki `footer.foot` notları oraya taşınır) ve bölüm renkleri (`<html data-bolum>`: Atlaslar mavi, Simülasyon sarı, Araçlar kırmızı) |
 | `docs/kaynaklar.html` | Yararlanılan kaynaklar: veri seti, model ve yazılım atıflarının tek yeri. Yeni veri/kütüphane eklenince buraya yaz; sayfalara ayrıca atıf satırı koyma |

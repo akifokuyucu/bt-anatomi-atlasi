@@ -1,23 +1,20 @@
-// Ana sayfa: özet sayıları ve son eklenenler. Vaka kartları atlaslar.js, araç kartları araclar.js'dedir.
+// Ana sayfa: konu kartlarındaki sayılar ve son eklenenler. Vaka kartları bt.js ve laparoskopi.js, araç kartları araclar.js'dedir.
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const json = (u) => fetch(u, { cache: 'no-cache' }).then((r) => r.json());
 
-async function ozetiCiz() {
-  const ul = document.getElementById('hero-stats');
+// Konu kartlarının alt satırı: içerik sayıları (BT vakası, ameliyat, modül…)
+async function sayilariYaz() {
+  const yaz = (k, t) => { const el = document.querySelector(`[data-konu="${k}"] .konu-say`); if (el) el.textContent = t; };
   try {
     const [bt, lap, araclar, sim] = await Promise.all([json('data/cases.json'), json('data/lapa_cases.json'), json('pano/araclar.json'), json('pano/simulasyon.json')]);
     const hazir = (l) => l.filter((c) => c.status === 'ready').length;
-    const btN = hazir(bt), lapN = hazir(lap);
-    // Simülasyon modülü: bir kartın bölümleri ayrı modül sayılır (EKG: ritim, derivasyonlar, infarkt = 3)
-    const simN = sim.reduce((t, s) => t + ((s.bolumler || []).length || 1), 0);
-    const ogeler = [
-      { n: btN + lapN, t: 'atlas vakası', alt: `${btN} BT · ${lapN} laparoskopi`, renk: '--c-atlas', href: 'atlaslar.html' },
-      { n: simN, t: 'simülasyon modülü', renk: '--c-sim', href: 'sim.html' },
-      { n: araclar.length, t: 'klinik araç', renk: '--c-arac', href: 'araclar.html' },
-    ];
-    ul.innerHTML = ogeler.map((o) =>
-      `<li><a href="${o.href}" style="--c: var(${o.renk})"><b>${o.n}</b>${esc(o.t)}${o.alt ? `<small>${esc(o.alt)}</small>` : ''}</a></li>`).join('');
-  } catch { ul.hidden = true; }
+    const modul = (ad) => { const s = sim.find((x) => x.ad.startsWith(ad)); return s ? (s.bolumler || []).length || 1 : 0; };
+    yaz('bt', `${hazir(bt)} vaka`);
+    yaz('lapa', `${hazir(lap)} ameliyat`);
+    yaz('ekg', `${modul('EKG')} bölüm`);
+    yaz('gorme', `${modul('Görme')} bölüm`);
+    yaz('araclar', `${araclar.length} araç`);
+  } catch { /* sayılar olmadan da kartlar çalışır */ }
 }
 
 // Son eklenenler: pano/pano.json'daki en yeni kartlar
@@ -52,5 +49,5 @@ async function yenilikleriKur() {
   }
 }
 
-ozetiCiz();
+sayilariYaz();
 yenilikleriKur();

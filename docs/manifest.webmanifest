@@ -14,8 +14,9 @@
     { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Atlaslar", "url": "atlaslar.html" },
-    { "name": "Simülasyon", "url": "sim.html" },
+    { "name": "BT", "url": "bt.html" },
+    { "name": "Laparoskopi", "url": "laparoskopi.html" },
+    { "name": "EKG", "url": "ekg.html" },
     { "name": "Araçlar", "url": "araclar.html" }
   ]
 }

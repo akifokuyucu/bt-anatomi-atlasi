@@ -6,9 +6,8 @@ const duz = (t) => String(t || '').toLocaleLowerCase('tr').replace(/ı/g, 'i').r
 const json = (u) => fetch(u).then((r) => (r.ok ? r.json() : [])).catch(() => []);
 
 const SAYFALAR = [
-  ['Atlaslar', 'Gerçek görüntüde Türkçe etiketli anatomi', 'atlaslar.html'],
+  ['BT atlası', 'Toraks, abdomen-pelvis ve kraniyal BT; normal ve patolojik vakalar', 'bt.html'],
   ['Araçlar', 'Klinik çalışmada işe yarayan küçük araçlar', 'araclar.html'],
-  ['Simülasyon', 'Etkileşimli fizyoloji simülasyonları', 'sim.html'],
   ['EKG', '3B kalpte uyarı iletimi ve 12 derivasyonlu EKG; ritim, PR, QRS ve eksen ayarı', 'ekg.html'],
   ['EKG derivasyonları', 'Derivasyon bir kameradır: 3B kalpte bakış açısı, kalp vektörü ve sınav', 'derivasyon.html'],
   ['EKG miyokard infarktüsü', 'STEMI bölgeleri: anteroseptal, ön, lateral, inferior, posterior, sağ ventrikül; ST yükselmesi ve evrim', 'mi.html'],
@@ -16,9 +15,9 @@ const SAYFALAR = [
   ['Göz ve görüntü', 'Miyopi, hipermetropi, astigmatizma, presbiyopi, katarakt, makula, diyabetik retinopati ve renk körlüğünde görüntü', 'gorme-goz.html'],
   ['Yararlanılan kaynaklar', 'Veri setleri, 3B model ve yazılımlar; sahipleri ve lisanslarıyla', 'kaynaklar.html'],
   ['Gizlilik ve Kullanım Koşulları', 'Hangi veri işlenir, kullanım koşulları ve sorumluluk sınırları', 'gizlilik.html'],
-  ['Normal BT', 'Normal toraks, abdomen ve kraniyal BT', 'atlaslar.html#saglikli'],
-  ['Patoloji BT', 'Lezyonu işaretli vakalar, tanı kartı', 'atlaslar.html#patoloji'],
-  ['Laparoskopi', 'Ameliyat görüntüsünde anatomi', 'atlaslar.html#laparoskopi'],
+  ['Normal BT', 'Normal toraks, abdomen ve kraniyal BT', 'bt.html#t=normal'],
+  ['Patoloji BT', 'Lezyonu işaretli vakalar, tanı kartı', 'bt.html#t=patoloji'],
+  ['Laparoskopi', 'Ameliyat adıyla kayıtlı görüntülerde anatomi', 'laparoskopi.html'],
 ];
 
 async function kayitlariYukle() {
