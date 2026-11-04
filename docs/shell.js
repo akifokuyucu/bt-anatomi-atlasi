@@ -18,7 +18,7 @@
     /^(bt|atlas|atlaslar)\.html$/.test(sayfa) ? 'bt' :
     /^(laparoskopi|lapa|lapav)\.html$/.test(sayfa) ? 'lapa' :
     /^(ekg|derivasyon|mi|sim)\.html$/.test(sayfa) ? 'ekg' :
-    /^(gorme|gorme-goz)\.html$/.test(sayfa) ? 'gorme' : '';
+    /^(gorme|gorme-goz|gorme-pupil)\.html$/.test(sayfa) ? 'gorme' : '';
   // Renk ailesi (shell.css): görüntü atlasları mavi, simülasyonlar sarı, araçlar kırmızı
   const bolum = { bt: 'atlaslar', lapa: 'atlaslar', ekg: 'simulasyon', gorme: 'simulasyon', araclar: 'araclar' }[konu] || '';
 
@@ -36,7 +36,7 @@
     { id: 'bt', ad: 'BT', href: 'bt.html', ozet: 'Toraks, abdomen-pelvis ve kraniyal BT; normal ve patolojik vakalar, Türkçe etiketli yapılar, sınav modu.' },
     { id: 'lapa', ad: 'Laparoskopi', href: 'laparoskopi.html', ozet: 'Ameliyat adıyla kayıtlı laparoskopik ve robotik görüntülerde anatomi; video modu.' },
     { id: 'ekg', ad: 'EKG', href: 'ekg.html', ozet: '3B kalpte uyarı iletimi, 12 derivasyon ve miyokard infarktüsü; parametreyi değiştirin.' },
-    { id: 'gorme', ad: 'Görme', href: 'gorme.html', ozet: 'Lezyonu yerleştirin; görme alanı, V1 haritası ve pupilla yanıtı hesaplanır. Göz hastalıklarında görüntü.' },
+    { id: 'gorme', ad: 'Görme', href: 'gorme.html', ozet: 'Lezyonu yerleştirin; görme alanı hesaplanır; pupilla testi ve göz hastalıklarında görüntü ayrı sekmelerde.' },
     { id: 'araclar', ad: 'Araçlar', href: 'araclar.html', ozet: 'Vizit notu, devir listesi, tahlil takibi: günlük klinik iş için küçük yardımcılar.' },
   ];
   window.KONU_LISTESI = KONU_LISTESI;
@@ -46,7 +46,7 @@
   // Tek konunun bölümleri: aynı konunun sayfaları arasında sekme çubuğu
   const KONULAR = [
     ['EKG bölümleri', [['ekg.html', 'Ritim ve iletim'], ['derivasyon.html', 'Derivasyonlar'], ['mi.html', 'Miyokard infarktüsü']]],
-    ['Görme bölümleri', [['gorme.html', 'Yollar ve görme alanı'], ['gorme-goz.html', 'Göz ve görüntü']]],
+    ['Görme bölümleri', [['gorme.html', 'Yollar ve görme alanı'], ['gorme-pupil.html', 'Pupilla'], ['gorme-goz.html', 'Göz ve görüntü']]],
   ];
 
   const nav = document.createElement('header');

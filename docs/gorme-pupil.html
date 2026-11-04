@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08090c">
+  <title>Pupilla: Sallanan Işık Testi · Simülasyon · Klinik Atlas</title>
+  <meta name="description" content="Sallanan ışık testini canlı izleyin: görme yolundaki lezyona göre iki pupillanın ışık yanıtı ve RAPD (relatif afferent pupilla defekti) kesilen liflerden hesaplanır.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="sim.css">
+  <link rel="stylesheet" href="gorme.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="shell.css">
+  <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){};document.documentElement.dataset.bolum="simulasyon"</script>
+  <script src="shell.js" defer></script>
+  <script src="ui.js" defer></script>
+</head>
+<body>
+  <header class="topbar ctx">
+    <nav class="crumbs" data-crumbs="Klinik Atlas=index.html|Görme yolları=gorme.html|Pupilla"></nav>
+    <a class="btn" href="index.html"><span data-icon="chevron" style="transform:scaleX(-1);display:inline-flex"></span><span class="lbl"> Ana sayfa</span></a>
+  </header>
+
+  <main class="gy pup">
+    <section class="card gy-secim" aria-label="Lezyon seçimi">
+      <div class="gy-ust">
+        <span class="gy-etiket">Lezyon tarafı</span>
+        <div class="seg" id="taraf" role="group" aria-label="Lezyon tarafı">
+          <button type="button" data-t="1" class="on">Sol</button>
+          <button type="button" data-t="-1">Sağ</button>
+        </div>
+      </div>
+      <ol class="gy-duraklar" id="duraklar" aria-label="Görme yolu durakları"></ol>
+      <div class="gy-chipler" id="chipler" role="group" aria-label="Patoloji"></div>
+    </section>
+
+    <section class="card gy-pupil">
+      <h2>Sallanan ışık testi</h2>
+      <canvas id="pupil" aria-label="Sallanan ışık testinde iki pupilla"></canvas>
+      <div class="seg" id="isik" role="group" aria-label="Işık">
+        <button type="button" data-i="sallan" class="on">Sallanan</button>
+        <button type="button" data-i="sol">Sol göz</button>
+        <button type="button" data-i="sag">Sağ göz</button>
+        <button type="button" data-i="yok">Kapalı</button>
+      </div>
+      <p class="gy-rapd" id="rapd"></p>
+      <p class="muted not">Sallanan ışık testi: ışık gözler arasında 2–3 sn aralıkla gidip gelir. Normalde iki pupilla da ışığa aynı daralır. Afferent yolu zayıf olan göze geçince ışık yanıtı azalır ve her iki pupilla genişler (RAPD). Pupilla lifleri traktusun sonunda mezensefalona ayrıldığı için o noktadan sonraki lezyonlar (LGN, radyasyon, korteks) RAPD yapmaz.</p>
+    </section>
+
+    <section class="card gy-bilgi" id="bilgi">
+      <span class="caption" id="b-yer"></span>
+      <h2 id="b-ad"></h2>
+      <p id="b-ozet"></p>
+      <p class="muted not">Lezyonun 3B modelde yeri ve görme alanındaki bozulma için <a id="yol-baglanti" href="gorme.html">Yollar ve görme alanı</a> sekmesine geçin.</p>
+    </section>
+  </main>
+
+  <script type="module" src="gorme-pupil.js"></script>
+</body>
+</html>

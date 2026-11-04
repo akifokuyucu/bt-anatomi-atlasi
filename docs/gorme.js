@@ -1,6 +1,6 @@
-// Görme yolları simülasyonu: lezyon seçimi, görme alanları, birleşik görüş, V1 haritası, pupilla ve sınav.
+// Görme yolları simülasyonu: lezyon seçimi, görme alanları ve birleşik görüş. Pupilla testi gorme-pupil.js'tedir.
 // Durum bağlantıda: #p=patoloji&t=1|-1&k=boyut (serbest lezyonda &x=..&y=..&z=..)
-import { modelKur, PATOLOJI, EVRE_AD, HALKA, ACI_N, alanSiniri, korNokta, pupillaSurus } from './gorme-model.js';
+import { modelKur, PATOLOJI, EVRE_AD, HALKA, ACI_N, alanSiniri, korNokta } from './gorme-model.js';
 import { gormeSahnesi, KADRAN, kadranRenk } from './gorme-3d.js';
 
 const $ = (id) => document.getElementById(id);
@@ -10,7 +10,7 @@ const yan = (h) => (h > 0 ? 'sol' : 'sağ');
 const buyuk = (t) => t.charAt(0).toLocaleUpperCase('tr') + t.slice(1);
 const metin = (t, h) => buyuk(String(t).replaceAll('{L}', yan(h)).replaceAll('{K}', yan(-h)));
 
-const durum = { p: 'normal', t: 1, k: 1, serbest: null, yerlestir: false, sahne: 'yol', kapsam: 90, isik: 'sallan', sinav: false, durak: 'normal' };
+const durum = { p: 'normal', t: 1, k: 1, serbest: null, yerlestir: false, sahne: 'yol', kapsam: 90, durak: 'normal' };
 let model, sahne3b = null, sonuc = null, kureler = [], alanFn = null;
 
 // --- Sahneler: 180°×135° dünya tuvali (8 px/°) ---------------------------------------
@@ -236,134 +236,6 @@ function birlesikCiz() {
   ctx.fillStyle = '#ffd34d'; ctx.beginPath(); ctx.arc(w / 2, h / 2, 3 * (window.devicePixelRatio || 1), 0, 7); ctx.fill();
 }
 
-// --- V1 düz haritası: iki yarıküre, solda kutup -------------------------------------------
-function v1Ciz() {
-  const c = $('v1');
-  const { w, h, o } = olc(c);
-  const ctx = c.getContext('2d');
-  ctx.fillStyle = '#0c0e13'; ctx.fillRect(0, 0, w, h);
-  const NX = 110, NY = 46;
-  const im = new ImageData(NX, NY);
-  const k = document.createElement('canvas'); k.width = NX; k.height = NY;
-  const LN = Math.log(121);
-  const ciz = (hem, y0, yk) => {
-    const v = im.data; v.fill(0);
-    const rk = {};
-    for (const a of Object.keys(KADRAN)) { const s = KADRAN[a]; rk[a] = [parseInt(s.slice(1, 3), 16), parseInt(s.slice(3, 5), 16), parseInt(s.slice(5, 7), 16)]; }
-    for (let j = 0; j < NY; j++) {
-      for (let i = 0; i < NX; i++) {
-        const d = (i + .5) / NX;
-        const E = 0.75 * (Math.exp(d * LN) - 1);
-        const psi = (1 - (j + .5) / NY * 2) * Math.PI / 2; // üst satır = alt kıyı değil: üst kıyı alt alanı taşır
-        const fieldY = -Math.sin(psi) * E;                 // üstte alt alan
-        const x = hem * Math.cos(psi) * E, y = fieldY;
-        const a = (hem > 0 ? 's' : 'l') + (y >= 0 ? 'u' : 'a');
-        let hs = 0;
-        if (sonuc) {
-          const dA = model.hasarOku(sonuc.D, 0, x, y), dB = model.hasarOku(sonuc.D, 1, x, y);
-          const icA = E <= alanSiniri(1, x, y), icB = E <= alanSiniri(-1, x, y);
-          hs = icA && icB ? (dA + dB) / 2 : icA ? dA : dB;
-        }
-        const q = 4 * (j * NX + i);
-        const parlak = 0.55 + 0.45 * (1 - d);
-        const r = rk[a];
-        v[q] = (r[0] * parlak) * (1 - hs) + 20 * hs; v[q + 1] = (r[1] * parlak) * (1 - hs) + 6 * hs; v[q + 2] = (r[2] * parlak) * (1 - hs) + 10 * hs; v[q + 3] = 255;
-      }
-    }
-    k.getContext('2d').putImageData(im, 0, 0);
-    ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(k, 46 * o, y0, w - 56 * o, yk);
-  };
-  const ust = 18 * o, ara = 22 * o, alt = 20 * o;
-  const yk = (h - ust - ara - alt) / 2;
-  ciz(1, ust, yk);
-  ciz(-1, ust + yk + ara, yk);
-  ctx.font = `600 ${11 * o}px Inter, sans-serif`; ctx.fillStyle = '#dfe3ea'; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-  ctx.fillText('Sol V1 (sağ alan)', 46 * o, ust - 9 * o);
-  ctx.fillText('Sağ V1 (sol alan)', 46 * o, ust + yk + ara - 9 * o);
-  ctx.font = `${10 * o}px Inter, sans-serif`; ctx.fillStyle = '#a7aebb'; ctx.textAlign = 'right';
-  for (const y0 of [ust, ust + yk + ara]) {
-    ctx.fillText('Kuneus', 42 * o, y0 + yk * .22);
-    ctx.fillText('Lingual', 42 * o, y0 + yk * .78);
-    ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = o;
-    ctx.beginPath(); ctx.moveTo(46 * o, y0 + yk / 2); ctx.lineTo(w - 10 * o, y0 + yk / 2); ctx.stroke();
-  }
-  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-  for (const E of [1, 5, 10, 30, 60, 90]) {
-    const x = 46 * o + Math.log(1 + E / .75) / LN * (w - 56 * o);
-    ctx.fillStyle = '#a7aebb';
-    ctx.fillText(`${E}°`, Math.min(x, w - 14 * o), h - 5 * o);
-    ctx.strokeStyle = 'rgba(0,0,0,.4)'; ctx.beginPath();
-    for (const y0 of [ust, ust + yk + ara]) { ctx.moveTo(x, y0); ctx.lineTo(x, y0 + yk); }
-    ctx.stroke();
-  }
-}
-
-// --- Pupilla ------------------------------------------------------------------------------
-const pup = { cap: [6.4, 6.4], surus: [1, 1], t: 0, son: 0, gorunur: true, kaynak: -1 };
-function pupilCiz(now) {
-  requestAnimationFrame(pupilCiz);
-  if (!pup.gorunur || document.hidden) { pup.son = now; return; }
-  const dt = Math.min(.1, (now - (pup.son || now)) / 1000);
-  pup.son = now; pup.t += dt;
-  let kay = -1;
-  if (durum.isik === 'sol') kay = 0;
-  else if (durum.isik === 'sag') kay = 1;
-  else if (durum.isik === 'sallan') {
-    const f = (pup.t % 4.4) / 4.4;
-    kay = f < 0.42 ? 0 : f < 0.5 ? -2 : f < 0.92 ? 1 : -2; // -2: göz arası geçiş
-  }
-  const hedef = kay >= 0 ? 6.4 - 3.8 * pup.surus[kay] : kay === -2 ? pup.cap[0] : 6.4;
-  const hiz = kay >= 0 && hedef < pup.cap[0] ? 3.5 : 1.1;
-  pup.cap = pup.cap.map((v) => v + (hedef - v) * Math.min(1, dt * hiz));
-  const c = $('pupil');
-  const { w, h, o } = olc(c);
-  const ctx = c.getContext('2d');
-  ctx.clearRect(0, 0, w, h);
-  const Ry = h * .3, Rx = Ry * 1.75;
-  [[w * .27, 0], [w * .73, 1]].forEach(([x, g]) => {
-    const y = h * .47;
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(x - Rx, y); ctx.quadraticCurveTo(x, y - Ry * 1.55, x + Rx, y); ctx.quadraticCurveTo(x, y + Ry * 1.55, x - Rx, y);
-    ctx.fillStyle = '#ece8e0'; ctx.fill(); ctx.clip();
-    const ir = Ry * 1.02;
-    const gr = ctx.createRadialGradient(x, y, ir * .15, x, y, ir);
-    gr.addColorStop(0, '#6a8fa8'); gr.addColorStop(1, '#2f4a5e');
-    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, ir, 0, 7); ctx.fill();
-    ctx.fillStyle = '#04050a'; ctx.beginPath(); ctx.arc(x, y, ir * pup.cap[g] / 8.6, 0, 7); ctx.fill();
-    ctx.restore();
-    if (kay === g) {
-      ctx.fillStyle = 'rgba(255,240,160,.22)'; ctx.beginPath(); ctx.arc(x, y, Rx * 1.05, 0, 7); ctx.fill();
-      ctx.fillStyle = '#ffe98a'; ctx.beginPath(); ctx.arc(x + ir * .25, y - ir * .25, 3.2 * o, 0, 7); ctx.fill();
-    }
-    ctx.font = `600 ${11 * o}px Inter, sans-serif`; ctx.textAlign = 'center'; ctx.fillStyle = '#dfe3ea';
-    ctx.fillText(g ? 'Sağ göz' : 'Sol göz', x, h - 6 * o);
-    ctx.font = `${10 * o}px var(--mono, monospace)`; ctx.fillStyle = '#a7aebb';
-    ctx.fillText(`${pup.cap[g].toFixed(1)} mm`, x, 13 * o);
-  });
-}
-
-function rapdYaz() {
-  const yol = sonuc ? pupillaSurus(model, sonuc.Dp) : [1, 1];
-  pup.surus = yol;
-  const dif = yol[0] - yol[1];
-  const a = Math.abs(dif);
-  let t;
-  if (a < 0.05) {
-    t = yol[0] < 0.75
-      ? '<b>RAPD yok.</b> Afferent kayıp iki gözde simetrik; karşılaştırmalı test farkı göstermez, ama iki gözün ışık yanıtı azalmıştır.'
-      : sonuc && (kureler.length || alanFn) && durum.p !== 'normal' && yol[0] > 0.97
-        ? '<b>RAPD yok, pupillalar normal.</b> Pupilla lifleri traktusun sonunda mezensefalona ayrılır; bu lezyon o noktadan sonradır.'
-        : '<b>RAPD yok.</b> Dikkat: sürüş iki gözde birbirine yakın.';
-  } else {
-    const g = dif > 0 ? 'Sağ' : 'Sol';
-    const d = a < 0.2 ? 'hafif' : a < 0.5 ? 'orta' : 'belirgin';
-    t = `<b>${g} gözde ${d} RAPD.</b> Işık bu göze geçince iki pupilla da genişler, çünkü bu gözden gelen afferent sinyal daha zayıftır. Sürüş: sol %${Math.round(yol[0] * 100)}, sağ %${Math.round(yol[1] * 100)}.`;
-  }
-  $('rapd').innerHTML = t;
-}
-
 // --- Lezyon hesabı ---------------------------------------------------------------------------
 function patoloji(id) { return PATOLOJI.find((p) => p.id === id); }
 
@@ -375,12 +247,10 @@ function hesapla() {
   else if (p.alan) alanFn = p.alan(durum.t);
   if (durum.p === 'normal' && !durum.serbest) alanFn = null;
   sonuc = model.hesapla({ kureler, alan: alanFn });
-  const gizli = durum.sinav && !sinav.cevaplandi;
-  sahne3b?.lezyon(gizli ? { kureler: [], alanFn: null, sonuc: null } : { kureler, alanFn, sonuc });
+  sahne3b?.lezyon({ kureler, alanFn, sonuc });
   ciz();
-  rapdYaz();
   bilgi();
-  if (!durum.sinav) bagBaglantiya();
+  bagBaglantiya();
 }
 
 let cizBekliyor = false;
@@ -392,7 +262,6 @@ function ciz() {
     alanCiz($('alan-sol'), 0);
     alanCiz($('alan-sag'), 1);
     birlesikCiz();
-    v1Ciz();
   });
 }
 
@@ -405,7 +274,6 @@ function bilgi() {
   const tarafAnlamli = !serbest && p.tek;
   $('taraf').style.opacity = tarafAnlamli ? '' : '.4';
   $('taraf').querySelectorAll('button').forEach((b) => { b.disabled = !tarafAnlamli; b.classList.toggle('on', +b.dataset.t === durum.t); });
-  if (durum.sinav && !sinav.cevaplandi) return;
   const ad = serbest ? 'Serbest lezyon' : p.ad;
   $('alan-baslik').textContent = serbest ? serbestOzet() : metin(p.alan_ad, durum.t);
   $('b-yer').textContent = serbest ? 'SİZ YERLEŞTİRDİNİZ' : p.evre === 'normal' ? 'REFERANS' : EVRE_AD[p.evre].toLocaleUpperCase('tr');
@@ -457,13 +325,14 @@ function bagBaglantiya() {
   q.set('k', durum.k);
   if (durum.serbest) { q.set('x', durum.serbest[0].toFixed(1)); q.set('y', durum.serbest[1].toFixed(1)); q.set('z', durum.serbest[2].toFixed(1)); }
   history.replaceState(null, '', '#' + q);
+  $('pupil-link').href = 'gorme-pupil.html#' + q; // aynı lezyonla pupilla sayfasına geç
 }
 function baglantidanOku() {
   const q = new URLSearchParams(location.hash.slice(1));
   const p = q.get('p');
   if (q.has('t')) durum.t = +q.get('t') < 0 ? -1 : 1;
   if (q.has('k')) durum.k = Math.min(1.6, Math.max(.5, +q.get('k') || 1));
-  if (p === 'serbest' && q.has('x')) { durum.serbest = [+q.get('x'), +q.get('y'), +q.get('z')]; durum.p = 'normal'; }
+  if (p === 'serbest' && q.has('x')) { durum.serbest = [+q.get('x'), +q.get('y'), +q.get('z')]; durum.p = 'normal'; $('gelismis').open = true; }
   else if (patoloji(p)) durum.p = p;
   durum.durak = patoloji(durum.p).evre;
   $('boyut').value = durum.k;
@@ -530,62 +399,6 @@ function izBagla(c, g) {
   c.addEventListener('pointermove', (e) => { if (e.buttons || e.pointerType === 'mouse') oku(e); });
 }
 
-// --- Sınav -----------------------------------------------------------------------------------------
-const SORU_SET = PATOLOJI.filter((p) => !['normal', 'genis', 'binazal', 'lgn_ant'].includes(p.id));
-const YER = [['on', 'Kiazma öncesi'], ['kiazma', 'Kiazma'], ['traktus', 'Traktus'], ['lgn', 'LGN'], ['radyasyon', 'Radyasyon'], ['v1', 'Korteks']];
-const sinav = { soru: 0, dogru: 0, yer: null, yan: null, cevaplandi: false, p: null, t: 1 };
-const dogruYer = (p) => (p.evre === 'retina' || p.evre === 'sinir' ? 'on' : p.evre);
-const dogruYan = (p, t) => (p.tek ? t : 0);
-function soruAc() {
-  sinav.p = SORU_SET[Math.floor(Math.random() * SORU_SET.length)];
-  sinav.t = Math.random() < .5 ? 1 : -1;
-  sinav.yer = null; sinav.yan = null; sinav.cevaplandi = false;
-  durum.p = sinav.p.id; durum.t = sinav.t; durum.k = 1; durum.serbest = null;
-  $('s-durum').textContent = `Soru ${sinav.soru + 1} · Doğru: ${sinav.dogru}/${sinav.soru}. Alanları okuyun; yeri ve tarafı işaretleyin. Tek gözlü defektte taraf, hasta olan gözdür.`;
-  $('s-yer').innerHTML = YER.map(([id, ad]) => `<button type="button" class="gy-chip" data-y="${id}">${ad}</button>`).join('');
-  $('s-taraf').querySelectorAll('button').forEach((b) => b.classList.remove('on'));
-  $('s-cevap').hidden = false; $('s-cevap').disabled = true; $('s-sonraki').hidden = true;
-  $('s-sonuc').hidden = true;
-  hesapla();
-}
-function cevapHazir() { $('s-cevap').disabled = !(sinav.yer && sinav.yan !== null); }
-function sinavKur() {
-  $('s-yer').addEventListener('click', (e) => {
-    const b = e.target.closest('button'); if (!b || sinav.cevaplandi) return;
-    sinav.yer = b.dataset.y;
-    $('s-yer').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
-    cevapHazir();
-  });
-  segKur('s-taraf', 't', (v) => { sinav.yan = +v; cevapHazir(); });
-  $('s-cevap').addEventListener('click', () => {
-    sinav.cevaplandi = true; sinav.soru++;
-    const y = dogruYer(sinav.p), s = dogruYan(sinav.p, sinav.t);
-    const tamam = sinav.yer === y && sinav.yan === s;
-    if (tamam) sinav.dogru++;
-    $('s-yer').querySelectorAll('button').forEach((b) => {
-      if (b.dataset.y === y) b.classList.add('dogru');
-      else if (b.dataset.y === sinav.yer) b.classList.add('yanlis');
-    });
-    const yanYazi = s === 0 ? 'orta hat veya iki taraflı' : `${yan(s)} taraf`;
-    $('s-sonuc').hidden = false;
-    $('s-sonuc').innerHTML = `<b>${tamam ? 'Doğru.' : 'Tam değil.'}</b> ${esc(sinav.p.ad)} (${yanYazi}): ${esc(metin(sinav.p.alan_ad, sinav.t))}. ${esc(metin(sinav.p.ozet, sinav.t))}`;
-    $('s-cevap').hidden = true; $('s-sonraki').hidden = false;
-    $('s-durum').textContent = `${sinav.soru} soruda ${sinav.dogru} doğru.`;
-    $('bilgi').hidden = false;
-    hesapla();
-  });
-  $('s-sonraki').addEventListener('click', () => { $('bilgi').hidden = true; soruAc(); });
-}
-function modDegis(m) {
-  durum.sinav = m === 'sinav';
-  document.body.classList.toggle('gy-sinavda', durum.sinav);
-  $('sinav').hidden = !durum.sinav;
-  $('bilgi').hidden = durum.sinav;
-  if (durum.yerlestir) yerlestirmeModu(false);
-  if (durum.sinav) { $('alan-bilgi').hidden = true; soruAc(); }
-  else { $('alan-bilgi').hidden = false; durum.durak = patoloji(durum.p).evre; secimCiz(); hesapla(); }
-}
-
 // --- Serbest lezyon ------------------------------------------------------------------------------------
 function yerlestirmeModu(ac) {
   durum.yerlestir = ac;
@@ -593,6 +406,7 @@ function yerlestirmeModu(ac) {
   $('sahne').classList.toggle('yerlestir', ac);
   $('ipucu').hidden = !ac;
   sahne3b?.orbit(!ac);
+  if (ac) $('gelismis').open = true;
   if (ac && !durum.serbest) { durum.k = 1; $('boyut').value = 1; }
 }
 function sahneBagla() {
@@ -609,9 +423,17 @@ function sahneBagla() {
 }
 
 // --- Açılış -----------------------------------------------------------------------------------------------
+// Açılır menüler (Gelişmiş, Görünüm): dışına tıklayınca ya da Esc ile kapanır
+function menuleriKur() {
+  const menuler = [...document.querySelectorAll('details.gy-gorunum, details.gy-gelismis')];
+  document.addEventListener('pointerdown', (e) => { for (const m of menuler) if (m.open && !m.contains(e.target)) m.open = false; });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') for (const m of menuler) m.open = false; });
+}
+
 async function basla() {
   const meta = await fetch('data/optik/optik.json').then((r) => r.json());
   model = modelKur(meta);
+  menuleriKur();
   duraklariKur();
   baglantidanOku();
   secimCiz();
@@ -619,23 +441,17 @@ async function basla() {
     .map(([k, ad]) => `<span><i style="background:${KADRAN[k]}"></i>${ad}</span>`).join('') + '<span class="muted">Parlak: makula · Kırmızı: kesik lif</span>';
 
   segKur('taraf', 't', (v) => { durum.t = +v; hesapla(); });
-  segKur('mod', 'm', modDegis);
-  segKur('sahne-sec', 's', (v) => {
-    durum.sahne = v;
-    if (v === 'perimetri' && durum.kapsam === 90) { durum.kapsam = 30; $('kapsam').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.k === '30')); }
+  $('sahne-sec').addEventListener('change', (e) => {
+    const [sahne, kapsam] = e.target.value.split(':');
+    durum.sahne = sahne; durum.kapsam = +kapsam;
     ciz();
   });
-  segKur('kapsam', 'k', (v) => { durum.kapsam = +v; ciz(); });
-  segKur('isik', 'i', (v) => { durum.isik = v; pup.t = 0; });
   segKur('gorunum', 'g', (v) => sahne3b?.gorunum(v));
   $('boyut').addEventListener('input', () => { durum.k = +$('boyut').value; hesapla(); });
   $('serbest').addEventListener('click', () => yerlestirmeModu(!durum.yerlestir));
   izBagla($('alan-sol'), 0);
   izBagla($('alan-sag'), 1);
-  sinavKur();
   new ResizeObserver(() => ciz()).observe($('alan-sol'));
-  new IntersectionObserver(([g]) => { pup.gorunur = g.isIntersecting; }).observe($('pupil'));
-  requestAnimationFrame(pupilCiz);
 
   // Alanlar 3B modeli beklemez; sahne yüklenince lezyon yansıtılır
   hesapla();

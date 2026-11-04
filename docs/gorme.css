@@ -25,8 +25,6 @@
 .gy-chip { min-height: 34px; background: transparent; border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 13px; cursor: pointer; }
 .gy-chip:hover { border-color: var(--line-hi); color: var(--text); }
 .gy-chip.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 18%, transparent); }
-.gy-chip.dogru { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 25%, transparent); color: var(--text); }
-.gy-chip.yanlis { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 25%, transparent); color: var(--text); }
 @media (pointer: coarse) { .gy-chip { min-height: 44px; } }
 
 /* 3B sahne: tema ne olursa olsun koyu; lifler toplamalı karışımla parlar */
@@ -57,24 +55,20 @@
 .gy-dl dd { margin: 0; font-size: 13.5px; line-height: 1.5; }
 .gy-dl ul { margin: 0; padding-left: 16px; display: grid; gap: 2px; }
 
-.gy-ikili { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 16px; align-items: start; }
 #pupil { width: 100%; aspect-ratio: 2.3; display: block; border-radius: 12px; background: #0c0e13; }
-#v1 { width: 100%; aspect-ratio: 1.7; display: block; border-radius: 12px; background: #0c0e13; }
 .gy-rapd { margin: 0; padding: 8px 10px; border: 1px solid var(--line-hi); border-radius: 10px; background: var(--panel-2); font-size: 13px; line-height: 1.45; }
 
-.gy-sinav .satir-btn { display: flex; gap: 8px; flex-wrap: wrap; }
-.gy-sonuc { margin: 0; padding: 10px 12px; border: 1px solid var(--line-hi); border-radius: 10px; background: var(--panel-2); font-size: 13.5px; line-height: 1.5; }
-.gy-sonuc[hidden], .gy-sinav[hidden], .gy-bilgi[hidden] { display: none; }
-body.gy-sinavda .gy-secim .gy-duraklar, body.gy-sinavda .gy-secim #chipler, body.gy-sinavda #serbest, body.gy-sinavda #taraf, body.gy-sinavda .gy-boyut, body.gy-sinavda .gy-pupil, body.gy-sinavda #alan-baslik { visibility: hidden; display: none; }
+.gy-bilgi[hidden] { display: none; }
 
-@media (max-width: 980px) {
+@media (max-width: 700px) {
   .gy { grid-template-columns: 1fr; padding: 12px; }
-  .gy-sahne { position: static; order: 3; }
+  /* Telefonda 3B model lezyon seçiminin hemen altında küçük ve sabit durur; görme alanları altından kayar,
+     böylece lezyonun yeri ile görme alanındaki bozulma aynı anda görünür. */
+  .gy-sahne { position: sticky; top: calc(var(--nav-h, 52px) + 4px); z-index: 6; order: 1; padding: 8px; }
   .gy-sag { order: 2; }
-  .gy-kutu { height: 56vh; min-height: 300px; }
+  .gy-kutu { height: 28vh; min-height: 180px; }
 }
 @media (max-width: 640px) {
-  .gy-ikili { grid-template-columns: 1fr; }
   .gy-dl > div { grid-template-columns: 1fr; gap: 4px; }
   .gy-gozler { gap: 8px; }
   .gy-boyut { max-width: none; flex-basis: 100%; }
@@ -106,3 +100,20 @@ body.gy-sinavda .gy-secim .gy-duraklar, body.gy-sinavda .gy-secim #chipler, body
   .goz-olcu { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .goz-ikili { grid-template-columns: 1fr; }
 }
+
+/* Sadeleştirilmiş denetimler: Gelişmiş (lezyon boyutu, serbest lezyon) ve Görünüm (bakış yönü, katmanlar) açılır menüleri */
+.gy-etiket { font-size: 13px; color: var(--muted); }
+.gy-gelismis { margin-left: auto; position: relative; }
+.gy-gorunum { position: relative; }
+.gy-gelismis > summary, .gy-gorunum > summary { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; font-size: 13px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; background: var(--panel-2); }
+.gy-gelismis > summary::-webkit-details-marker, .gy-gorunum > summary::-webkit-details-marker { display: none; }
+.gy-gelismis > summary::after, .gy-gorunum > summary::after { content: "▾"; font-size: 11px; }
+.gy-gelismis[open] > summary, .gy-gorunum[open] > summary { color: var(--text); border-color: var(--accent); }
+.gy-gel-ic, .gy-gor-ic { position: absolute; z-index: 12; top: calc(100% + 6px); display: grid; gap: 10px; padding: 12px; min-width: 260px; background: var(--panel); border: 1px solid var(--line-hi); border-radius: 12px; box-shadow: 0 12px 32px -12px rgba(0, 0, 0, .5); }
+.gy-gel-ic { right: 0; }
+.gy-gor-ic { left: 0; }
+.gy-katman { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+@media (max-width: 700px) { .gy-gor-ic { min-width: min(300px, calc(100vw - 48px)); } }
+
+/* Pupilla sayfası: tek sütun */
+.gy.pup { grid-template-columns: minmax(0, 1fr); max-width: 860px; }

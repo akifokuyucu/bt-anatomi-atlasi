@@ -16,7 +16,7 @@ const CDN_YOL = [
 const ONYUKLE = [
   './', 'index.html', 'bt.html', 'bt.js', 'laparoskopi.html', 'laparoskopi.js', 'vaka-kart.js', 'atlaslar.html', 'gecis.js', 'home-3d.js', 'mpr.js', 'mpr.css', 'mesh-worker.js', 'araclar.html', 'form.html', 'form.js', 'form.css', 'formlar/index.json', 'formlar/vizit.json',
   'formlar/nobet.json', 'formlar/konsultasyon.json', 'tahlil.html', 'tahlil.js', 'tahlil.css', 'tahlil/parse.py',
-  'devir.html', 'devir.js', 'devir.css', 'sim.html', 'ekg.html', 'derivasyon.html', 'derivasyon.js', 'mi.html', 'mi.js', 'ekg.js', 'ekg-model.js', 'ekg-heart.js', 'sim.css', 'pano/simulasyon.json', 'data/heart/heart.glb', 'data/heart/heart.json', 'gorme.html', 'gorme.js', 'gorme-3d.js', 'gorme-model.js', 'gorme.css', 'gorme-goz.html', 'gorme-goz.js', 'data/optik/optik.glb', 'data/optik/optik.json', 'gizlilik.html', 'kaynaklar.html', 'style.css', 'home.css', 'home.js', 'premium.css', 'shell.css',
+  'devir.html', 'devir.js', 'devir.css', 'sim.html', 'ekg.html', 'derivasyon.html', 'derivasyon.js', 'mi.html', 'mi.js', 'ekg.js', 'ekg-model.js', 'ekg-heart.js', 'sim.css', 'pano/simulasyon.json', 'data/heart/heart.glb', 'data/heart/heart.json', 'gorme.html', 'gorme.js', 'gorme-3d.js', 'gorme-model.js', 'gorme.css', 'gorme-goz.html', 'gorme-goz.js', 'gorme-pupil.html', 'gorme-pupil.js', 'data/optik/optik.glb', 'data/optik/optik.json', 'gizlilik.html', 'kaynaklar.html', 'style.css', 'home.css', 'home.js', 'premium.css', 'shell.css',
   'shell.js', 'ui.js', 'search.js', 'araclar.js', 'manifest.webmanifest', 'pano/araclar.json', 'pano/pano.json',
 ];
 
