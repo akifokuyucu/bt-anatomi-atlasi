@@ -25,6 +25,7 @@ Gerçek bir abdomen-pelvis BT'si üzerinde Türkçe etiketli, tarayıcıda çal�
 | `docs/data/<vaka>/`, `docs/data/cases.json` | Vaka başına üretilmiş web verisi (vakalar `CASES` sözlüğünde, `build_atlas.py`): `ct.bin.gz` (int16 HU), `labels.bin.gz` ve `overlay.bin.gz` (uint8), `atlas.json` |
 | `scripts/build_atlas.py` | Atlas üretimi; Türkçe adlar, renkler ve sistemler `BASE` sözlüğünde, segment notları `LIVER_SEGMENTS`'te |
 | `scripts/fetch_dsad.py`, `scripts/build_lapa.py` | Kullanımda değil: kaldırılan DSAD kare atlasını üretirdi; çalıştırılırsa `lapa_cases.json`a rektum kaydını geri yazar |
+| `scripts/build_kapak.py`, `scripts/kapak_gercek.py` | BT ve laparoskopi kartlarının kapakları → `docs/img/kapak/`: hazır vakalar gerçek BT kesiti / video karesi + organ konturu (JPG, 4:3), veri olmayan (Hazırlanıyor) vakalar vektör çizim (SVG); vaka kimliği → dosya eşlemesi `docs/vaka-kart.js` içindeki `KAPAK` tablosunda. Yeni vaka eklenince hem betiğe çizim hem tabloya satır eklenir; tabloda olmayan vaka kendi `img` görseline döner |
 | `scripts/build_lapa_video.py` | Açık lisanslı videodan klip + SAM 2 kare kare izleme → `docs/data/lapav01/` (`video.mp4`, `video.json`, `poster.jpg`); istem noktaları `CASES[...]["prompts"]` |
 | `scripts/fetch_case.py` | TotalSegmentator veri setinden tek vaka indirir |
 | `data/segments/` | Karaciğer segment maskeleri (NIfTI) |
