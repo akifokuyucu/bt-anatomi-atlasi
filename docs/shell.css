@@ -287,6 +287,9 @@ body.focus .crumbbar { display: none; }
 .sf-links { display: flex; flex-wrap: wrap; gap: 2px 18px; }
 .sf-links a { display: inline-flex; align-items: center; min-height: 34px; color: var(--muted); text-decoration: none; }
 .sf-links a:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+.sf-imza { margin: 0; }
+.sf-imza a { display: inline-block; padding: 6px 0; color: inherit; text-underline-offset: 3px; }
+.sf-imza a:hover { color: var(--text); }
 body.focus .site-foot { display: none; }
 @media print { .site-foot { display: none; } }
 @media (max-width: 899px) { body:has(.dock) .site-foot { padding-bottom: 96px; } }

@@ -124,6 +124,7 @@
     const notlar = sayfaNotlari.map((f) => f.innerHTML.replace(tekrar, '').replace(/<p>\s*<\/p>/g, '').trim()).filter(Boolean);
     sayfaNotlari.forEach((f) => f.remove());
     const GH = 'https://github.com/akifokuyucu/bt-anatomi-atlasi';
+    const BLOG = 'https://ahmetin-blogu.akif-okuyucu.workers.dev'; // kişisel merkez; alan adı alınınca yalnızca burası değişir
     const baglantilar = [
       ['kaynaklar.html', 'Yararlanılan kaynaklar'],
       ['gizlilik.html', 'Gizlilik ve Kullanım Koşulları'],
@@ -140,7 +141,10 @@
         '<nav class="sf-links" aria-label="Site bilgileri">' +
           baglantilar.map(([href, ad, dis]) => `<a href="${href}"${dis ? ' target="_blank" rel="noopener"' : ''}>${ad}${dis ? ' ↗' : ''}</a>`).join('') +
         '</nav>' +
-      '</div>';
+      '</div>' +
+      '<p class="sf-imza">Dr. Ahmet Akif Okuyucu tarafından geliştirilmiştir · ' +
+        `<a href="${BLOG}/portfolyo/" target="_blank" rel="noopener">Geliştirici &amp; Portfolyo</a> · ` +
+        `<a href="${BLOG}/" target="_blank" rel="noopener">Yazılar</a></p>`;
     document.body.appendChild(foot);
   });
 
