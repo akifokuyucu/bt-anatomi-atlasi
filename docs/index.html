@@ -26,7 +26,6 @@
   <link rel="stylesheet" href="premium.css">
   <link rel="stylesheet" href="shell.css">
   <script>try{var t=localStorage.getItem("btatlas.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){};(function(){var p=location.pathname.split("/").pop(),b=/^(atlaslar|atlas|bt|laparoskopi|lapa|lapav)\.html$/.test(p)?"atlaslar":/^(sim|ekg|derivasyon|mi)\.html$/.test(p)?"simulasyon":/^(araclar|devir|tahlil|form)\.html$/.test(p)?"araclar":"";if(b)document.documentElement.dataset.bolum=b})()</script>
-  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
   <script src="shell.js" defer></script>
   <script src="ui.js" defer></script>
   <script>
@@ -48,14 +47,7 @@
         <p class="caption">ANATOMİ · FİZYOLOJİ · KLİNİK İŞ</p>
         <h1>Görüntü, fizyoloji ve günlük klinik işler tek yerde</h1>
         <p class="lead">Anatomiyi gerçek BT ve ameliyat görüntülerinde görün, fizyolojiyi simülasyonda deneyin, günlük notlarınızı araçlarla hazırlayın.</p>
-        <div class="cta">
-          <a class="btn accent big" href="bt.html">BT atlasını aç</a>
-          <a class="btn big" href="ekg.html">EKG'yi dene</a>
-        </div>
-        <p class="ipucu">Çalışmak istediğiniz konuyu seçin: BT, EKG, laparoskopi, görme yolları. Her konuda yapıya dokunup öğrenir, sınav modunda kendinizi test edersiniz.</p>
       </div>
-      <!-- Süs amaçlı 3B kalp ve noise halkası (home-3d.js); WebGL yoksa boş kalır -->
-      <div class="hero-3d" id="hero-3d" aria-hidden="true"></div>
     </section>
 
     <nav class="konular" aria-label="Konular">
@@ -96,6 +88,5 @@
   </main>
 
   <script type="module" src="home.js"></script>
-  <script type="module" src="home-3d.js"></script>
 </body>
 </html>
