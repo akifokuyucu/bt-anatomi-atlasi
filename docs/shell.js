@@ -54,7 +54,7 @@
   nav.innerHTML =
     '<div class="sitenav-in">' +
       '<a class="sn-brand" href="index.html" title="Klinik Atlas ana sayfa" aria-label="Klinik Atlas, ana sayfa">' +
-        '<span class="logo" aria-hidden="true">◐</span><span class="sn-ad">Klinik Atlas</span></a>' +
+        '<span class="logo" aria-hidden="true"></span><span class="sn-ad">Klinik Atlas</span></a>' +
       '<nav class="sn-links" aria-label="Ana menü">' +
         OGE.map(([id, ad, href]) =>
           `<a class="sn-link" href="${href}" data-sn="${id}"${konu === id ? ' aria-current="page"' : ''}>${IC_OGE[id]}<span>${ad}</span></a>`).join('') +
@@ -143,7 +143,7 @@
     const tekrar = /<b>Eğitim (?:amaçlıdır, tanı için kullanılamaz|ve çalışma kolaylığı içindir)\.?<\/b>\s*/g;
     const notlar = sayfaNotlari.map((f) => f.innerHTML.replace(tekrar, '').replace(/<p>\s*<\/p>/g, '').trim()).filter(Boolean);
     sayfaNotlari.forEach((f) => f.remove());
-    const GH = 'https://github.com/akifokuyucu/bt-anatomi-atlasi';
+    const GH = 'https://github.com/akifokuyucu/klinik-atlas';
     const BLOG = 'https://ahmetin-blogu.akif-okuyucu.workers.dev'; // kişisel merkez; alan adı alınınca yalnızca burası değişir
     const baglantilar = [
       ['kaynaklar.html', 'Yararlanılan kaynaklar'],

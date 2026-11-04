@@ -1,6 +1,6 @@
-# BT Anatomi Atlası
+# Klinik Atlas
 
-Gerçek bir abdomen-pelvis BT'si üzerinde Türkçe etiketli, tarayıcıda çalışan etkileşimli atlas. Canlı site GitHub Pages ile `main` dalının `docs/` klasöründen yayınlanır; `main`'e her push siteyi günceller.
+Türkçe etiketli BT ve laparoskopi anatomi atlası, EKG ve görme yolları simülasyonları ve günlük klinik araçlar; tarayıcıda çalışır. Canlı site GitHub Pages ile `main` dalının `docs/` klasöründen yayınlanır; `main`'e her push siteyi günceller.
 
 ## Dosya haritası
 

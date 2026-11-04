@@ -1,8 +1,8 @@
-# BT Anatomi Atlası (prototip)
+# Klinik Atlas
 
-Gerçek bir kontrastlı abdomen-pelvis BT'si üzerinde renkli organ maskeleri ve çizgili Türkçe etiketler gösteren, tarayıcıda çalışan etkileşimli atlas.
+Türkçe etiketli BT ve laparoskopi anatomi atlası, EKG ve görme yolları simülasyonları ve günlük klinik araçlar; asistan eğitimi için, tarayıcıda çalışır. Atlas, gerçek BT kesitleri üzerinde renkli organ maskeleri ve çizgili Türkçe etiketler gösterir.
 
-**Canlı site:** https://akifokuyucu.github.io/bt-anatomi-atlasi/
+**Canlı site:** https://akifokuyucu.github.io/klinik-atlas/
 
 Site GitHub Pages ile `main` dalının `docs/` klasöründen yayınlanır; `main`'e her push siteyi bir iki dakika içinde günceller.
 

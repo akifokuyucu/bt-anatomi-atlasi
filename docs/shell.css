@@ -10,7 +10,7 @@
 }
 .sitenav-in { max-width: 1180px; height: 100%; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 18px; }
 .sn-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; min-height: 44px; }
-.sn-brand .logo { font-size: 24px; line-height: 1; }
+.sn-brand .logo { width: 26px; height: 26px; }
 .sn-ad { font-family: var(--serif); font-weight: 600; font-size: 18px; letter-spacing: -.005em; }
 .sn-links { display: flex; gap: 4px; margin-left: 8px; }
 .sn-link {
