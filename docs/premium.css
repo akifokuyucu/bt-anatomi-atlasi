@@ -243,7 +243,7 @@ body.focus .panel {
   border-left: 1px solid var(--line); transform: translateX(105%); transition: transform .3s var(--ease);
 }
 body.focus.drawer .panel { transform: none; }
-body.focus .list { max-height: 40vh; }
+body.focus .list { max-height: 40vh; max-height: 40dvh; }
 
 .dock button {
   display: grid; justify-items: center; gap: 3px; background: none; border: 0; color: var(--muted);
@@ -264,8 +264,8 @@ body.focus .list { max-height: 40vh; }
     -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%);
     border-top: 1px solid rgba(255, 255, 255, .08);
   }
-  body:not(.focus) { padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
-  body.focus .panel { top: auto; left: 0; width: auto; height: 62vh; border-left: 0; border-top: 1px solid var(--line); border-radius: 18px 18px 0 0; transform: translateY(105%); padding-bottom: 90px; }
+  body:has(.dock):not(.focus) { padding-bottom: calc(70px + env(safe-area-inset-bottom)); } /* yalnızca atlas sayfası (dock var) */
+  body.focus .panel { top: auto; left: 0; width: auto; height: 62vh; height: 62dvh; border-left: 0; border-top: 1px solid var(--line); border-radius: 18px 18px 0 0; transform: translateY(105%); padding-bottom: 90px; }
   body.focus.drawer .panel { transform: none; }
 }
 body.focus .dock {

@@ -79,8 +79,8 @@ h1 { margin: 0; font-size: 16px; font-weight: 650; }
 .toggle input[type=checkbox] { accent-color: var(--accent); }
 .toggle.opacity input { width: 80px; accent-color: var(--accent); }
 
-.viewer { position: relative; height: min(68vh, 760px); min-height: 360px; background: #000; touch-action: none; user-select: none; }
-@media (max-width: 900px) { .viewer { height: 62vh; min-height: 240px; } }
+.viewer { position: relative; height: min(68vh, 760px); height: min(68svh, 760px); min-height: 360px; background: #000; touch-action: none; user-select: none; }
+@media (max-width: 900px) { .viewer { height: 62vh; height: 62svh; min-height: 240px; } }
 #canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: ns-resize; }
 .viewer.pan #canvas { cursor: grab; }
 
@@ -132,8 +132,8 @@ h1 { margin: 0; font-size: 16px; font-weight: 650; }
 .info .actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
 
 .search { width: 100%; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
-.list { max-height: 46vh; overflow-y: auto; display: grid; gap: 2px; scrollbar-width: thin; }
-@media (max-width: 900px) { .list { max-height: 50vh; } }
+.list { max-height: 46vh; max-height: 46svh; overflow-y: auto; display: grid; gap: 2px; scrollbar-width: thin; }
+@media (max-width: 900px) { .list { max-height: 50vh; max-height: 50svh; } }
 .group-title { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; color: var(--muted); margin: 8px 4px 2px; text-transform: uppercase; }
 .item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; border: 0; background: none; text-align: left; width: 100%; }
 .item:hover { background: var(--panel-2); }
@@ -160,7 +160,7 @@ a.brand:hover .logo { filter: brightness(1.2); }
   .topbar { flex-wrap: wrap; }
   .top-actions .lbl { display: none; }
   .top-actions .btn { padding: 7px 10px; }
-  .top-actions .select { max-width: 150px; }
+  .top-actions .select { flex: 1 1 100%; max-width: none; order: -1; } /* vaka seçici kesilmesin: kendi satırında tam genişlik */
 }
 
 /* Yapı ağacı */

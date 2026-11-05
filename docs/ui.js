@@ -23,6 +23,8 @@
     coronal: '<rect x="4" y="3" width="16" height="18" rx="4"/><path d="M12 3v18" opacity=".35"/>',
     sagittal: '<path d="M8 3c6 0 9 3 9 9s-3 9-9 9"/><path d="M8 3v18" opacity=".35"/>',
     chevron: '<path d="m9 6 6 6-6 6"/>',
+    back: '<path d="m15 18-6-6 6-6"/>',
+    sliders: '<path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/>',
     home: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   };
 

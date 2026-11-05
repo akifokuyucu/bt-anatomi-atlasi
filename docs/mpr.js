@@ -15,7 +15,7 @@ export function mprKur(api) {
   kok.hidden = true;
   const kesitHtml = (p) =>
     `<div class="mpr-pane" data-plane="${p}" style="--c:${RENK[p]}">` +
-    `<div class="mpr-ust"><b>${AD[p]}</b><span class="mono" data-bilgi></span></div>` +
+    `<div class="mpr-ust"><b>${AD[p]}</b><span class="mono" data-bilgi></span><span class="spacer"></span><button type="button" class="mpr-buyut" aria-label="${AD[p]} kesiti büyüt" aria-pressed="false">⤢</button></div>` +
     `<div class="mpr-sahne"><canvas aria-label="${AD[p]} kesit"></canvas><i class="mpr-cizgi v"></i><i class="mpr-cizgi h"></i></div>` +
     `<input type="range" class="mpr-surgu" min="0" max="0" value="0" aria-label="${AD[p]} kesit"></div>`;
   kok.innerHTML =
@@ -24,12 +24,26 @@ export function mprKur(api) {
     '<div class="mpr-izgara">' + PLANES.map(kesitHtml).join('') +
     '<div class="mpr-pane mpr-3b"><div class="mpr-ust"><b>3B</b><span class="mono" id="mpr3bBilgi"></span><span class="spacer"></span>' +
     '<div class="seg mini" id="mprGorunum" role="group" aria-label="3B bakış yönü">' +
-    ['on:Ön', 'arka:Arka', 'sag:Sağ', 'sol:Sol', 'ust:Üst', 'alt:Alt'].map((x) => `<button type="button" data-g="${x.split(':')[0]}">${x.split(':')[1]}</button>`).join('') + '</div></div>' +
+    ['on:Ön', 'arka:Arka', 'sag:Sağ', 'sol:Sol', 'ust:Üst', 'alt:Alt'].map((x) => `<button type="button" data-g="${x.split(':')[0]}">${x.split(':')[1]}</button>`).join('') + '</div><button type="button" class="mpr-3b-buyut" aria-label="3B görünümü büyüt" aria-pressed="false">⤢</button></div>' +
     '<div class="mpr-sahne mpr-3b-sahne" id="mpr3b"><div class="mpr-durum" id="mpr3bDurum"></div></div>' +
     '<div class="mpr-3b-alt"><label class="toggle"><input type="checkbox" id="mprDuzlem"> Kesit düzlemleri</label>' +
     '<button type="button" class="btn small" id="mpr3bOrtala">Ortala</button>' +
     '<button type="button" class="btn small accent" id="mpr3bYukle" hidden>3B\'yi yükle</button></div></div></div>';
   viewer.after(kok);
+
+  // Telefonda 2×2 ızgara: bir pencere tam genişliğe büyütülebilir (aynı anda yalnızca biri)
+  kok.addEventListener('click', (e) => {
+    const b = e.target.closest('.mpr-buyut, .mpr-3b-buyut');
+    if (!b) return;
+    const pane = b.closest('.mpr-pane');
+    const ac = !pane.classList.contains('buyuk');
+    kok.querySelectorAll('.mpr-pane').forEach((x) => {
+      x.classList.remove('buyuk');
+      x.querySelector('.mpr-buyut, .mpr-3b-buyut')?.setAttribute('aria-pressed', 'false');
+    });
+    if (ac) { pane.classList.add('buyuk'); b.setAttribute('aria-pressed', 'true'); }
+    pane.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  });
 
   const panes = {};
   for (const p of PLANES) {

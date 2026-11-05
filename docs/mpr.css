@@ -24,8 +24,35 @@
 
 @media (max-width: 899px) {
   .mpr-izgara { grid-template-columns: minmax(0, 1fr); }
-  .mpr-sahne { --maks: 52vh; }
+  .mpr-sahne { --maks: 52vh; --maks: 52svh; }
   .mpr-3b-sahne { min-height: 320px; width: 100%; }
   .mpr-3b-alt .btn { min-height: 40px; }
 }
 @media (pointer: coarse) { .seg.mini button { padding: 8px 10px; } }
+
+/* ---------- Telefon (body.tel): Üçlü + 3B 2×2 ızgara, bir pencere büyütülebilir ---------- */
+.mpr-buyut, .mpr-3b-buyut { display: none; }
+body.tel .mpr-buyut, body.tel .mpr-3b-buyut {
+  display: inline-grid; place-items: center; flex: none; width: 40px; height: 40px; margin: -6px -4px -6px 0;
+  background: none; border: 0; border-radius: 10px; color: var(--muted); font-size: 18px; cursor: pointer;
+}
+body.tel .mpr-buyut[aria-pressed="true"], body.tel .mpr-3b-buyut[aria-pressed="true"] { color: var(--accent); }
+body.tel .mpr-izgara { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+body.tel .mpr-sahne { --maks: 30svh; }
+body.tel .mpr-3b-sahne { min-height: 0; height: auto; width: 100%; aspect-ratio: 1; }
+body.tel .mpr-pane.buyuk { grid-column: 1 / -1; }
+body.tel .mpr-pane.buyuk .mpr-sahne:not(.mpr-3b-sahne) { --maks: 50svh; }
+body.tel .mpr-ust { flex-wrap: wrap; row-gap: 2px; padding: 4px 8px; }
+body.tel .mpr-ust .mono { font-size: 10px; }
+body.tel #mprGorunum { flex-wrap: wrap; width: 100%; }
+body.tel #mprGorunum button { flex: 1 1 30%; min-height: 34px; padding: 4px; }
+body.tel .mpr-bar { padding: 6px 10px; gap: 6px 12px; }
+body.tel .mpr-bar .muted { display: none; }
+body.tel .mpr-bar .selstrip:not([hidden]) { position: static; flex: 1 1 100%; z-index: auto; }
+body.tel .mpr-3b-alt { gap: 6px 10px; padding: 6px 8px; }
+@media (orientation: landscape) and (max-height: 500px) {
+  body.tel .mpr-izgara { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  body.tel .mpr-sahne { --maks: 42svh; }
+  body.tel .mpr-buyut, body.tel .mpr-3b-buyut { display: none; }
+  body.tel .mpr-3b-sahne { aspect-ratio: auto; height: 42svh; min-height: 0; }
+}

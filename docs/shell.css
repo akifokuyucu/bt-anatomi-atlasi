@@ -330,3 +330,155 @@ body.focus .site-foot { display: none; }
 /* Hazırlanıyor kartları: kapak siyah beyaz ve soluk, henüz oluşmadığı belli olsun */
 .case.planned img { filter: grayscale(1) contrast(.92) brightness(.9); opacity: .8; }
 .case.planned img.yuklendi { opacity: .8; }
+
+/* ---------- Atlas: telefonda dokunma hedefleri ve test modu ---------- */
+@media (pointer: coarse) {
+  .seg button { min-height: 40px; padding-left: 12px; padding-right: 12px; }
+  .btn.small { min-height: 40px; padding: 4px 12px; }
+  .btn.icon { width: 44px; height: 44px; flex: none; }
+  .toggle { min-height: 40px; gap: 8px; }
+  .toggle input[type=checkbox] { width: 22px; height: 22px; }
+  .toggle.opacity input[type=range] { min-height: 32px; }
+  .eye { width: 38px; height: 38px; }
+  .item, .grp > summary { min-height: 42px; }
+  .slice-bar input[type=range] { min-height: 32px; min-width: 0; }
+  .slice-bar { gap: 6px; }
+  #sliceInfo { min-width: 0; font-size: 11px; }
+}
+/* Test sırasında yapı listesi gizlenir: adlar cevabı ele vermesin (telefon) */
+@media (max-width: 900px) { body:has(#quiz:not([hidden])) .list-card { display: none; } }
+
+/* ---------- Atlas telefonda (body.tel): odak düzeni, Ayarlar paneli, seçili yapı şeridi ---------- */
+.geri, .sheet, .selstrip, .sheet-grip, .dock .dock-ayar { display: none; }
+body.tel .dock .dock-ayar { display: grid; }
+body.tel .geri { display: inline-flex; }
+body.tel #focusBtn { display: none; }
+body.tel .dock button { min-width: 50px; padding-left: 2px; padding-right: 2px; }
+body.tel .dock { max-width: calc(100vw - 8px); }
+
+body.tel .sheet {
+  display: grid; grid-template-rows: auto auto minmax(0, 1fr);
+  position: fixed; z-index: 45; left: 0; right: 0; bottom: 0; max-height: 56dvh;
+  padding-bottom: calc(86px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--bg) 95%, transparent);
+  -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+  border-top: 1px solid var(--line); border-radius: 18px 18px 0 0; box-shadow: 0 -20px 50px -30px #000;
+  transform: translateY(105%); visibility: hidden; transition: transform .3s var(--ease), visibility 0s .3s;
+}
+body.tel.ayar .sheet { transform: none; visibility: visible; transition: transform .3s var(--ease); }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 14px 8px; }
+.sheet-head > div { display: grid; min-width: 0; }
+.sheet-head b { font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sheet-body { overflow-y: auto; overscroll-behavior: contain; display: grid; gap: 4px; align-content: start; padding: 0 4px; }
+body.tel .sheet .top-actions { margin: 0; padding: 4px 10px 0; justify-content: flex-start; }
+body.tel .sheet .top-actions .btn.accent { display: none; }
+body.tel .sheet .top-actions .lbl { display: inline; }
+body.tel .sheet #planes { display: none; }
+body.focus.tel .sheet .toolbar { display: grid; border-bottom: 0; padding: 6px 10px 10px; }
+body.tel .sheet .chips { flex-wrap: wrap; overflow: visible; }
+
+.sheet-grip { position: relative; width: 100%; height: 28px; touch-action: none; cursor: grab; }
+.sheet-grip::before { content: ""; position: absolute; left: 50%; top: 10px; width: 40px; height: 4px; margin-left: -20px; border-radius: 4px; background: var(--line-hi, var(--muted)); opacity: .8; }
+body.tel .sheet > .sheet-grip { display: block; }
+@media (max-width: 900px) {
+  body.focus .panel > .panel-grip { display: block; position: sticky; top: -12px; z-index: 2; margin: -12px -12px 0; width: auto; background: color-mix(in srgb, var(--bg) 96%, transparent); }
+}
+
+body.tel .selstrip:not([hidden]) {
+  display: flex; align-items: center; gap: 10px; position: absolute; left: 10px; right: 10px; bottom: 26px; z-index: 3;
+  min-height: 48px; padding: 6px 12px; text-align: left; cursor: pointer; color: var(--text);
+  border: 1px solid var(--line-hi, var(--line)); border-radius: 14px;
+  background: color-mix(in srgb, var(--panel) 92%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.selstrip b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 600; }
+.selstrip .swatch { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+.selstrip .ayr { display: inline-flex; align-items: center; gap: 2px; color: var(--accent); font-size: 13px; font-weight: 600; }
+
+/* ---------- Atlas telefonda yatay (body.tel): dock sağ kenarda, paneller yandan açılır ---------- */
+@media (orientation: landscape) and (max-height: 500px) {
+  body.tel .dock {
+    left: auto; right: 6px; top: 50%; bottom: auto; transform: translateY(-50%);
+    flex-direction: column; width: auto; max-width: none; padding: 4px; border-radius: 16px;
+  }
+  body.tel .dock button { min-width: 56px; min-height: 44px; padding: 2px; font-size: 10px; }
+  body.focus.tel .viewer-wrap { padding: env(safe-area-inset-top) 70px calc(0px + env(safe-area-inset-bottom)) env(safe-area-inset-left); }
+  body.tel .viewer-head { flex-wrap: nowrap; gap: 8px; padding: 4px 10px; overflow: hidden; }
+  body.tel .viewer-head .toggle.opacity { display: none; }
+  body.tel .viewer-head .mono { display: none; } /* düzlem adı dock'ta zaten seçili */
+  body.tel .slice-bar { padding: 2px 10px; }
+  body.tel .quiz { padding: 6px 10px; gap: 6px; }
+  body.tel .quiz-options { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  body.tel .quiz-options button { padding: 6px 8px; font-size: 12px; }
+  body.tel .selstrip:not([hidden]) { bottom: 8px; }
+  body.tel .panel, body.tel .sheet {
+    top: 0; bottom: 0; left: auto; right: 70px; height: auto; max-height: none; width: min(400px, 55vw);
+    border-radius: 0; border-top: 0; border-left: 1px solid var(--line); padding-bottom: 12px;
+    transform: translateX(calc(100% + 80px));
+  }
+  body.tel .sheet { padding-bottom: 8px; }
+  body.tel .panel > .panel-grip, body.tel .sheet > .sheet-grip { display: none; }
+}
+
+/* Test başlığı: skor tek satırda, başlık kalan yeri alır */
+body.tel #quizScore { white-space: nowrap; }
+body.tel .quiz-head { gap: 8px; flex-wrap: wrap; }
+body.tel .quiz-head .caption { flex: 1 1 140px; min-width: 0; }
+body.baslangic .panel, body.baslangic .sheet, body.baslangic .dock { transition: none !important; }
+
+/* ---------- Telefon: dokunmada hover kalıntısı, ana sayfa ve alt bilgi ---------- */
+/* Dokunmatik cihazda hover yükselmesi dokunuştan sonra takılı kalır */
+@media (hover: none) {
+  .pano-kart:hover, .case:hover, .area:hover, .chip:hover, .btn:hover, .quiz-options button:hover:not(:disabled) { transform: none; }
+  .case:hover img { transform: none; }
+}
+
+@media (max-width: 640px) {
+  /* Alt bilgi: 44 px dokunma alanı, bağlantılar iki sütun */
+  .sf-links { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+  .sf-links a { min-height: 44px; }
+  .sf-imza a { display: inline-flex; align-items: center; min-height: 44px; padding: 0; }
+  .sf-imza { display: flex; flex-wrap: wrap; align-items: center; gap: 0 6px; }
+
+  /* Okunurluk: en küçük yazılar 12 px */
+  .caption, .badge, .badge.new, .mini, .pano-alt .muted { font-size: 12px; }
+  .konu-say { font-size: 13px; }
+
+  /* Açılış animasyonu telefonda kısa: içerik beklemeden görünsün */
+  .hero-text > * { animation-duration: .3s; animation-delay: 0s !important; }
+
+  /* Ana sayfa: menüde yalnızca marka, arama, tema (konular zaten kartlarda) */
+  body:has(.konu-izgara) .sn-links { display: none; }
+  body:has(.konu-izgara) .sn-ad { display: inline; }
+  body:has(.konu-izgara) .sn-actions { margin-left: auto; }
+
+  /* Ana sayfa: kısa başlık bloğu */
+  .hero.portal .caption { display: none; }
+  .hero.portal .lead { font-size: 14px; margin: 0; }
+  .konular { padding-bottom: 20px; }
+  .konular-bas { font-size: 18px; margin-bottom: 10px; }
+
+  /* Konu kartları: başlık · sayı · ok tek satırda, açıklama en çok 2 satır */
+  .konu-izgara { gap: 10px; }
+  .konu {
+    display: grid; grid-template-columns: 1fr auto auto; grid-template-areas: "t s a" "d d d";
+    align-items: center; gap: 2px 10px; min-height: 0; padding: 12px 14px 12px;
+  }
+  .konu b { grid-area: t; font-size: 20px; }
+  .konu b::after { content: none; }
+  .konu::after { content: "→"; grid-area: a; color: var(--c); font-size: 18px; }
+  .konu-say { grid-area: s; margin: 0; padding: 0; white-space: nowrap; }
+  .konu .muted {
+    grid-area: d; font-size: 13px; line-height: 1.4;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+
+  /* Son eklenenler: yatay kaydırmalı kartlar, sonraki kartın kenarı görünür */
+  #yenilikler { padding: 22px 0; }
+  .pano {
+    display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    margin: 0 -16px; padding: 0 16px 6px; scroll-padding-left: 16px; overscroll-behavior-x: contain;
+  }
+  .pano::-webkit-scrollbar { display: none; }
+  .pano-kart { flex: 0 0 82%; scroll-snap-align: start; }
+  .pano-alt .btn { min-height: 44px; display: inline-flex; align-items: center; }
+}

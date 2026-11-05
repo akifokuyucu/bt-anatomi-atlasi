@@ -267,6 +267,15 @@ async function copyLink() {
   const v = sliderToSlice(state.plane, state.slices[state.plane]);
   const text = `${st ? `${nm(st)} · ` : ''}${PLANE_TR[state.plane]} ${v + 1}/${n} — Klinik Atlas\n${location.href}`;
   const btn = $('shareBtn');
+  // Dokunmatik cihazda işletim sisteminin paylaşım menüsü; iptal edilirse sessizce çık
+  if (matchMedia('(pointer: coarse)').matches && navigator.share) {
+    try {
+      await navigator.share({ title: 'Klinik Atlas', text: text.split('\n')[0], url: location.href });
+      return;
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+    }
+  }
   try {
     await navigator.clipboard.writeText(text);
     btn.innerHTML = UI.icon('check') + '<span class="lbl"> Kopyalandı</span>';
@@ -583,7 +592,8 @@ function drawLabels(L) {
   })).filter((p) => p.x > -20 && p.x < L.cw + 20 && p.y > -20 && p.y < L.ch + 20);
 
   const mid = L.x0 + L.dw / 2;
-  const maxN = Math.max(1, Math.floor((L.ch - 16) / lh));
+  // Telefonda her yanda en çok 4 etiket (seçili yapı önce); adların tamamı seçili yapı şeridinde
+  const maxN = Math.min(document.body.classList.contains('tel') ? 4 : 99, Math.max(1, Math.floor((L.ch - 16) / lh)));
   const colW = Math.max(60, L.gutter - 14);
   const sides = [
     { pts: pts.filter((p) => p.x < mid), left: true },
@@ -990,6 +1000,7 @@ function bindEvents() {
   const pointers = new Map();
   let drag = null;
   let pinch = null;
+  let sonDokunus = null;
   let wheelAcc = 0;
 
   const rel = (e) => {
@@ -1005,7 +1016,7 @@ function bindEvents() {
       drag = { x0: x, y0: y, x, y, acc: 0, moved: false };
     } else if (pointers.size === 2) {
       const [a, b] = [...pointers.values()];
-      pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) };
+      pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), mx: (a[0] + b[0]) / 2, my: (a[1] + b[1]) / 2 };
       drag = null;
     }
   });
@@ -1016,8 +1027,15 @@ function bindEvents() {
     if (pinch && pointers.size === 2) {
       const [a, b] = [...pointers.values()];
       const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
-      zoomAt(d / pinch.d, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
+      const mx = (a[0] + b[0]) / 2;
+      const my = (a[1] + b[1]) / 2;
+      // İki parmak hem yakınlaştırır hem görüntüyü taşır (Taşı aracına gerek kalmaz)
+      state.pan[0] += mx - pinch.mx;
+      state.pan[1] += my - pinch.my;
+      zoomAt(d / pinch.d, mx, my);
       pinch.d = d;
+      pinch.mx = mx;
+      pinch.my = my;
       return;
     }
     if (drag) {
@@ -1048,7 +1066,18 @@ function bindEvents() {
   const end = (e) => {
     pointers.delete(e.pointerId);
     if (pointers.size < 2) pinch = null;
-    if (drag && !drag.moved && e.type === 'pointerup') clickAt(drag.x, drag.y);
+    if (drag && !drag.moved && e.type === 'pointerup') {
+      // Çift dokunma (parmak/kalem): yakınlaşmışsa sığdır, değilse dokunulan noktaya 2,5× yakınlaş
+      const t = performance.now();
+      if (e.pointerType !== 'mouse' && sonDokunus && t - sonDokunus.t < 320 && Math.hypot(drag.x - sonDokunus.x, drag.y - sonDokunus.y) < 30) {
+        sonDokunus = null;
+        if (state.zoom > 1.05) { state.zoom = 1; state.pan = [0, 0]; draw(); updateSliceInfo(); }
+        else zoomAt(2.5, drag.x, drag.y);
+      } else {
+        sonDokunus = { t, x: drag.x, y: drag.y };
+        clickAt(drag.x, drag.y);
+      }
+    }
     drag = null;
   };
   canvas.addEventListener('pointerup', end);
@@ -1165,6 +1194,7 @@ function lookalikes(s, pool) {
 function quizStart(exam = false) {
   state.quiz = { score: 0, total: 0, exam, wrong: [] };
   state.selected = 0;
+  document.body.classList.remove('drawer'); // telefonda odak modu çekmecesi şıkların üstünde kalmasın
   $('quiz').hidden = false;
   $('quizBtn').innerHTML = UI.icon('x') + '<span class="lbl"> Testi bitir</span>';
   quizNew();
@@ -1174,7 +1204,17 @@ function quizExit() {
   state.quiz = null;
   $('quiz').hidden = true;
   $('quizBtn').innerHTML = UI.icon('target') + '<span class="lbl"> Kendini test et</span>';
+  if (document.body.classList.contains('tel')) { state.zoom = 1; state.pan = [0, 0]; }
   render();
+}
+
+// Hedef yapının kesitteki çapa noktasını ekranın ortasına alıp 2,2× yakınlaştırır
+function quizYakinlas(target) {
+  const e = (atlas.anchors[state.plane][state.slices[state.plane]] || []).find(([id]) => id === target.id);
+  if (!e) { state.zoom = 1; return; }
+  state.zoom = 2.2;
+  const L = layout();
+  state.pan = [L.dw / 2 - (e[1] + 0.5) * L.ku, L.dh / 2 - (e[2] + 0.5) * L.kv];
 }
 
 function quizNew() {
@@ -1201,6 +1241,7 @@ function quizNew() {
   const b = Math.max(a + 1, Math.ceil(slices.length * 0.75));
   state.slices[state.plane] = pick(slices.slice(a, b));
   state.pan = [0, 0];
+  if (document.body.classList.contains('tel')) quizYakinlas(target); // telefonda küçük yapı görünsün
 
   const same = shuffle(pool.filter((s) => s.id !== target.id && s.system === target.system));
   const other = shuffle(pool.filter((s) => s.id !== target.id && s.system !== target.system));
