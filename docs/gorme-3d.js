@@ -13,11 +13,12 @@ const GORUNUM = {
 export const KADRAN = { su: '#ffb347', sa: '#ff5f7e', lu: '#3fd6ff', la: '#8f8bff' };
 export const kadranRenk = (x, y) => (x >= 0 ? (y >= 0 ? KADRAN.su : KADRAN.sa) : (y >= 0 ? KADRAN.lu : KADRAN.la));
 
+// Sıra önceliktir: ekranda üst üste binen etiketlerden sonra gelen gizlenir
 const ETIKETLER = [
-  ['Sol göz', [29, -166, 1518]], ['Sağ göz', [-30, -166, 1518]],
-  ['Optik sinir', [17, -128, 1527]], ['Kiazma', [0, -105, 1544]], ['Hipofiz', [0, -106, 1524]],
-  ['Optik traktus', [-24, -91, 1541]], ['LGN', [24, -74, 1540]],
-  ['Meyer halkası', [40, -100, 1529]], ['Optik radyasyon', [-34, -40, 1552]], ['V1', [8, -12, 1556], 'v1'],
+  ['Sol göz', [29, -166, 1518]], ['Sağ göz', [-30, -166, 1518]], ['Kiazma', [0, -105, 1544]],
+  ['LGN', [24, -74, 1540]], ['V1', [8, -12, 1556], 'v1'], ['Optik traktus', [-24, -91, 1541]],
+  ['Optik radyasyon', [-34, -40, 1552]], ['Optik sinir', [17, -128, 1527]],
+  ['Meyer halkası', [40, -100, 1529]], ['Hipofiz', [0, -106, 1524]],
 ];
 
 export async function gormeSahnesi(kutu, etiketKutu, model) {
@@ -261,11 +262,17 @@ export async function gormeSahnesi(kutu, etiketKutu, model) {
   let etiketAcik = true;
   const gecici = new THREE.Vector3();
   function etiketCiz(w, h) {
+    const konan = [];
     for (const e of etiketler) {
       if (!etiketAcik) { e.d.style.display = 'none'; continue; }
       gecici.copy(e.v).project(cam);
+      const x = (gecici.x * 0.5 + 0.5) * w, y = (-gecici.y * 0.5 + 0.5) * h;
       e.d.style.display = '';
-      e.d.style.transform = `translate(-50%,-50%) translate(${(gecici.x * 0.5 + 0.5) * w}px,${(-gecici.y * 0.5 + 0.5) * h}px)`;
+      if (!e.g) { e.g = e.d.offsetWidth; e.y = e.d.offsetHeight; } // boyut bir kez ölçülür
+      const k = [x - e.g / 2 - 2, y - e.y / 2 - 1, x + e.g / 2 + 2, y + e.y / 2 + 1];
+      if (konan.some((o) => k[0] < o[2] && k[2] > o[0] && k[1] < o[3] && k[3] > o[1])) { e.d.style.display = 'none'; continue; }
+      konan.push(k);
+      e.d.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px)`;
     }
   }
 

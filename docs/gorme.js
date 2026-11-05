@@ -10,7 +10,11 @@ const yan = (h) => (h > 0 ? 'sol' : 'sağ');
 const buyuk = (t) => t.charAt(0).toLocaleUpperCase('tr') + t.slice(1);
 const metin = (t, h) => buyuk(String(t).replaceAll('{L}', yan(h)).replaceAll('{K}', yan(-h)));
 
-const durum = { p: 'normal', t: 1, k: 1, serbest: null, yerlestir: false, sahne: 'yol', kapsam: 90, durak: 'normal' };
+const durum = { p: 'normal', t: 1, k: 1, serbest: null, yerlestir: false, sahne: 'perimetri', kapsam: 30, sahneElle: false, durak: 'normal' };
+// Defekti 30° dışında kalan patolojiler: perimetri kendiliğinden geniş açılır (kullanıcı sahne seçmediyse)
+const GENIS = new Set(['rp', 'rd', 'hilal']);
+// Lezyonun yaptığı kayıp koyu bordo; doğal alan sınırı ve kör nokta siyah kalır, ikisi karışmasın
+const KAYIP = [70, 18, 30], SINIR = [11, 13, 18];
 let model, sahne3b = null, sonuc = null, kureler = [], alanFn = null;
 
 // --- Sahneler: 180°×135° dünya tuvali (8 px/°) ---------------------------------------
@@ -77,7 +81,7 @@ function dunyaCiz(ad) {
     g.fillStyle = '#fff'; g.font = 'bold 26px Inter, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('50', ox - W * .29 + 4, ufuk + H * .02);
   } else if (ad === 'okuma') {
     g.fillStyle = '#f5f1e8'; g.fillRect(0, 0, W, H);
-    const yazi = 'Görme yolları retinada başlar. Nazal retinadan gelen lifler kiazmada çaprazlaşır, temporal retinadan gelenler aynı tarafta kalır. Böylece sağdaki her şey sol yarıküreye, soldaki her şey sağ yarıküreye taşınır. Sağ homonim hemianopide okunmakta olan kelimenin devamı görünmez, bu yüzden hasta satırı ağır ağır, tek tek heceleyerek izler. Sol hemianopide ise bir sonraki satırın başını bulmak zorlaşır. Merkezi saptayan bir skotomda harfler kaybolur ama sayfanın kenarları seçilebilir. '.repeat(14);
+    const yazi = 'Görme yolları retinada başlar. Nazal retinadan gelen lifler kiazmada çaprazlaşır, temporal retinadan gelenler aynı tarafta kalır. Böylece sağdaki her şey sol yarıküreye, soldaki her şey sağ yarıküreye taşınır. Sağ homonim hemianopide okunmakta olan kelimenin devamı görünmez, bu yüzden hasta satırı ağır ağır, tek tek heceleyerek izler. Sol hemianopide ise bir sonraki satırın başını bulmak zorlaşır. Merkezi tutan bir skotomda harfler kaybolur ama sayfanın kenarları seçilebilir. '.repeat(14);
     g.fillStyle = '#20242a'; g.font = '500 19px Georgia, serif'; g.textBaseline = 'top'; g.textAlign = 'left';
     const kel = yazi.split(' ');
     let x = 26, y = 20;
@@ -140,8 +144,9 @@ function alanCiz(c, g) {
         if (E > sin) a = 1; else a = Math.max(0, 1 - (sin - E) / 2.5);
         const kn = korNokta(e, x, y);
         if (kn < 1) a = Math.max(a, 1 - Math.max(0, kn - 0.7) / 0.3);
-        if (sonuc) a = Math.max(a, model.hasarOku(sonuc.D, g, x, y));
-        v[q] = 11; v[q + 1] = 13; v[q + 2] = 18; v[q + 3] = a * 248;
+        const d = sonuc ? Math.min(1, model.hasarOku(sonuc.D, g, x, y) * 1.4) : 0;
+        const r = d > a ? KAYIP : SINIR;
+        v[q] = r[0]; v[q + 1] = r[1]; v[q + 2] = r[2]; v[q + 3] = Math.max(a, d) * 248;
       }
     }
     katG.putImageData(katV, 0, 0);
@@ -201,6 +206,7 @@ function alanCiz(c, g) {
 }
 
 function birlesikCiz() {
+  if (!$('birlesik').open) return; // kapalıyken tuvalin boyutu yok
   const c = $('alan-iki');
   const { w, h } = olc(c);
   const ctx = c.getContext('2d');
@@ -217,17 +223,18 @@ function birlesikCiz() {
     for (let i = 0; i < NX; i++) {
       const x = ((i + .5) / NX * 2 - 1) * 90, y = (1 - (j + .5) / NY * 2) * (90 * NY / NX);
       const E = Math.hypot(x, y);
-      let en = 1;
+      let en = 1, kayip = false;
       for (const [g, e] of [[0, 1], [1, -1]]) {
         const sin = alanSiniri(e, x, y);
         const dis = E > sin ? 1 : Math.max(0, 1 - (sin - E) / 3);
         const kn = korNokta(e, x, y);
         const kor = kn < 1 ? 1 : 0;
-        const d = sonuc ? model.hasarOku(sonuc.D, g, x, y) : 0;
-        en = Math.min(en, Math.max(dis, kor, d));
+        const d = sonuc ? Math.min(1, model.hasarOku(sonuc.D, g, x, y) * 1.4) : 0;
+        const t = Math.max(dis, kor, d);
+        if (t < en) { en = t; kayip = d > Math.max(dis, kor); }
       }
-      const q = 4 * (j * NX + i);
-      v[q] = 11; v[q + 1] = 13; v[q + 2] = 18; v[q + 3] = en * 248;
+      const q = 4 * (j * NX + i), r = kayip ? KAYIP : SINIR;
+      v[q] = r[0]; v[q + 1] = r[1]; v[q + 2] = r[2]; v[q + 3] = en * 248;
     }
   }
   kg.putImageData(im, 0, 0);
@@ -240,6 +247,7 @@ function birlesikCiz() {
 function patoloji(id) { return PATOLOJI.find((p) => p.id === id); }
 
 function hesapla() {
+  kapsamAyarla();
   const p = patoloji(durum.p);
   kureler = []; alanFn = null;
   if (durum.serbest) kureler = [[...durum.serbest, 4.5 * durum.k]];
@@ -262,6 +270,9 @@ function ciz() {
     alanCiz($('alan-sol'), 0);
     alanCiz($('alan-sag'), 1);
     birlesikCiz();
+    $('alan-lejant').innerHTML = durum.sahne === 'perimetri'
+      ? '<span><i class="lj-kayip-p"></i>Koyu kare: görülmeyen nokta</span><span><i class="lj-normal-p"></i>Açık kare: normal</span>' + (durum.kapsam === 30 ? '<span>Merkez 30°; periferik defekt için geniş perimetriyi seçin</span>' : '')
+      : '<span><i class="lj-kayip"></i>Lezyonun yaptığı kayıp</span><span><i class="lj-sinir"></i>Normal alan sınırı ve kör nokta</span>';
   });
 }
 
@@ -272,8 +283,9 @@ function bilgi() {
   $('boyut').closest('.gy-boyut').classList.toggle('kapali', $('boyut').disabled);
   $('v-boyut').textContent = serbest ? `${(4.5 * durum.k).toFixed(1)} mm` : `${Math.round(durum.k * 100)}%`;
   const tarafAnlamli = !serbest && p.tek;
-  $('taraf').style.opacity = tarafAnlamli ? '' : '.4';
+  $('taraf').hidden = !tarafAnlamli;
   $('taraf').querySelectorAll('button').forEach((b) => { b.disabled = !tarafAnlamli; b.classList.toggle('on', +b.dataset.t === durum.t); });
+  $('taraf-not').textContent = tarafNotu(p, serbest);
   const ad = serbest ? 'Serbest lezyon' : p.ad;
   $('alan-baslik').textContent = serbest ? serbestOzet() : metin(p.alan_ad, durum.t);
   $('b-yer').textContent = serbest ? 'SİZ YERLEŞTİRDİNİZ' : p.evre === 'normal' ? 'REFERANS' : EVRE_AD[p.evre].toLocaleUpperCase('tr');
@@ -288,6 +300,25 @@ function bilgi() {
   $('b-eslik-k').hidden = serbest || !p.eslik;
   $('b-goruntu').textContent = serbest ? '' : p.goruntu || '';
   $('b-goruntu-k').hidden = serbest || !p.goruntu;
+}
+
+// Taraf seçiminin anlamı: lezyon nerede, defekt hangi yanda
+function tarafNotu(p, serbest) {
+  if (serbest) return 'Serbest lezyonda taraf, konduğu yerden belirlenir';
+  if (p.evre === 'normal') return 'Lezyon yok';
+  if (!p.tek) return 'İki taraflı tutulum';
+  const L = yan(durum.t), K = yan(-durum.t);
+  if (p.evre === 'retina' || p.evre === 'sinir') return `→ ${L} gözde defekt`;
+  if (p.evre === 'kiazma') return `→ ${L} gözde kayıp, ${K} gözde üst temporal defekt`;
+  if (p.id === 'hilal') return `→ ${L} yarıküre, ${K} gözün temporal hilali`;
+  return `→ ${L} yarıküre, defekt ${K} alanda`;
+}
+
+// Defekt 30° dışındaysa perimetri geniş açılır
+function kapsamAyarla() {
+  if (durum.sahneElle || durum.sahne !== 'perimetri') return;
+  durum.kapsam = GENIS.has(durum.p) && !durum.serbest ? 90 : 30;
+  $('sahne-sec').value = `perimetri:${durum.kapsam}`;
 }
 
 // Serbest lezyonun defektine ad verir: hangi gözde hangi bölge kayıp
@@ -332,6 +363,7 @@ function baglantidanOku() {
   const p = q.get('p');
   if (q.has('t')) durum.t = +q.get('t') < 0 ? -1 : 1;
   if (q.has('k')) durum.k = Math.min(1.6, Math.max(.5, +q.get('k') || 1));
+  durum.serbest = null;
   if (p === 'serbest' && q.has('x')) { durum.serbest = [+q.get('x'), +q.get('y'), +q.get('z')]; durum.p = 'normal'; $('gelismis').open = true; }
   else if (patoloji(p)) durum.p = p;
   durum.durak = patoloji(durum.p).evre;
@@ -443,9 +475,12 @@ async function basla() {
   segKur('taraf', 't', (v) => { durum.t = +v; hesapla(); });
   $('sahne-sec').addEventListener('change', (e) => {
     const [sahne, kapsam] = e.target.value.split(':');
-    durum.sahne = sahne; durum.kapsam = +kapsam;
+    durum.sahne = sahne; durum.kapsam = +kapsam; durum.sahneElle = true;
     ciz();
   });
+  $('birlesik').addEventListener('toggle', () => ciz());
+  // Bağlantı elle değişince (geri tuşu, paylaşılan bağlantı) sayfa güncellenir
+  window.addEventListener('hashchange', () => { baglantidanOku(); secimCiz(); hesapla(); });
   segKur('gorunum', 'g', (v) => sahne3b?.gorunum(v));
   $('boyut').addEventListener('input', () => { durum.k = +$('boyut').value; hesapla(); });
   $('serbest').addEventListener('click', () => yerlestirmeModu(!durum.yerlestir));

@@ -36,6 +36,7 @@
           <button type="button" data-t="1" class="on">Sol</button>
           <button type="button" data-t="-1">Sağ</button>
         </div>
+        <span class="gy-taraf-not" id="taraf-not" aria-live="polite"></span>
         <details class="gy-gelismis" id="gelismis">
           <summary>Gelişmiş</summary>
           <div class="gy-gel-ic">
@@ -85,11 +86,12 @@
           <h2 id="alan-baslik">Normal görme alanı</h2>
           <label class="alan">Sahne
             <select id="sahne-sec" class="select" aria-label="Görülen sahne ve kapsam">
+              <option value="perimetri:30">Perimetri · merkez (30°)</option>
+              <option value="perimetri:90">Perimetri · geniş (90°)</option>
               <option value="yol:90">Yol · geniş (90°)</option>
               <option value="yol:30">Yol · merkez (30°)</option>
               <option value="okuma:30">Okuma · merkez</option>
               <option value="amsler:30">Amsler ızgarası</option>
-              <option value="perimetri:30">Perimetri çıktısı</option>
             </select>
           </label>
         </div>
@@ -97,11 +99,15 @@
           <figure><canvas id="alan-sol" aria-label="Sol göz görme alanı"></canvas><figcaption><b>Sol göz</b> · OS</figcaption></figure>
           <figure><canvas id="alan-sag" aria-label="Sağ göz görme alanı"></canvas><figcaption><b>Sağ göz</b> · OD</figcaption></figure>
         </div>
+        <p class="gy-lejant" id="alan-lejant"></p>
         <p class="muted not" id="alan-bilgi">Alanda bir noktaya dokunun: o noktayı taşıyan lifler 3B sahnede parlar.</p>
-        <figure class="gy-birlesik">
-          <canvas id="alan-iki" aria-label="İki gözle birleşik görüş"></canvas>
-          <figcaption><b>Hastanın iki gözle gördüğü</b> · Bir nokta ancak iki gözde de kayıpsa kaybolur</figcaption>
-        </figure>
+        <details class="gy-birlesik" id="birlesik">
+          <summary>Hastanın iki gözle gördüğü</summary>
+          <figure>
+            <canvas id="alan-iki" aria-label="İki gözle birleşik görüş"></canvas>
+            <figcaption>Bir nokta ancak iki gözde de kayıpsa kaybolur</figcaption>
+          </figure>
+        </details>
       </section>
 
       <section class="card gy-bilgi" id="bilgi">
