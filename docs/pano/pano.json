@@ -30,16 +30,6 @@
     "branslar": ["Kardiyoloji", "Acil"]
   },
   {
-    "id": "klinik-araclar",
-    "tur": "duyuru",
-    "baslik": "Tahlil Takibi ve klinik formlar",
-    "ozet": "Tahlil PDF'lerini tarayıcıda yıl yıl grafikleyin; vizit, nöbet devri ve konsültasyon notlarını hazırlayın.",
-    "url": "araclar.html",
-    "kaynak": "Klinik Atlas",
-    "tarih": "2026-10-28",
-    "branslar": ["Klinik"]
-  },
-  {
     "id": "pano-lapa-video",
     "tur": "duyuru",
     "baslik": "Laparoskopi video modu yayında",

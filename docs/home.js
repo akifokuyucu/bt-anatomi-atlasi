@@ -13,7 +13,7 @@ async function sayilariYaz() {
     yaz('lapa', `${hazir(lap)} ameliyat`);
     yaz('ekg', `${modul('EKG')} bölüm`);
     yaz('gorme', `${modul('Görme')} bölüm`);
-    yaz('araclar', `${araclar.length} araç`);
+    { const h = araclar.filter((t) => t.durum !== 'yakinda').length; yaz('araclar', h ? `${h} araç` : 'Yakında'); }
   } catch { /* sayılar olmadan da kartlar çalışır */ }
 }
 

@@ -1,5 +1,15 @@
 [
   {
+    "ad": "Hasta Veri Seti Oluşturma",
+    "grup": "Bilimsel çalışma",
+    "aciklama": "Bilimsel çalışmalarda kullanmak için kendi hasta veri setinizi kolayca oluşturup takip edebileceğiniz açık kaynak bir sistem.",
+    "branslar": [
+      "Araştırma"
+    ],
+    "url": "araclar.html",
+    "durum": "yakinda"
+  },
+  {
     "ad": "Vizit / Günlük Hasta Notu",
     "grup": "Hasta notları",
     "aciklama": "SOAP, sistem sistem ya da kısa not düzeninde vizit notu; yazdır, PDF al ya da panoya kopyala.",
@@ -7,7 +17,7 @@
       "Klinik"
     ],
     "url": "form.html#f=vizit",
-    "durum": "beta"
+    "durum": "yakinda"
   },
   {
     "ad": "Konsültasyon İstem Formu",
@@ -17,7 +27,7 @@
       "Klinik"
     ],
     "url": "form.html#f=konsultasyon",
-    "durum": "beta"
+    "durum": "yakinda"
   },
   {
     "ad": "Yazdırılabilir Devir Listesi",
@@ -27,7 +37,7 @@
       "Klinik"
     ],
     "url": "devir.html",
-    "durum": "yayinda"
+    "durum": "yakinda"
   },
   {
     "ad": "Nöbet Devir Notu",
@@ -37,7 +47,7 @@
       "Klinik"
     ],
     "url": "form.html#f=nobet",
-    "durum": "beta"
+    "durum": "yakinda"
   },
   {
     "ad": "Tahlil Takibi",
@@ -47,6 +57,6 @@
       "Klinik"
     ],
     "url": "tahlil.html",
-    "durum": "beta"
+    "durum": "yakinda"
   }
 ]

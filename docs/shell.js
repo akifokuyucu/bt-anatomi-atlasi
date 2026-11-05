@@ -37,7 +37,7 @@
     { id: 'lapa', ad: 'Laparoskopi', href: 'laparoskopi.html', ozet: 'Ameliyat adıyla kayıtlı laparoskopik ve robotik görüntülerde anatomi; video modu.' },
     { id: 'ekg', ad: 'EKG', href: 'ekg.html', ozet: '3B kalpte uyarı iletimi, 12 derivasyon ve miyokard infarktüsü; parametreyi değiştirin.' },
     { id: 'gorme', ad: 'Görme', href: 'gorme.html', ozet: 'Lezyonu yerleştirin; görme alanı hesaplanır; pupilla testi ve göz hastalıklarında görüntü ayrı sekmelerde.' },
-    { id: 'araclar', ad: 'Araçlar', href: 'araclar.html', ozet: 'Vizit notu, devir listesi, tahlil takibi: günlük klinik iş için küçük yardımcılar.' },
+    { id: 'araclar', ad: 'Araçlar', href: 'araclar.html', ozet: 'Hasta veri seti, vizit notu, devir listesi, tahlil takibi: yakında.' },
   ];
   window.KONU_LISTESI = KONU_LISTESI;
   const OGE = KONU_LISTESI.map((k) => [k.id, k.ad, k.href]);
